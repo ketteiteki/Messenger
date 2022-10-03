@@ -17,23 +17,45 @@ public class EntityHelper
 			passwordSalt: "fgtrhwjmvcx");
 	}
 	
-	public static User CreateUserKhachatur()
+	public static User CreateUserAlice()
 	{
 		return new User(
-			displayName: "Khachatur",
-			nickName: "Khachatur",
+			displayName: "Alice",
+			nickName: "Alice",
 			bio: "qwerty",
 			avatarLink: null,
 			passwordHash: "weudydsggdfu",
 			passwordSalt: "fgtrhwjmvcxgfkl");
 	}
+	
+	public static User CreateUserBob()
+	{
+		return new User(
+			displayName: "Bob",
+			nickName: "Bob123",
+			bio: "qwerty",
+			avatarLink: null,
+			passwordHash: "kgjfdlgd",
+			passwordSalt: "rwievcj");
+	}
 	//create chat
 	public static Chat CreateChannel(Guid ownerId, string name, string title)
 	{
 		return new Chat(
-			name: "convers",
-			title: "21ths den",
+			name: name,
+			title: title,
 			type: ChatType.Channel,
+			ownerId: ownerId,
+			avatarLink: null,
+			lastMessageId: null);
+	}
+	
+	public static Chat CreateConversation(Guid ownerId, string name, string title)
+	{
+		return new Chat(
+			name: name,
+			title: title,
+			type: ChatType.Сonversation,
 			ownerId: ownerId,
 			avatarLink: null,
 			lastMessageId: null);
