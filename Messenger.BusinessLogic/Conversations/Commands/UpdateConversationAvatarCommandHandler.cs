@@ -3,7 +3,6 @@ using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Exceptions;
 using Messenger.BusinessLogic.Models;
 using Messenger.Services;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.BusinessLogic.Conversations.Commands;
@@ -12,19 +11,18 @@ public class UpdateConversationAvatarCommandHandler : IRequestHandler<UpdateConv
 {
 	private readonly DatabaseContext _context;
 	private readonly IFileService _fileService;
-	private readonly IWebHostEnvironment _webHostEnvironment;
 	
-	public UpdateConversationAvatarCommandHandler(DatabaseContext context, IFileService fileService,
-		IWebHostEnvironment webHostEnvironment)
+	public UpdateConversationAvatarCommandHandler(DatabaseContext context, IFileService fileService)
 	{
 		_context = context;
 		_fileService = fileService;
-		_webHostEnvironment = webHostEnvironment;
 	}
 	
 	public async Task<ChatDto> Handle(UpdateConversationAvatarCommand request, CancellationToken cancellationToken)
 	{
 		var chatUserByRequester = await _context.ChatUsers
+			.Include(c => c.Chat)
+			.Include(c => c.Role)
 			.FirstOrDefaultAsync(r => r.UserId == request.RequesterId && r.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
@@ -35,14 +33,15 @@ public class UpdateConversationAvatarCommandHandler : IRequestHandler<UpdateConv
 		{
 			if (chatUserByRequester.Chat.AvatarLink != null)
 			{
-				_fileService.DeleteFile(Path.Combine(_webHostEnvironment.WebRootPath,
-					chatUserByRequester.Chat.AvatarLink.Split("/")[^1]));
+				// _fileService.DeleteFile(Path.Combine(_webHostEnvironment.WebRootPath,
+				// 	chatUserByRequester.Chat.AvatarLink.Split("/")[^1]));
+				_fileService.DeleteFile("");
 				chatUserByRequester.Chat.AvatarLink = null;
 			}
 			
 			if (request.AvatarFile != null)
 			{
-				var avatarLink = await _fileService.CreateFileAsync(_webHostEnvironment.WebRootPath, request.AvatarFile);
+				var avatarLink = await _fileService.CreateFileAsync("", request.AvatarFile);
 				chatUserByRequester.Chat.AvatarLink = avatarLink;
 			}
 			

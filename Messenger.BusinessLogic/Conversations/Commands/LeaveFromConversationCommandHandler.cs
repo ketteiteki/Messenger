@@ -18,6 +18,7 @@ public class LeaveFromConversationCommandHandler : IRequestHandler<LeaveFromConv
 	public async Task<ChatDto> Handle(LeaveFromConversationCommand request, CancellationToken cancellationToken)
 	{
 		var chatUser = await _context.ChatUsers
+			.Include(c => c.Chat)
 			.FirstOrDefaultAsync(c => c.ChatId == request.ChatId && c.UserId == request.RequesterId, cancellationToken);
 
 		if (chatUser == null)

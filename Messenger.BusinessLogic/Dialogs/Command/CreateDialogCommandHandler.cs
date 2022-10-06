@@ -30,7 +30,8 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, C
 		var dialog = await (
 				from chatUser1 in _context.ChatUsers
 				join chatUser2 in _context.ChatUsers
-					on new {x1 = chatUser1.UserId, x2 = chatUser1.ChatId} equals new {x1 = chatUser2.UserId, x2 = chatUser2.ChatId}
+					on new {x1 = chatUser1.UserId, x2 = chatUser1.ChatId} 
+					equals new {x1 = chatUser2.UserId, x2 = chatUser2.ChatId}
 				where chatUser1.Chat.Type == ChatType.Dialog &&
 				      chatUser1.UserId == request.RequesterId && chatUser2.UserId == request.UserId
 				select chatUser2)

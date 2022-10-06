@@ -20,6 +20,9 @@ public class CreateOrUpdateRoleUserInConversationCommandHandler
 	public async Task<RoleUserByChatDto> Handle(CreateOrUpdateRoleUserInConversationCommand request, CancellationToken cancellationToken)
 	{
 		var chatUser = await _context.ChatUsers
+			.Include(c => c.User)
+			.Include(c => c.Chat)
+			.Include(c => c.Role)
 			.FirstOrDefaultAsync(c => c.UserId == request.UserId && c.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUser == null)
@@ -38,7 +41,7 @@ public class CreateOrUpdateRoleUserInConversationCommandHandler
 					canChangeChatData: request.CanChangeChatData,
 					canAddAndRemoveUserToConversation: request.CanAddAndRemoveUserToConversation,
 					canGivePermissionToUser: request.CanGivePermissionToUser,
-					isOwner: chatUser.Chat.OwnerId == request.RequesterId);
+					isOwner: chatUser.Chat.OwnerId == request.UserId);
 
 				_context.RoleUserByChats.Add(role);
 				await _context.SaveChangesAsync(cancellationToken);

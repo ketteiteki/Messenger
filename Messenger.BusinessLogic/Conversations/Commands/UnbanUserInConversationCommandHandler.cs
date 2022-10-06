@@ -18,6 +18,8 @@ public class UnbanUserInConversationCommandHandler : IRequestHandler<UnbanUserIn
 	public async Task<UserDto> Handle(UnbanUserInConversationCommand request, CancellationToken cancellationToken)
 	{
 		var chatUserByRequester = await _context.ChatUsers
+			.Include(c => c.Chat)
+			.Include(c => c.Role)
 			.FirstOrDefaultAsync(r => r.UserId == request.RequesterId && r.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
@@ -26,6 +28,7 @@ public class UnbanUserInConversationCommandHandler : IRequestHandler<UnbanUserIn
 		if (chatUserByRequester.Role is { CanBanUser: true } || chatUserByRequester.Chat.OwnerId == request.RequesterId)
 		{
 			var banUserByChat = await _context.BanUserByChats
+				.Include(b => b.User)
 				.FirstOrDefaultAsync(r => r.UserId == request.UserId && r.ChatId == request.ChatId, cancellationToken);
 
 			if (banUserByChat == null)

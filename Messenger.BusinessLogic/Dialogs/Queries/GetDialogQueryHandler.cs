@@ -21,7 +21,8 @@ public class GetDialogQueryHandler : IRequestHandler<GetDialogQuery, ChatDto>
 		var dialog = await (
 				from chatUser1 in _context.ChatUsers.AsNoTracking()
 				join chatUser2 in _context.ChatUsers.AsNoTracking()
-					on new {x1 = chatUser1.UserId, x2 = chatUser1.ChatId} equals new {x1 = chatUser2.UserId, x2 = chatUser2.ChatId}
+					on new {x1 = chatUser1.UserId, x2 = chatUser1.ChatId} 
+					equals new {x1 = chatUser2.UserId, x2 = chatUser2.ChatId}
 				where chatUser1.Chat.Type == ChatType.Dialog &&
 				      chatUser1.User.Id == request.RequesterId && chatUser2.User.Id == request.WithWhomId
 				select new ChatDto

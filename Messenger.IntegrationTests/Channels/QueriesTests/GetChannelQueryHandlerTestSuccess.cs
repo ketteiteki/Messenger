@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Messenger.IntegrationTests.Channels.QueriesTests;
 
-public class GetChannelQueryHandlerTestAccess : IntegrationTestBase, IIntegrationTest
+public class GetChannelQueryHandlerTestSuccess : IntegrationTestBase, IIntegrationTest
 {
 	[Fact]
 	public async Task Test()

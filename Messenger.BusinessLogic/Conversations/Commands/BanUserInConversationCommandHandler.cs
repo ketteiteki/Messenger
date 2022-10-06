@@ -22,6 +22,8 @@ public class BanUserInConversationCommandHandler : IRequestHandler<BanUserInConv
 			throw new BadRequestException("The ban time must be longer than the current time");
 
 		var chatUserByRequester = await _context.ChatUsers
+			.Include(c => c.Role)
+			.Include(c => c.Chat)
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
@@ -30,6 +32,7 @@ public class BanUserInConversationCommandHandler : IRequestHandler<BanUserInConv
 		if (chatUserByRequester.Role is { CanBanUser: true } || chatUserByRequester.Chat.OwnerId == request.RequesterId)
 		{
 			var chatUser = await _context.ChatUsers
+				.Include(c => c.User)
 				.FirstOrDefaultAsync(b => b.UserId == request.UserId && b.ChatId == request.ChatId, cancellationToken);
 
 			if (chatUser == null) throw new ForbiddenException("User is not in this chat");

@@ -38,7 +38,29 @@ public class EntityHelper
 			passwordHash: "kgjfdlgd",
 			passwordSalt: "rwievcj");
 	}
+
+	public static User CreateUserAlex()
+	{
+		return new User(
+			displayName: "Alex",
+			nickName: "Alex123",
+			bio: "qwerty",
+			avatarLink: null,
+			passwordHash: "kg432jfdlgd",
+			passwordSalt: "rwfnbvievcj");
+	}
 	//create chat
+	public static Chat CreateDialog()
+	{
+		return new Chat(
+			name: null,
+			title: null,
+			type: ChatType.Dialog,
+			ownerId: null,
+			avatarLink: null,
+			lastMessageId: null);
+	}
+	
 	public static Chat CreateChannel(Guid ownerId, string name, string title)
 	{
 		return new Chat(

@@ -25,8 +25,6 @@ public class RoleUserByChat
 	public bool CanAddAndRemoveUserToConversation { get; set; }
 
 	public bool IsOwner { get; set; }
-	
-	public Guid ChatUserId { get; set; }
 
 	public RoleUserByChat(Guid userId, Guid chatId, string roleTitle, RoleColor roleColor,
 		bool canBanUser, bool canChangeChatData, bool canGivePermissionToUser,

@@ -35,6 +35,8 @@ public class JoinToConversationCommandHandler : IRequestHandler<JoinToConversati
 		_context.ChatUsers.Add(newChatUser);
 		await _context.SaveChangesAsync(cancellationToken);
 
+		await _context.Entry(newChatUser).Reference(c => c.Chat).LoadAsync(cancellationToken);
+		
 		return new ChatDto
 		{
 			Id = newChatUser.ChatId,

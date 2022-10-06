@@ -53,7 +53,6 @@ public class DatabaseContext : DbContext
 			.OnDelete(DeleteBehavior.Cascade);
 		
 		//roleUserByChat
-		
 		modelBuilder
 			.Entity<RoleUserByChat>()
 			.HasKey(c => new {c.ChatId, c.UserId});

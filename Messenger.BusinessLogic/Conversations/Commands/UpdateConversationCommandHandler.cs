@@ -18,16 +18,19 @@ public class UpdateConversationCommandHandler : IRequestHandler<UpdateConversati
 	public async Task<ChatDto> Handle(UpdateConversationCommand request, CancellationToken cancellationToken)
 	{
 		var chatUserByRequester = await _context.ChatUsers
+			.Include(c => c.Chat)
+			.Include(c => c.Role)
 			.FirstOrDefaultAsync(r => r.UserId == request.RequesterId && r.ChatId == request.ChatId, cancellationToken);
-
+		
 		if (chatUserByRequester == null)
 			throw new DbEntityNotFoundException("No requester in the chat");
 
-		if (chatUserByRequester.Role is { CanChangeChatData: true } || chatUserByRequester.Chat.OwnerId == request.RequesterId)
+		if (chatUserByRequester.Role is { CanChangeChatData: true } ||  chatUserByRequester.Chat.OwnerId == request.RequesterId)
 		{
 			if (request.Name != chatUserByRequester.Chat.Name)
 			{
 				var conversationByName = await _context.Chats
+					.AsNoTracking()
 					.FirstOrDefaultAsync(c => c.Name == request.Name, cancellationToken);
 			
 				if (conversationByName != null && conversationByName.Id != chatUserByRequester.Chat.Id) 
@@ -38,19 +41,19 @@ public class UpdateConversationCommandHandler : IRequestHandler<UpdateConversati
 			
 			chatUserByRequester.Chat.Title = request.Title;
 			
-			_context.Chats.Update(chatUserByRequester.Chat);
+			_context.Chats.Update( chatUserByRequester.Chat);
 			await _context.SaveChangesAsync(cancellationToken);
 			
 			return new ChatDto
 			{
-				Id = chatUserByRequester.Chat.Id,
-				Name = chatUserByRequester.Chat.Name,
-				Title = chatUserByRequester.Chat.Title,
-				Type = chatUserByRequester.Chat.Type,
-				AvatarLink = chatUserByRequester.Chat.AvatarLink,
-				MembersCount = chatUserByRequester.Chat.ChatUsers.Count,
+				Id =  chatUserByRequester.Chat.Id,
+				Name =  chatUserByRequester.Chat.Name,
+				Title =  chatUserByRequester.Chat.Title,
+				Type =  chatUserByRequester.Chat.Type,
+				AvatarLink =  chatUserByRequester.Chat.AvatarLink,
+				MembersCount =  chatUserByRequester.Chat.ChatUsers.Count,
 				CanSendMedia = chatUserByRequester.CanSendMedia,
-				IsOwner = chatUserByRequester.Chat.OwnerId == request.RequesterId,
+				IsOwner =  chatUserByRequester.Chat.OwnerId == request.RequesterId,
 				IsMember = true,
 				MuteDateOfExpire = chatUserByRequester.MuteDateOfExpire,
 				BanDateOfExpire = null,

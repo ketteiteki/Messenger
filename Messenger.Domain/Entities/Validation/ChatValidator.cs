@@ -6,7 +6,7 @@ public class ChatValidator : AbstractValidator<Chat>
 {
 	public ChatValidator()
 	{
-		RuleFor(x => x.Name).NotEmpty().Length(1, 20);
-		RuleFor(x => x.Title).Length(1, 20);
+		RuleFor(x => x.Name).MaximumLength(20);
+		RuleFor(x => x.Title).MaximumLength(20);
 	}
 }

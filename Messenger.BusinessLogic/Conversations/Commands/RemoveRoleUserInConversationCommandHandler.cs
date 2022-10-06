@@ -19,6 +19,9 @@ public class RemoveRoleUserInConversationCommandHandler
 	public async Task<RoleUserByChatDto> Handle(RemoveRoleUserInConversationCommand request, CancellationToken cancellationToken)
 	{
 		var chatUser = await _context.ChatUsers
+			.Include(c => c.Chat)
+			.Include(c => c.User)
+			.Include(c => c.Role)
 			.FirstOrDefaultAsync(r => r.UserId == request.UserId && r.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUser == null)
@@ -29,10 +32,12 @@ public class RemoveRoleUserInConversationCommandHandler
 			
 		if (chatUser.Chat.OwnerId == request.RequesterId)
 		{
+			var role = chatUser.Role;
+			
 			_context.RoleUserByChats.Remove(chatUser.Role);
 			await _context.SaveChangesAsync(cancellationToken);
 		
-			return new RoleUserByChatDto(chatUser.Role);
+			return new RoleUserByChatDto(role);
 		}
 		
 		throw new ForbiddenException("Only the creator can be given a role");
