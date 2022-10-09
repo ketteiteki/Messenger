@@ -1,6 +1,6 @@
 using MediatR;
-using Messenger.BusinessLogic.Auth.Commands;
-using Messenger.BusinessLogic.Auth.Queries;
+using Messenger.BusinessLogic.ApiCommands.Auth;
+using Messenger.BusinessLogic.ApiQueries.Auth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Messanger.Controllers;
@@ -19,13 +19,10 @@ public class AuthController : ControllerBase
 	[HttpGet("authorization")]
 	public async Task<IActionResult> Authorization()
 	{
-		if (!HttpContext.Request.Cookies.TryGetValue("authorization", out var result))
+		if (!HttpContext.Request.Cookies.TryGetValue("authorization", out var authorizationToken))
 			return Unauthorized();
 
-		var command = new AuthorizationCommand
-		{
-			AuthorizationToken = result!
-		};
+		var command = new AuthorizationCommand(authorizationToken!);
 
 		var authorizationResult = await _mediator.Send(command);
 		

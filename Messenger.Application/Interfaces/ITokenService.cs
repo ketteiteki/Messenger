@@ -7,5 +7,5 @@ public interface ITokenService
 {
 	public string CreateAccessToken(User user);
 
-	public JwtSecurityToken? ValidateAccessToken(string token);
+	public bool TryValidateAccessToken(string token, out JwtSecurityToken validatedJwtToken);
 }

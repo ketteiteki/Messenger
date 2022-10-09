@@ -26,7 +26,7 @@ public class TokenService : ITokenService
 		return tokenHandler.WriteToken(jwtToken);
 	}
 	
-	public JwtSecurityToken? ValidateAccessToken(string token)
+	public bool TryValidateAccessToken(string token, out JwtSecurityToken validatedJwtToken)
 	{
 		var tokenHandler = new JwtSecurityTokenHandler();
 		var key = Encoding.Default.GetBytes(EnvironmentConstants.JwtIssuerSigningAccessKey);
@@ -43,11 +43,15 @@ public class TokenService : ITokenService
 				ClockSkew = TimeSpan.Zero
 			}, out SecurityToken validatedToken);
 
-			return (JwtSecurityToken)validatedToken;
+			validatedJwtToken = (JwtSecurityToken)validatedToken;
+
+			return true;
 		}
 		catch
 		{
-			return null;
+			validatedJwtToken = new JwtSecurityToken();
+			
+			return false;
 		}
 	}
 }

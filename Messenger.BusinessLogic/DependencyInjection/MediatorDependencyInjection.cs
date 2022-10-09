@@ -1,5 +1,5 @@
 using MediatR;
-using Messenger.BusinessLogic.Auth.Commands;
+using Messenger.BusinessLogic.ApiCommands.Auth;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Messenger.BusinessLogic.DependencyInjection;
