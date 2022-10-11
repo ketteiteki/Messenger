@@ -15,6 +15,6 @@ public class AuthorizationTestSuccess : IntegrationTestBase, IIntegrationTest
 
 		await MessengerModule.RequestAsync
 			(new AuthorizationCommand(
-				AuthorizationToken: registrationUser.AccessToken), CancellationToken.None);
+				AuthorizationToken: registrationUser.Value.AccessToken), CancellationToken.None);
 	}
 }

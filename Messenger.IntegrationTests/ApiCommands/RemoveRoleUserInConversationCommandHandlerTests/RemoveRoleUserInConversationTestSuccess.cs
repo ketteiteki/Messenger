@@ -1,10 +1,8 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
-using Messenger.Domain.Entities;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace Messenger.IntegrationTests.ApiCommands.RemoveRoleUserInConversationCommandHandlerTests;
@@ -14,46 +12,43 @@ public class RemoveRoleUserInConversationTestSuccess : IntegrationTestBase, IInt
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = EntityHelper.CreateUser21th();
-		var alice = EntityHelper.CreateUserAlice();
+		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+		
+		var command = new CreateConversationCommand(
+			RequestorId: user21th.Value.Id,
+			Name: "convers",
+			Title: "21ths den",
+			AvatarFile: null);
 
-		DatabaseContextFixture.Users.AddRange(user21th, alice);
-		await DatabaseContextFixture.SaveChangesAsync();
+		var conversation = await MessengerModule.RequestAsync(command, CancellationToken.None);
+		
+		var joinToConversationCommand = new JoinToConversationCommand(
+			RequestorId: alice.Value.Id,
+			ChatId: conversation.Value.Id);
 
-		var conversation = EntityHelper.CreateConversation(user21th.Id, "qwerty", "qwerty");
-	
-		DatabaseContextFixture.Chats.Add(conversation);
-		await DatabaseContextFixture.SaveChangesAsync();
+		await MessengerModule.RequestAsync(joinToConversationCommand, CancellationToken.None);
 
-		DatabaseContextFixture.ChatUsers.AddRange(
-			new ChatUser {UserId = user21th.Id, ChatId = conversation.Id},
-			new ChatUser {UserId = alice.Id, ChatId = conversation.Id});
-		await DatabaseContextFixture.SaveChangesAsync();
+		var createOrUpdateRoleUserInConversation = new CreateOrUpdateRoleUserInConversationCommand(
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id,
+			UserId: alice.Value.Id,
+			RoleTitle: "moderator",
+			RoleColor: RoleColor.Cyan,
+			CanBanUser: true,
+			CanChangeChatData: false,
+			CanAddAndRemoveUserToConversation: false,
+			CanGivePermissionToUser:false);
 
-		var roleForAlice = new RoleUserByChat(
-			userId: alice.Id,
-			chatId: conversation.Id,
-			roleTitle: "moderator",
-			roleColor: RoleColor.Blue,
-			canBanUser: false,
-			canChangeChatData: false,
-			canGivePermissionToUser: false,
-			canAddAndRemoveUserToConversation: false,
-			isOwner: false);
-
-		DatabaseContextFixture.RoleUserByChats.Add(roleForAlice);
-		await DatabaseContextFixture.SaveChangesAsync();
+		await MessengerModule.RequestAsync(createOrUpdateRoleUserInConversation, CancellationToken.None);
 
 		var removeRoleUserInConversationCommand = new RemoveRoleUserInConversationCommand(
-			RequestorId: user21th.Id,
-			ChatId: conversation.Id,
-			UserId: alice.Id);
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id,
+			UserId: alice.Value.Id);
 
-		await MessengerModule.RequestAsync(removeRoleUserInConversationCommand, CancellationToken.None);
+		var role = await MessengerModule.RequestAsync(removeRoleUserInConversationCommand, CancellationToken.None);
 
-		var roleOfAlise = await DatabaseContextFixture.RoleUserByChats
-			.FirstOrDefaultAsync(r => r.UserId == alice.Id && r.ChatId == conversation.Id);
-
-		roleOfAlise.Should().BeNull();
+		role.IsSuccess.Should().BeTrue();
 	}
 }

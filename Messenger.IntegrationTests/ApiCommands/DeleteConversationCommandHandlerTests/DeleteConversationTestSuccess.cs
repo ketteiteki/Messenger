@@ -1,9 +1,8 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
-using Messenger.Domain.Entities;
+using Messenger.BusinessLogic.ApiQueries.Conversations;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace Messenger.IntegrationTests.ApiCommands.DeleteConversationCommandHandlerTests;
@@ -13,28 +12,28 @@ public class DeleteConversationTestSuccess : IntegrationTestBase, IIntegrationTe
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = EntityHelper.CreateUser21th();
-		
-		DatabaseContextFixture.Users.AddRange(user21th);
-		await DatabaseContextFixture.SaveChangesAsync();
+		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
 
-		var conversation = EntityHelper.CreateConversation(user21th.Id, "qwerty", "qwerty");
-		
-		DatabaseContextFixture.Chats.Add(conversation);
-		await DatabaseContextFixture.SaveChangesAsync();
-		
-		DatabaseContextFixture.ChatUsers.Add(new ChatUser {UserId = user21th.Id, ChatId = conversation.Id});
-		await DatabaseContextFixture.SaveChangesAsync();
+		var command = new CreateConversationCommand(
+			RequestorId: user21th.Value.Id,
+			Name: "convers",
+			Title: "21ths den",
+			AvatarFile: null);
 
+		var conversation = await MessengerModule.RequestAsync(command, CancellationToken.None);
+		
 		var deleteConversationCommand = new DeleteConversationCommand(
-			RequestorId: user21th.Id,
-			ChatId: conversation.Id);
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id);
 
 		await MessengerModule.RequestAsync(deleteConversationCommand, CancellationToken.None);
 
-		var conversationForCheck = await DatabaseContextFixture.Chats
-			.FirstOrDefaultAsync(c => c.Id == conversation.Id);
+		var conversationForCheckCommand = new GetConversationQuery(
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id);
 
-		conversationForCheck.Should().BeNull();
+		var conversationForCheck = await MessengerModule.RequestAsync(conversationForCheckCommand, CancellationToken.None);
+		
+		conversationForCheck.Value.Should().BeNull();
 	}
 }

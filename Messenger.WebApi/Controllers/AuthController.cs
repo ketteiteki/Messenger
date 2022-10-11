@@ -7,55 +7,28 @@ namespace Messanger.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController : ControllerBase
+public class AuthController : ApiControllerBase
 {
-	private readonly IMediator _mediator;
-
-	public AuthController(IMediator mediator)
-	{
-		_mediator = mediator;
-	}
+	public AuthController(IMediator mediator) : base(mediator) {}
 	
-	[HttpGet("authorization")]
-	public async Task<IActionResult> Authorization()
+	[HttpGet("authorization/{token}")]
+	public async Task<IActionResult> Authorization(string token, CancellationToken cancellationToken)
 	{
-		if (!HttpContext.Request.Cookies.TryGetValue("authorization", out var authorizationToken))
-			return Unauthorized();
+		var command = new AuthorizationCommand(token);
 
-		var command = new AuthorizationCommand(authorizationToken!);
-
-		var authorizationResult = await _mediator.Send(command);
-		
-		HttpContext.Response.Cookies.Append("authorization", authorizationResult.AccessToken);
-		
-		return Ok(authorizationResult);
+		return await RequestAsync(command, cancellationToken);;
 	}
 
 	[HttpPost("registration")]
-	public async Task<IActionResult> Registration([FromBody] RegistrationCommand registrationCommand)
+	public async Task<IActionResult> Registration([FromBody] RegistrationCommand registrationCommand,
+		CancellationToken cancellationToken)
 	{
-		var registrationResult = await _mediator.Send(registrationCommand);
-		
-		HttpContext.Response.Cookies.Append("authorization", registrationResult.AccessToken);
-		
-		return Ok(registrationCommand);
+		return await RequestAsync(registrationCommand, cancellationToken);
 	}
 	
 	[HttpPost("login")]
-	public async Task<IActionResult> Login([FromBody] LoginCommand loginCommand)
+	public async Task<IActionResult> Login([FromBody] LoginCommand loginCommand, CancellationToken cancellationToken)
 	{
-		var loginResult = await _mediator.Send(loginCommand);
-		
-		HttpContext.Response.Cookies.Append("authorization", loginResult.AccessToken);
-		
-		return Ok(loginResult);
-	}
-	
-	[HttpPost("logout")]
-	public IActionResult LogOut()
-	{
-		HttpContext.Response.Cookies.Delete("authorization");
-		
-		return Ok();
+		return await RequestAsync(loginCommand, cancellationToken);
 	}
 }

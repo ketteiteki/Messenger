@@ -30,6 +30,7 @@ public class AddUserToConversationCommandHandler : IRequestHandler<AddUserToConv
 		    chatUserByRequester.Chat.OwnerId == request.RequestorId)
 		{
 			var user = await _context.Users
+				.AsNoTracking()
 				.FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
 
 			if (user == null) 

@@ -1,6 +1,7 @@
 using FluentAssertions;
+using Messenger.BusinessLogic.ApiCommands.Channels;
+using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.BusinessLogic.ApiQueries.Channels;
-using Messenger.Domain.Entities;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
@@ -12,51 +13,58 @@ public class GetChannelTestSuccess : IntegrationTestBase, IIntegrationTest
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = EntityHelper.CreateUser21th();
-		var bob = EntityHelper.CreateUserBob();
-		var alice = EntityHelper.CreateUserAlice();
-		
-		DatabaseContextFixture.Users.AddRange(user21th, bob, alice);
-		await DatabaseContextFixture.SaveChangesAsync();
+		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
+		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
-		var chatEntity = EntityHelper.CreateChannel(user21th.Id, "convers", "21ths den");
+		var createChannelCommand = new CreateChannelCommand(
+			RequestorId: user21th.Value.Id,
+			Name: "qwerty",
+			Title: "qwerty",
+			AvatarFile: null);
 
-		DatabaseContextFixture.Chats.AddRange(chatEntity);
-		await DatabaseContextFixture.SaveChangesAsync();
-		
-		chatEntity.ChatUsers.Add(new ChatUser {UserId = user21th.Id, ChatId = chatEntity.Id});
-		chatEntity.ChatUsers.Add(new ChatUser {UserId = bob.Id, ChatId = chatEntity.Id, CanSendMedia = false});
-		
-		DatabaseContextFixture.Chats.Update(chatEntity);
-		await DatabaseContextFixture.SaveChangesAsync();
-		
-		var queryForRequester = new GetChannelQuery(
-			RequestorId: user21th.Id,
-			ChannelId: chatEntity.Id);
-		var queryForAlice = new GetChannelQuery(
-			RequestorId: alice.Id,
-			ChannelId: chatEntity.Id);
-		var queryForBob = new GetChannelQuery(
-			RequestorId: bob.Id,
-			ChannelId: chatEntity.Id);
+		var channel = await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
 
-		var chatForRequester = await MessengerModule.RequestAsync(queryForRequester, CancellationToken.None);
-		var chatForAlice = await MessengerModule.RequestAsync(queryForAlice, CancellationToken.None);
-		var chatForBob = await MessengerModule.RequestAsync(queryForBob, CancellationToken.None);
+		await MessengerModule.RequestAsync(
+			new JoinToChannelCommand(
+				RequestorId: bob.Value.Id,
+				ChannelId: channel.Value.Id), CancellationToken.None);
 
-		chatForRequester.IsMember.Should().Be(true);
-		chatForRequester.IsOwner.Should().Be(true);
-		chatForRequester.MembersCount.Should().Be(2);
-		chatForRequester.CanSendMedia.Should().Be(true);
+		var createPermissionsForBob = new CreatePermissionsUserInConversationCommand(
+			RequestorId: user21th.Value.Id,
+			UserId: bob.Value.Id,
+			ChatId: channel.Value.Id,
+			CanSendMedia: false);
+
+		await MessengerModule.RequestAsync(createPermissionsForBob, CancellationToken.None);
 		
-		chatForAlice.IsMember.Should().Be(false);
-		chatForAlice.IsOwner.Should().Be(false);
-		chatForAlice.MembersCount.Should().Be(2);
-		chatForAlice.CanSendMedia.Should().Be(false);
+		var channelForRequestorQuery = new GetChannelQuery(
+			RequestorId: user21th.Value.Id,
+			ChannelId: channel.Value.Id);
+		var channelForAliceQuery = new GetChannelQuery(
+			RequestorId: alice.Value.Id,
+			ChannelId: channel.Value.Id);
+		var channelForBobQuery = new GetChannelQuery(
+			RequestorId: bob.Value.Id,
+			ChannelId: channel.Value.Id);
+
+		var chatForRequester = await MessengerModule.RequestAsync(channelForRequestorQuery, CancellationToken.None);
+		var chatForAlice = await MessengerModule.RequestAsync(channelForAliceQuery, CancellationToken.None);
+		var chatForBob = await MessengerModule.RequestAsync(channelForBobQuery, CancellationToken.None);
+
+		chatForRequester.Value.IsMember.Should().Be(true);
+		chatForRequester.Value.IsOwner.Should().Be(true);
+		chatForRequester.Value.MembersCount.Should().Be(2);
+		chatForRequester.Value.CanSendMedia.Should().Be(true);
 		
-		chatForBob.IsMember.Should().Be(true);
-		chatForBob.IsOwner.Should().Be(false);
-		chatForBob.MembersCount.Should().Be(2);
-		chatForBob.CanSendMedia.Should().Be(false);
+		chatForAlice.Value.IsMember.Should().Be(false);
+		chatForAlice.Value.IsOwner.Should().Be(false);
+		chatForAlice.Value.MembersCount.Should().Be(2);
+		chatForAlice.Value.CanSendMedia.Should().Be(false);
+		
+		chatForBob.Value.IsMember.Should().Be(true);
+		chatForBob.Value.IsOwner.Should().Be(false);
+		chatForBob.Value.MembersCount.Should().Be(2);
+		chatForBob.Value.CanSendMedia.Should().Be(false);
 	}
 }

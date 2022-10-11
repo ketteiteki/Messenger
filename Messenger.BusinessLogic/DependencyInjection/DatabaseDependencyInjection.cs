@@ -10,7 +10,7 @@ public static class DatabaseDependencyInjection
 	public static IServiceCollection AddDatabaseServices(this IServiceCollection serviceCollection)
 	{
 		serviceCollection.AddDbContext<DatabaseContext>(opt =>
-			opt.UseNpgsql(EnvironmentConstants.DatabaseConnectionString));
+			opt.UseNpgsql(EnvironmentConstants.DatabaseConnectionString), ServiceLifetime.Transient);
 
 		return serviceCollection;
 	}

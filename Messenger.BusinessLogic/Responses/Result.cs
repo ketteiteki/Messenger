@@ -6,7 +6,7 @@ public class Result<TValue>
 {
 	public bool IsSuccess { get; set; } = true;
 
-	public TValue? Value { get; set; }
+	public TValue Value { get; set; }
 	
 	public Error? Error { get; set; }
 

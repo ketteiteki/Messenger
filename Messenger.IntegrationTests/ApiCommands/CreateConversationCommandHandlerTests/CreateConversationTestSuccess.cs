@@ -1,7 +1,7 @@
+using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
-using Microsoft.AspNetCore.Http;
 using Xunit;
 
 namespace Messenger.IntegrationTests.ApiCommands.CreateConversationCommandHandlerTests;
@@ -11,17 +11,18 @@ public class CreateConversationTestSuccess : IntegrationTestBase, IIntegrationTe
 	[Fact]
 	public async Task Test()
 	{
-		var user = EntityHelper.CreateUser21th();
+		var user = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
 
-		DatabaseContextFixture.Users.Add(user);
-		await DatabaseContextFixture.SaveChangesAsync();
-
-		var conversation = new CreateConversationCommand(
-			RequestorId: user.Id,
+		var command = new CreateConversationCommand(
+			RequestorId: user.Value.Id,
 			Name: "qwerty",
 			Title: "qwery",
 			AvatarFile: null);
 
-		await MessengerModule.RequestAsync(conversation, CancellationToken.None);
+		var conversation = await MessengerModule.RequestAsync(command, CancellationToken.None);
+		
+		conversation.IsSuccess.Should().BeTrue();
+		conversation.Value.IsOwner.Should().BeTrue();
+		conversation.Value.IsMember.Should().BeTrue();
 	}
 }

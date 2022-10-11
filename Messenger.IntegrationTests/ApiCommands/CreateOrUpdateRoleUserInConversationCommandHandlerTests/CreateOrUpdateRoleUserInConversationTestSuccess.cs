@@ -1,10 +1,8 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
-using Messenger.Domain.Entities;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace Messenger.IntegrationTests.ApiCommands.CreateOrUpdateRoleUserInConversationCommandHandlerTests;
@@ -14,26 +12,28 @@ public class CreateOrUpdateRoleUserInConversationTestSuccess : IntegrationTestBa
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = EntityHelper.CreateUser21th();
-		var alice = EntityHelper.CreateUserAlice();
+		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
-		DatabaseContextFixture.Users.AddRange(user21th, alice);
-		await DatabaseContextFixture.SaveChangesAsync();
+		var createConversationCommand = new CreateConversationCommand(
+			RequestorId: user21th.Value.Id,
+			Name: "qwerty",
+			Title: "qwerty",
+			AvatarFile: null);
 
-		var conversation = EntityHelper.CreateConversation(user21th.Id, "qwerty", "qwerty");
-	
-		DatabaseContextFixture.Chats.Add(conversation);
-		await DatabaseContextFixture.SaveChangesAsync();
+		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-		DatabaseContextFixture.ChatUsers.AddRange(
-			new ChatUser {UserId = user21th.Id, ChatId = conversation.Id},
-			new ChatUser {UserId = alice.Id, ChatId = conversation.Id});
-		await DatabaseContextFixture.SaveChangesAsync();
+		var addAliceInConversationCommand = new AddUserToConversationCommand(
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id,
+			UserId: alice.Value.Id);
 
-		var CreateOrUpdateRoleUserInConversation = new CreateOrUpdateRoleUserInConversationCommand(
-			RequestorId: user21th.Id,
-			ChatId: conversation.Id,
-			UserId: alice.Id,
+		await MessengerModule.RequestAsync(addAliceInConversationCommand, CancellationToken.None);
+		
+		var createOrUpdateRoleUserInConversation = new CreateOrUpdateRoleUserInConversationCommand(
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id,
+			UserId: alice.Value.Id,
 			RoleTitle: "moderator",
 			RoleColor: RoleColor.Cyan,
 			CanBanUser: true,
@@ -41,18 +41,14 @@ public class CreateOrUpdateRoleUserInConversationTestSuccess : IntegrationTestBa
 			CanAddAndRemoveUserToConversation: true,
 			CanGivePermissionToUser:false);
 
-		await MessengerModule.RequestAsync(CreateOrUpdateRoleUserInConversation, CancellationToken.None);
+		var role = await MessengerModule.RequestAsync(createOrUpdateRoleUserInConversation, CancellationToken.None);
 
-		var chatUser = await DatabaseContextFixture.ChatUsers
-			.Include(c => c.Role)
-			.FirstAsync(c => c.UserId == alice.Id && c.ChatId == conversation.Id);
-
-		chatUser.Role?.RoleColor.Should().Be(CreateOrUpdateRoleUserInConversation.RoleColor);
-		chatUser.Role?.RoleTitle.Should().Be(CreateOrUpdateRoleUserInConversation.RoleTitle);
-		chatUser.Role?.CanBanUser.Should().Be(CreateOrUpdateRoleUserInConversation.CanBanUser);
-		chatUser.Role?.CanChangeChatData.Should().Be(CreateOrUpdateRoleUserInConversation.CanChangeChatData);
-		chatUser.Role?.CanGivePermissionToUser.Should().Be(CreateOrUpdateRoleUserInConversation.CanGivePermissionToUser);
-		chatUser.Role?.CanAddAndRemoveUserToConversation.Should().Be(CreateOrUpdateRoleUserInConversation.CanAddAndRemoveUserToConversation);
-		chatUser.Role?.IsOwner.Should().Be(false);
+		role.Value.RoleColor.Should().Be(createOrUpdateRoleUserInConversation.RoleColor);
+		role.Value.RoleTitle.Should().Be(createOrUpdateRoleUserInConversation.RoleTitle);
+		role.Value.CanBanUser.Should().Be(createOrUpdateRoleUserInConversation.CanBanUser);
+		role.Value.CanChangeChatData.Should().Be(createOrUpdateRoleUserInConversation.CanChangeChatData);
+		role.Value.CanGivePermissionToUser.Should().Be(createOrUpdateRoleUserInConversation.CanGivePermissionToUser);
+		role.Value.CanAddAndRemoveUserToConversation.Should().Be(createOrUpdateRoleUserInConversation.CanAddAndRemoveUserToConversation);
+		role.Value.IsOwner.Should().Be(false);
 	}
 }

@@ -23,9 +23,9 @@ public class CreateConversationCommandHandler : IRequestHandler<CreateConversati
 	
 	public async Task<Result<ChatDto>> Handle(CreateConversationCommand request, CancellationToken cancellationToken)
 	{
-		var requester = await _context.Users.FindAsync(request.RequestorId);
+		var requestor = await _context.Users.FindAsync(request.RequestorId);
 			
-		if (requester == null) throw new Exception("Requester not found");
+		if (requestor == null) throw new Exception("Requester not found");
 		
 		var conversationByName = await _context.Chats
 			.FirstOrDefaultAsync(c => c.Name == request.Name, cancellationToken);
@@ -35,9 +35,9 @@ public class CreateConversationCommandHandler : IRequestHandler<CreateConversati
 
 		var newConversation = new Chat(
 			name: request.Name,
-			ownerId: requester.Id,
+			ownerId: requestor.Id,
 			title: request.Title,
-			type: ChatType.Сonversation,
+			type: ChatType.Conversation,
 			avatarLink: null,
 			lastMessageId: null
 		);
@@ -49,7 +49,7 @@ public class CreateConversationCommandHandler : IRequestHandler<CreateConversati
 			newConversation.AvatarLink = avatarLink;
 		}
 
-		newConversation.ChatUsers.Add(new ChatUser {ChatId = newConversation.Id, UserId = requester.Id});
+		newConversation.ChatUsers.Add(new ChatUser {ChatId = newConversation.Id, UserId = requestor.Id});
 		
 		_context.Chats.Add(newConversation);
 		await _context.SaveChangesAsync(cancellationToken);

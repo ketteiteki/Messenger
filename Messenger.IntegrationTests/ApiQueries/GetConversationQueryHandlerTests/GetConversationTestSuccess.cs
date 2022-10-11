@@ -1,6 +1,6 @@
 using FluentAssertions;
+using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.BusinessLogic.ApiQueries.Conversations;
-using Messenger.Domain.Entities;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
@@ -12,47 +12,47 @@ public class GetConversationTestSuccess : IntegrationTestBase, IIntegrationTest
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = EntityHelper.CreateUser21th();
-		var alice = EntityHelper.CreateUserAlice();
-		var bob = EntityHelper.CreateUserBob();
+		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+		var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 		
-		DatabaseContextFixture.Users.AddRange(user21th, alice, bob);
-		await DatabaseContextFixture.SaveChangesAsync();
-
-		var conversation = EntityHelper.CreateConversation(user21th.Id, "qwerty", "qwerty");
+		var createConversationCommand = new CreateConversationCommand(
+			RequestorId: user21th.Value.Id,
+			Name: "qwerty",
+			Title: "qwerty",
+			AvatarFile: null);
 		
-		DatabaseContextFixture.Chats.Add(conversation);
-		await DatabaseContextFixture.SaveChangesAsync();
+		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 		
-		DatabaseContextFixture.ChatUsers.AddRange(
-			new ChatUser {UserId = user21th.Id, ChatId = conversation.Id},
-			new ChatUser {UserId = alice.Id, ChatId = conversation.Id});
-		await DatabaseContextFixture.SaveChangesAsync();
+		await MessengerModule.RequestAsync(
+			new JoinToConversationCommand(
+				RequestorId: alice.Value.Id,
+				ChatId: conversation.Value.Id), CancellationToken.None);
 
 		var queryFor21th = new GetConversationQuery(
-			RequestorId: user21th.Id,
-			ChatId: conversation.Id);
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id);
 
 		var queryForAlice = new GetConversationQuery(
-			RequestorId: alice.Id,
-			ChatId: conversation.Id);
+			RequestorId: alice.Value.Id,
+			ChatId: conversation.Value.Id);
 		
 		var queryForBob =new GetConversationQuery(
-			RequestorId: bob.Id,
-			ChatId: conversation.Id);
+			RequestorId: bob.Value.Id,
+			ChatId: conversation.Value.Id);
 		
 		var resultFor21th = await MessengerModule.RequestAsync(queryFor21th, CancellationToken.None);
 		var resultForAlice = await MessengerModule.RequestAsync(queryForAlice, CancellationToken.None);
 		var resultForBob = await MessengerModule.RequestAsync(queryForBob, CancellationToken.None);
 
-		resultFor21th.IsOwner.Should().BeTrue();
-		resultFor21th.IsMember.Should().BeTrue();
-		resultFor21th.MembersCount.Should().Be(2);
+		resultFor21th.Value.IsOwner.Should().BeTrue();
+		resultFor21th.Value.IsMember.Should().BeTrue();
+		resultFor21th.Value.MembersCount.Should().Be(2);
 		
-		resultForAlice.IsOwner.Should().BeFalse();
-		resultForAlice.IsMember.Should().BeTrue();
+		resultForAlice.Value.IsOwner.Should().BeFalse();
+		resultForAlice.Value.IsMember.Should().BeTrue();
 		
-		resultForBob.IsOwner.Should().BeFalse();
-		resultForBob.IsMember.Should().BeFalse();
+		resultForBob.Value.IsOwner.Should().BeFalse();
+		resultForBob.Value.IsMember.Should().BeFalse();
 	}
 }

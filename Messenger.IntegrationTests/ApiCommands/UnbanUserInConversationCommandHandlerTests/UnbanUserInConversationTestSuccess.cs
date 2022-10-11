@@ -1,10 +1,8 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
-using Messenger.Domain.Entities;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace Messenger.IntegrationTests.ApiCommands.UnbanUserInConversationCommandHandlerTests;
@@ -14,63 +12,74 @@ public class UnbanUserInConversationTestSuccess : IntegrationTestBase, IIntegrat
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = EntityHelper.CreateUser21th();
-		var alice = EntityHelper.CreateUserAlice();
-		var bob = EntityHelper.CreateUserBob();
-		var alex = EntityHelper.CreateUserAlex();
+		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+		var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
+		var alex = await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
-		DatabaseContextFixture.Users.AddRange(user21th, alice, bob, alex);
-		await DatabaseContextFixture.SaveChangesAsync();
+		var createConversationCommand = new CreateConversationCommand(
+			RequestorId: user21th.Value.Id,
+			Name: "qwerty",
+			Title: "qwerty",
+			AvatarFile: null);
 
-		var conversation = EntityHelper.CreateConversation(user21th.Id, "qwerty", "qwerty");
+		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-		DatabaseContextFixture.Chats.Add(conversation);
-		await DatabaseContextFixture.SaveChangesAsync();
-
-		DatabaseContextFixture.ChatUsers.AddRange(
-			new ChatUser {UserId = user21th.Id, ChatId = conversation.Id},
-			new ChatUser {UserId = bob.Id, ChatId = conversation.Id});
-		await DatabaseContextFixture.SaveChangesAsync();
-
-		DatabaseContextFixture.BanUserByChats.AddRange(
-			new BanUserByChat {UserId = alice.Id, ChatId = conversation.Id, BanDateOfExpire = DateTime.UtcNow.AddDays(2)},
-			new BanUserByChat {UserId = alex.Id, ChatId = conversation.Id, BanDateOfExpire = DateTime.UtcNow.AddDays(2)});
-		await DatabaseContextFixture.SaveChangesAsync();
+		await MessengerModule.RequestAsync(
+			new JoinToConversationCommand(
+				RequestorId: alice.Value.Id,
+				ChatId: conversation.Value.Id), CancellationToken.None);
+		await MessengerModule.RequestAsync(
+			new JoinToConversationCommand(
+				RequestorId: bob.Value.Id,
+				ChatId: conversation.Value.Id), CancellationToken.None);
+		await MessengerModule.RequestAsync(
+			new JoinToConversationCommand(
+				RequestorId: alex.Value.Id,
+				ChatId: conversation.Value.Id), CancellationToken.None);
 		
-		var roleForBob = new RoleUserByChat(
-			userId: bob.Id,
-			chatId: conversation.Id,
-			roleTitle: "moderator",
-			roleColor: RoleColor.Black,
-			canBanUser: true,
-			canChangeChatData: false,
-			canGivePermissionToUser: false,
-			canAddAndRemoveUserToConversation: false,
-			isOwner: false);
+		var banForAliceCommand = new BanUserInConversationCommand(
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id,
+			UserId: alice.Value.Id,
+			BanDateOfExpire: DateTime.UtcNow.AddDays(2));
 		
-		DatabaseContextFixture.RoleUserByChats.Add(roleForBob);
-		await DatabaseContextFixture.SaveChangesAsync();
+		var banForAlexCommand = new BanUserInConversationCommand(
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id,
+			UserId: alex.Value.Id,
+			BanDateOfExpire: DateTime.UtcNow.AddDays(2));
 
-		var unbanUserInConversationCommandForAlice = new UnbanUserInConversationCommand(
-			RequestorId: user21th.Id,
-			ChatId: conversation.Id,
-			UserId: alice.Id);
+		await MessengerModule.RequestAsync(banForAliceCommand, CancellationToken.None);
+		await MessengerModule.RequestAsync(banForAlexCommand, CancellationToken.None);
 		
-		var unbanUserInConversationCommandForAlex = new UnbanUserInConversationCommand(
-			RequestorId: bob.Id,
-			ChatId: conversation.Id,
-			UserId: alex.Id);
+		var createRoleBobInConversation = new CreateOrUpdateRoleUserInConversationCommand(
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id,
+			UserId: bob.Value.Id,
+			RoleTitle: "moderator",
+			RoleColor: RoleColor.Cyan,
+			CanBanUser: true,
+			CanChangeChatData: false,
+			CanAddAndRemoveUserToConversation: true,
+			CanGivePermissionToUser:false);
 
-		await MessengerModule.RequestAsync(unbanUserInConversationCommandForAlice, CancellationToken.None);
-		await MessengerModule.RequestAsync(unbanUserInConversationCommandForAlex, CancellationToken.None);
+		await MessengerModule.RequestAsync(createRoleBobInConversation, CancellationToken.None);
 
-		var banByChatOfAlice = await DatabaseContextFixture.ChatUsers
-			.FirstOrDefaultAsync(b => b.UserId == alice.Id && b.ChatId == conversation.Id);
+		var unbanUserInConversationCommandForAliceCommand = new UnbanUserInConversationCommand(
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id,
+			UserId: alice.Value.Id);
 		
-		var banByChatOfAlex = await DatabaseContextFixture.BanUserByChats
-			.FirstOrDefaultAsync(b => b.UserId == alex.Id && b.ChatId == conversation.Id);
+		var unbanUserInConversationCommandForAlexCommand = new UnbanUserInConversationCommand(
+			RequestorId: bob.Value.Id,
+			ChatId: conversation.Value.Id,
+			UserId: alex.Value.Id);
 
-		banByChatOfAlice.Should().BeNull();
-		banByChatOfAlex.Should().BeNull();
+		var unbanAlice = await MessengerModule.RequestAsync(unbanUserInConversationCommandForAliceCommand, CancellationToken.None);
+		var unbanAlex = await MessengerModule.RequestAsync(unbanUserInConversationCommandForAlexCommand, CancellationToken.None);
+
+		unbanAlice.IsSuccess.Should().BeTrue();
+		unbanAlex.IsSuccess.Should().BeTrue();
 	}
 }

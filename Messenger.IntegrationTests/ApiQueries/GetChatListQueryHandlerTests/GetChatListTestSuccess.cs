@@ -1,6 +1,7 @@
 using FluentAssertions;
+using Messenger.BusinessLogic.ApiCommands.Conversations;
+using Messenger.BusinessLogic.ApiCommands.Dialogs;
 using Messenger.BusinessLogic.ApiQueries.Chats;
-using Messenger.Domain.Entities;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
@@ -13,38 +14,48 @@ public class GetChatListTestSuccess : IntegrationTestBase, IIntegrationTest
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = EntityHelper.CreateUser21th();
-		var alice = EntityHelper.CreateUserAlice();
+		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
-		DatabaseContextFixture.Users.AddRange(user21th, alice);
-		await DatabaseContextFixture.SaveChangesAsync();
+		var createConversationCommand1 = new CreateConversationCommand(
+			RequestorId: user21th.Value.Id,
+			Name: "conv1",
+			Title: "conv1",
+			AvatarFile: null);
 		
-		var conv1 = EntityHelper.CreateChannel(user21th.Id, "conv1", "21th conv1");
-		var conv2 = EntityHelper.CreateChannel(user21th.Id, "conv2", "21th conv2");
-		var conv3 = EntityHelper.CreateChannel(user21th.Id, "conv3", "21th conv3");
+		var createConversationCommand2 = new CreateConversationCommand(
+			RequestorId: user21th.Value.Id,
+			Name: "conv2",
+			Title: "conv2",
+			AvatarFile: null);
+		
+		var createConversationCommand3 = new CreateConversationCommand(
+			RequestorId: user21th.Value.Id,
+			Name: "conv3",
+			Title: "conv3",
+			AvatarFile: null);
 
-		var dialog = EntityHelper.CreateDialog();
-		
-		DatabaseContextFixture.Chats.AddRange(conv1, conv2, conv3, dialog);
-		await DatabaseContextFixture.SaveChangesAsync();
-		
-		DatabaseContextFixture.ChatUsers.AddRange(
-		new ChatUser {UserId = user21th.Id, ChatId = conv1.Id},
-		new ChatUser {UserId = user21th.Id, ChatId = conv2.Id},
-		new ChatUser {UserId = user21th.Id, ChatId = conv3.Id},
-		new ChatUser {UserId = alice.Id, ChatId = conv3.Id},
-		new ChatUser {UserId = alice.Id, ChatId = dialog.Id},
-		new ChatUser {UserId = user21th.Id, ChatId = dialog.Id});
+		var createDialogCommand = new CreateDialogCommand(
+			RequestorId: user21th.Value.Id,
+			UserId: alice.Value.Id);
 
-		await DatabaseContextFixture.SaveChangesAsync();
-		
-		var queryFor21th = new GetChatListQuery(RequestorId: user21th.Id);
-		var queryForAlice = new GetChatListQuery(RequestorId: alice.Id);
+		await MessengerModule.RequestAsync(createConversationCommand1, CancellationToken.None);
+		await MessengerModule.RequestAsync(createConversationCommand2, CancellationToken.None);
+		var conversation3 = await MessengerModule.RequestAsync(createConversationCommand3, CancellationToken.None);
+		await MessengerModule.RequestAsync(createDialogCommand, CancellationToken.None);
+
+		await MessengerModule.RequestAsync(
+			new JoinToConversationCommand(
+				RequestorId: alice.Value.Id,
+				ChatId: conversation3.Value.Id), CancellationToken.None);
+
+		var queryFor21th = new GetChatListQuery(RequestorId: user21th.Value.Id);
+		var queryForAlice = new GetChatListQuery(RequestorId: alice.Value.Id);
 
 		var chatListFor21th = await MessengerModule.RequestAsync(queryFor21th, CancellationToken.None);
 		var chatListForAlice = await MessengerModule.RequestAsync(queryForAlice, CancellationToken.None);
 
-		foreach (var chat in chatListFor21th)
+		foreach (var chat in chatListFor21th.Value)
 		{
 			if (chat.Type == ChatType.Dialog)
 			{
@@ -59,7 +70,7 @@ public class GetChatListTestSuccess : IntegrationTestBase, IIntegrationTest
 			chat.IsOwner.Should().Be(true);
 		}
 		
-		foreach (var chat in chatListForAlice)
+		foreach (var chat in chatListForAlice.Value)
 		{
 			chat.IsMember.Should().Be(true);
 			chat.IsOwner.Should().Be(false);

@@ -77,7 +77,7 @@ public class EntityHelper
 		return new Chat(
 			name: name,
 			title: title,
-			type: ChatType.Сonversation,
+			type: ChatType.Conversation,
 			ownerId: ownerId,
 			avatarLink: null,
 			lastMessageId: null);

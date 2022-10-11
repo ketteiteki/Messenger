@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
-using Messenger.Domain.Entities;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
@@ -13,59 +12,68 @@ public class CreatePermissionsUserInConversationTestSuccess : IntegrationTestBas
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = EntityHelper.CreateUser21th();
-		var alice = EntityHelper.CreateUserAlice();
-		var bob = EntityHelper.CreateUserBob();
-		var alex = EntityHelper.CreateUserAlex();
+		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+		var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
+		var alex = await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
-		DatabaseContextFixture.Users.AddRange(user21th, alice, bob, alex);
-		await DatabaseContextFixture.SaveChangesAsync();
+		var createConversationCommand = new CreateConversationCommand(
+			RequestorId: user21th.Value.Id,
+			Name: "qwerty",
+			Title: "qwerty",
+			AvatarFile: null);
 
-		var conversation = EntityHelper.CreateConversation(user21th.Id, "qwerty", "qwerty");
-	
-		DatabaseContextFixture.Chats.Add(conversation);
-		await DatabaseContextFixture.SaveChangesAsync();
+		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-		DatabaseContextFixture.ChatUsers.AddRange(
-			new ChatUser {UserId = user21th.Id, ChatId = conversation.Id},
-			new ChatUser {UserId = alice.Id, ChatId = conversation.Id},
-			new ChatUser {UserId = bob.Id, ChatId = conversation.Id},
-			new ChatUser {UserId = alex.Id, ChatId = conversation.Id});
-		await DatabaseContextFixture.SaveChangesAsync();
+		var addAliceInConversationCommand = new AddUserToConversationCommand(
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id,
+			UserId: alice.Value.Id);
 		
-		var roleForAlice = new RoleUserByChat(
-			userId: alice.Id,
-			chatId: conversation.Id,
-			roleTitle: "moderator",
-			roleColor: RoleColor.Blue,
-			canBanUser: false,
-			canChangeChatData: false,
-			canGivePermissionToUser: true,
-			canAddAndRemoveUserToConversation: false,
-			isOwner: false);
+		var addBobInConversationCommand = new AddUserToConversationCommand(
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id,
+			UserId: bob.Value.Id);
+		
+		var addAlexInConversationCommand = new AddUserToConversationCommand(
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id,
+			UserId: alex.Value.Id);
 
-		DatabaseContextFixture.RoleUserByChats.Add(roleForAlice);
-		await DatabaseContextFixture.SaveChangesAsync();
+		await MessengerModule.RequestAsync(addAliceInConversationCommand, CancellationToken.None);
+		await MessengerModule.RequestAsync(addBobInConversationCommand, CancellationToken.None);
+		await MessengerModule.RequestAsync(addAlexInConversationCommand, CancellationToken.None);
+		
+		var createRoleForAliceCommand = new CreateOrUpdateRoleUserInConversationCommand(
+			RequestorId: user21th.Value.Id,
+			UserId: alice.Value.Id,
+			ChatId: conversation.Value.Id,
+			RoleTitle: "moderator",
+			RoleColor: RoleColor.Blue,
+			CanBanUser: false,
+			CanChangeChatData: false,
+			CanGivePermissionToUser: true,
+			CanAddAndRemoveUserToConversation: false);
 
-		var createPermissionsUserInConversationCommandBy21th = new CreatePermissionsUserInConversationCommand(
-			RequestorId: user21th.Id,
-			UserId: bob.Id,
-			ChatId: conversation.Id,
+		await MessengerModule.RequestAsync(createRoleForAliceCommand, CancellationToken.None);
+		
+		var createPermissionsUserInConversationBy21thCommand = new CreatePermissionsUserInConversationCommand(
+			RequestorId: user21th.Value.Id,
+			UserId: bob.Value.Id,
+			ChatId: conversation.Value.Id,
 			CanSendMedia: false);
 
-		var result21th = await MessengerModule.RequestAsync(createPermissionsUserInConversationCommandBy21th, CancellationToken.None);
-
-		result21th.CanSendMedia.Should().BeFalse();
-
-		var createPermissionsUserInConversationCommandByAlice = new CreatePermissionsUserInConversationCommand(
-			RequestorId: alice.Id,
-			UserId: alex.Id,
-			ChatId: conversation.Id,
+		var createPermissionsUserInConversationByAliceCommand = new CreatePermissionsUserInConversationCommand(
+			RequestorId: alice.Value.Id,
+			UserId: alex.Value.Id,
+			ChatId: conversation.Value.Id,
 			CanSendMedia: false
 		);
 		
-		var resultAlice = await MessengerModule.RequestAsync(createPermissionsUserInConversationCommandByAlice, CancellationToken.None);
+		var permissionByBob = await MessengerModule.RequestAsync(createPermissionsUserInConversationBy21thCommand, CancellationToken.None);
+		var permissionByAlex = await MessengerModule.RequestAsync(createPermissionsUserInConversationByAliceCommand, CancellationToken.None);
 
-		resultAlice.CanSendMedia.Should().BeFalse();
+		permissionByBob.Value.CanSendMedia.Should().BeFalse();
+		permissionByAlex.Value.CanSendMedia.Should().BeFalse();
 	}
 }

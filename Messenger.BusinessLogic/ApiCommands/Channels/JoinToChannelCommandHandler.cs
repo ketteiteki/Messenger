@@ -6,39 +6,39 @@ using Messenger.Domain.Enum;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace Messenger.BusinessLogic.ApiCommands.Conversations;
+namespace Messenger.BusinessLogic.ApiCommands.Channels;
 
-public class JoinToConversationCommandHandler : IRequestHandler<JoinToConversationCommand, Result<ChatDto>>
+public class JoinToChannelCommandHandler : IRequestHandler<JoinToChannelCommand, Result<ChatDto>>
 {
 	private readonly DatabaseContext _context;
 
-	public JoinToConversationCommandHandler(DatabaseContext context)
+	public JoinToChannelCommandHandler(DatabaseContext context)
 	{
 		_context = context;
 	}
 	
-	public async Task<Result<ChatDto>> Handle(JoinToConversationCommand request, CancellationToken cancellationToken)
+	public async Task<Result<ChatDto>> Handle(JoinToChannelCommand request, CancellationToken cancellationToken)
 	{
-		var conversation = await _context.Chats
-			.Where(c => c.Type == ChatType.Conversation)
-			.FirstOrDefaultAsync(c => c.Id == request.ChatId, cancellationToken);
+		var channel = await _context.Chats
+			.Where(c => c.Type == ChatType.Channel)
+			.FirstOrDefaultAsync(c => c.Id == request.ChannelId, cancellationToken);
 
-		if (conversation == null) return new Result<ChatDto>(new DbEntityNotFoundError("Conversation not found"));
+		if (channel == null) return new Result<ChatDto>(new DbEntityNotFoundError("Channel not found"));
 		
 		var chatUser = await _context.ChatUsers
-			.FirstOrDefaultAsync(c => c.UserId == request.RequestorId && c.ChatId == request.ChatId, cancellationToken);
+			.FirstOrDefaultAsync(c => c.UserId == request.RequestorId && c.ChatId == request.ChannelId, cancellationToken);
 
 		if (chatUser != null)
 			return new Result<ChatDto>(new DbEntityExistsError("User already exists in the conversation"));
 
 		var banUserByChat = await _context.BanUserByChats
-			.FirstOrDefaultAsync(b => b.UserId == request.RequestorId && b.ChatId == request.ChatId, cancellationToken);
+			.FirstOrDefaultAsync(b => b.UserId == request.RequestorId && b.ChatId == request.ChannelId, cancellationToken);
 
 		if (banUserByChat != null)
 			return new Result<ChatDto>(
 				new ForbiddenError($"You are banned in the chat. Unban date: {banUserByChat.BanDateOfExpire}"));
 		
-		var newChatUser = new ChatUser { UserId = request.RequestorId, ChatId = request.ChatId };
+		var newChatUser = new ChatUser { UserId = request.RequestorId, ChatId = request.ChannelId };
 		
 		_context.ChatUsers.Add(newChatUser);
 		await _context.SaveChangesAsync(cancellationToken);
@@ -55,7 +55,7 @@ public class JoinToConversationCommandHandler : IRequestHandler<JoinToConversati
 				AvatarLink = newChatUser.Chat.AvatarLink,
 				IsOwner = newChatUser.Chat.OwnerId == request.RequestorId,
 				IsMember = true,
-				MuteDateOfExpire = newChatUser.MuteDateOfExpire,
+				MuteDateOfExpire = null,
 				BanDateOfExpire = null,
 			});
 	}

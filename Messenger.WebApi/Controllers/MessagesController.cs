@@ -7,14 +7,9 @@ namespace Messanger.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class MessagesController : ControllerBase
+public class MessagesController : ApiControllerBase
 {
-	private readonly IMediator _mediator;
-
-	public MessagesController(IMediator mediator)
-	{
-		_mediator = mediator;
-	}
+	public MessagesController(IMediator mediator) : base(mediator) {}
 	
 	[Authorize]
 	[HttpGet("{messageId}")]

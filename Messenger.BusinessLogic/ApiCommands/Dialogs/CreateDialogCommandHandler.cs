@@ -61,7 +61,8 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 				Type = newDialog.Type,
 				AvatarLink = user.AvatarLink,
 				MembersCount = 2,
-				IsMember = true
+				IsMember = true,
+				Members = newDialog.ChatUsers.Select(c => new UserDto(c.User)).ToList()
 			});
 	}
 }

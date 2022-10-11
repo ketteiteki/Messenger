@@ -18,19 +18,19 @@ public class AddUserToConversationTestSuccess : IntegrationTestBase, IIntegratio
 		var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
 		var conversation = await MessengerModule.RequestAsync(
-			CommandHelper.CreateConversationCommand(user21th.Id, "qwerty", "qwerty", null), CancellationToken.None);
+			CommandHelper.CreateConversationCommand(user21th.Value.Id, "qwerty", "qwerty", null), CancellationToken.None);
 
 		var AddUserToConversationBy21thCommand = new AddUserToConversationCommand(
-			RequestorId: user21th.Id,
-			ChatId: conversation.Id,
-			UserId: alice.Id);
+			RequestorId: user21th.Value.Id,
+			ChatId: conversation.Value.Id,
+			UserId: alice.Value.Id);
 
 		await MessengerModule.RequestAsync(AddUserToConversationBy21thCommand, CancellationToken.None);
 
 		var createRoleAliceInConversationCommand = new CreateOrUpdateRoleUserInConversationCommand(
-			RequestorId: user21th.Id,
-			UserId: alice.Id,
-			ChatId: conversation.Id,
+			RequestorId: user21th.Value.Id,
+			UserId: alice.Value.Id,
+			ChatId: conversation.Value.Id,
 			RoleColor: RoleColor.Red,
 			RoleTitle: "moderator",
 			CanBanUser: false,
@@ -41,19 +41,19 @@ public class AddUserToConversationTestSuccess : IntegrationTestBase, IIntegratio
 		await MessengerModule.RequestAsync(createRoleAliceInConversationCommand, CancellationToken.None);
 
 		var AddUserToConversationByAliceCommand = new AddUserToConversationCommand(
-			RequestorId: alice.Id,
-			ChatId: conversation.Id,
-			UserId: bob.Id);
+			RequestorId: alice.Value.Id,
+			ChatId: conversation.Value.Id,
+			UserId: bob.Value.Id);
 
 		await MessengerModule.RequestAsync(AddUserToConversationByAliceCommand, CancellationToken.None);
 
 		var getConversationCommand = new GetConversationQuery(
-			RequestorId: bob.Id,
-			ChatId: conversation.Id);
+			RequestorId: bob.Value.Id,
+			ChatId: conversation.Value.Id);
 
 		var conversationForCheck = await MessengerModule.RequestAsync(getConversationCommand, CancellationToken.None);
 		
-		conversationForCheck.IsMember.Should().BeTrue();
-		conversationForCheck.MembersCount.Should().Be(3);
+		conversationForCheck.Value.IsMember.Should().BeTrue();
+		conversationForCheck.Value.MembersCount.Should().Be(3);
 	}
 }

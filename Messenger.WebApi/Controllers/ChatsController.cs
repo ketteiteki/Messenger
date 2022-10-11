@@ -5,12 +5,7 @@ namespace Messanger.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class ChatsController : ControllerBase
+public class ChatsController : ApiControllerBase
 {
-	private readonly IMediator _mediator;
-
-	public ChatsController(IMediator mediator)
-	{
-		_mediator = mediator;
-	}
+	public ChatsController(IMediator mediator) : base(mediator) {}
 }

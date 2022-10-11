@@ -10,10 +10,10 @@ public class LoginTestSuccess : IntegrationTestBase, IIntegrationTest
 	[Fact]
 	public async Task Test()
 	{
-		var user = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21tth = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
 
 		await MessengerModule.RequestAsync(new LoginCommand(
-			NickName: user.Nickname,
+			NickName: user21tth.Value.Nickname,
 			Password: "1234567890"), CancellationToken.None);
 	}
 }

@@ -1,9 +1,7 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
-using Messenger.Domain.Entities;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace Messenger.IntegrationTests.ApiCommands.LeaveFromConversationCommandHandlerTests;
@@ -13,31 +11,29 @@ public class LeaveFromConversationTestSuccess : IntegrationTestBase, IIntegratio
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = EntityHelper.CreateUser21th();
-		var alice = EntityHelper.CreateUserAlice();
+		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+		
+		var command = new CreateConversationCommand(
+			RequestorId: user21th.Value.Id,
+			Name: "qwerty",
+			Title: "qwerty",
+			AvatarFile: null);
 
-		DatabaseContextFixture.Users.AddRange(user21th, alice);
-		await DatabaseContextFixture.SaveChangesAsync();
+		var conversation = await MessengerModule.RequestAsync(command, CancellationToken.None);
+		
+		var joinToConversationCommand = new JoinToConversationCommand(
+			RequestorId: alice.Value.Id,
+			ChatId: conversation.Value.Id);
 
-		var conversation = EntityHelper.CreateConversation(user21th.Id, "qwerty", "qwerty");
-	
-		DatabaseContextFixture.Chats.Add(conversation);
-		await DatabaseContextFixture.SaveChangesAsync();
-
-		DatabaseContextFixture.ChatUsers.AddRange(
-			new ChatUser {UserId = user21th.Id, ChatId = conversation.Id},
-			new ChatUser {UserId = alice.Id, ChatId = conversation.Id});
-		await DatabaseContextFixture.SaveChangesAsync();
-
+		await MessengerModule.RequestAsync(joinToConversationCommand, CancellationToken.None);
+		
 		var leaveFromConversationCommand = new LeaveFromConversationCommand(
-			RequestorId: alice.Id,
-			ChatId: conversation.Id);
+			RequestorId: alice.Value.Id,
+			ChatId: conversation.Value.Id);
 
-		await MessengerModule.RequestAsync(leaveFromConversationCommand, CancellationToken.None);
+		var conversationAfterLeave = await MessengerModule.RequestAsync(leaveFromConversationCommand, CancellationToken.None);
 
-		var chatUser = await DatabaseContextFixture.ChatUsers
-			.FirstOrDefaultAsync(c => c.UserId == alice.Id && c.ChatId == conversation.Id);
-
-		chatUser.Should().BeNull();
+		conversationAfterLeave.IsSuccess.Should().BeTrue();
 	}
 }

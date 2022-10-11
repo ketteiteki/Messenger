@@ -30,7 +30,7 @@ public class GetConversationQueryHandler : IRequestHandler<GetConversationQuery,
 						equals new {x1 = banUserByChat.UserId, x2 = banUserByChat.ChatId }
 						into banUserByChatEnumerable
 					from banUserByChatItem in banUserByChatEnumerable.DefaultIfEmpty()
-					where chat.Id == request.ChatId && chat.Type == ChatType.Сonversation
+					where chat.Id == request.ChatId && chat.Type == ChatType.Conversation
 					select new ChatDto
 					{
 						Id = chat.Id,

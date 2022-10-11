@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Messenger.IntegrationTests;
 
+[Collection("Sequential")]
 public class IntegrationTestBase : IAsyncLifetime
 {
 	protected DatabaseContext DatabaseContextFixture { get; }
@@ -24,7 +25,7 @@ public class IntegrationTestBase : IAsyncLifetime
 		MessengerModule = new MessengerModule();
 		
 		DatabaseContextFixture = ServiceProvider.GetRequiredService<DatabaseContext>() ??
-		                         throw new InvalidOperationException("MangoDbContext service is not registered in the DI.");
+		                         throw new InvalidOperationException("DatabaseContext service is not registered in the DI.");
 	}
 
 	public async Task InitializeAsync()
