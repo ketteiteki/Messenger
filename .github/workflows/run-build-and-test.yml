@@ -10,7 +10,6 @@ on:
 jobs:
   build-and-test-dotnet:
     name: Run Build and Test .NET
-    needs: build-and-lint-angular
     runs-on: ubuntu-latest
     steps:
       - name: Fetch Sources
