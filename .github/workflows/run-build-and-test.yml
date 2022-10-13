@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch Sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup .NET 6.0 SDK
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 6.0.x
 
@@ -43,7 +43,7 @@ jobs:
 
       - name: Run .NET Publish
         run: |
-          dotnet publish "Messenger.WebApi/Messenger.WebApi.csproj" -r "linux-x64" -o "messenger-linux-build/src"
+          dotnet publish "Messenger.WebApi/Messenger.WebApi.csproj" -r "linux-x64" -o "messenger-linux-build/src" --self-contained
 
       - name: Drop Artifact
         uses: actions/upload-artifact@v3
