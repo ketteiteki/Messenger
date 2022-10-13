@@ -35,14 +35,14 @@ public class UpdateConversationAvatarCommandHandler : IRequestHandler<UpdateConv
 			if (chatUserByRequester.Chat.AvatarLink != null)
 			{
 				_fileService.DeleteFile(Path.Combine(
-					EnvironmentConstants.GetPathWWWRoot(),
+					BaseDirService.GetPathWwwRoot(),
 					chatUserByRequester.Chat.AvatarLink.Split("/")[^1]));
 				chatUserByRequester.Chat.AvatarLink = null;
 			}
 			
 			if (request.AvatarFile != null)
 			{
-				var avatarLink = await _fileService.CreateFileAsync(EnvironmentConstants.GetPathWWWRoot(), request.AvatarFile);
+				var avatarLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), request.AvatarFile);
 				chatUserByRequester.Chat.AvatarLink = avatarLink;
 			}
 			

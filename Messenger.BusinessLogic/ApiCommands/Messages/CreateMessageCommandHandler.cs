@@ -58,7 +58,7 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 			
 				foreach (var file in request.Files)
 				{
-					var fileLink = await _fileService.CreateFileAsync(EnvironmentConstants.GetPathWWWRoot(), file);
+					var fileLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), file);
 
 					var attachment = new Attachment(
 						name: file.FileName,

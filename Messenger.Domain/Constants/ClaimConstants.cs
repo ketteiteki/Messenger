@@ -1,8 +1,8 @@
 namespace Messenger.Domain.Constants;
 
-public class ClaimConstants
+public static class ClaimConstants
 {
-	public static string Id = "IdClaimConst";
+    public const string Id = "IdClaimConst";
 
-	public static string Login = "LoginClaimConst";
+    public const string Login = "LoginClaimConst";
 }

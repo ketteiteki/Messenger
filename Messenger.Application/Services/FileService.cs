@@ -6,17 +6,17 @@ namespace Messenger.Application.Services;
 
 public class FileService : IFileService
 {
-	public async Task<string> CreateFileAsync(string path, IFormFile file)
+	public async Task<string> CreateFileAsync(string path, IFormFile file, string domainName = "localhost:7400")
 	{
 		var fileName = $"{Guid.NewGuid().ToString()}.jpeg";
 		Directory.CreateDirectory(path);
-		
-		using (FileStream stream = new FileStream(Path.Combine(path, fileName), FileMode.OpenOrCreate))
+
+		await using (var stream = new FileStream(Path.Combine(path, fileName), FileMode.OpenOrCreate))
 		{
 			await file.CopyToAsync(stream);
 		}
 
-		return $"{EnvironmentConstants.DomainName}/{fileName}";
+		return $"{domainName}/{fileName}";
 	}
 
 	public void DeleteFile(string path)
@@ -24,8 +24,8 @@ public class FileService : IFileService
 		File.Delete(path);
 	}
 
-	public bool IsFileExtension(IFormFile file, params string[] extentions)
+	public bool IsFileExtension(IFormFile file, params string[] extensions)
 	{
-		return extentions.Contains(file.ContentType);
+		return extensions.Contains(file.ContentType);
 	}
 }

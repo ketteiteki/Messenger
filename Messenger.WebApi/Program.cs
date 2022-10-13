@@ -1,4 +1,4 @@
-namespace Messanger;
+namespace Messenger.WebApi;
 
 class Program
 {

@@ -10,9 +10,9 @@ namespace Messenger.IntegrationTests;
 [Collection("Sequential")]
 public class IntegrationTestBase : IAsyncLifetime
 {
-	protected DatabaseContext DatabaseContextFixture { get; }
+	private DatabaseContext DatabaseContextFixture { get; }
 	
-	protected MessengerModule MessengerModule { get; set; }
+	protected MessengerModule MessengerModule { get; }
 	
 	private IServiceProvider ServiceProvider { get; }
 	

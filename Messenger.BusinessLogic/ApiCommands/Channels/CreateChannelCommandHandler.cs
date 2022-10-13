@@ -42,7 +42,7 @@ public class CreateChannelCommandHandler : IRequestHandler<CreateChannelCommand,
 
 		if (request.AvatarFile != null)
 		{
-			var fileLink = await _fileService.CreateFileAsync(EnvironmentConstants.GetPathWWWRoot(), request.AvatarFile);
+			var fileLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), request.AvatarFile);
 
 			newChannel.AvatarLink = fileLink;
 		}

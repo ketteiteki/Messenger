@@ -44,7 +44,7 @@ public class CreateConversationCommandHandler : IRequestHandler<CreateConversati
 
 		if (request.AvatarFile != null)
 		{
-			var avatarLink = await _fileService.CreateFileAsync(EnvironmentConstants.GetPathWWWRoot(), request.AvatarFile);
+			var avatarLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), request.AvatarFile);
 
 			newConversation.AvatarLink = avatarLink;
 		}

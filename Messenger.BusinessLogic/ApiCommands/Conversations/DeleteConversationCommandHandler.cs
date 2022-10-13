@@ -28,7 +28,7 @@ public class DeleteConversationCommandHandler : IRequestHandler<DeleteConversati
 			return new Result<ChatDto>(new ForbiddenError("It is forbidden to delete someone else's conversation"));
 		
 		if (conversation.AvatarLink != null)
-			_fileService.DeleteFile(Path.Combine(EnvironmentConstants.GetPathWWWRoot(), conversation.AvatarLink.Split("/")[^1]));
+			_fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), conversation.AvatarLink.Split("/")[^1]));
 		
 		_context.Chats.Remove(conversation);
 		await _context.SaveChangesAsync(cancellationToken);

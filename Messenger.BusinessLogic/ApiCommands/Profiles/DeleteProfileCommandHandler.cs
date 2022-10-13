@@ -26,7 +26,7 @@ public class DeleteProfileCommandHandler : IRequestHandler<DeleteProfileCommand,
 
 		if (user.AvatarLink != null)
 		{
-			_fileService.DeleteFile(Path.Combine(EnvironmentConstants.GetPathWWWRoot(), user.AvatarLink.Split("/")[^1]));
+			_fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), user.AvatarLink.Split("/")[^1]));
 			user.AvatarLink = null;
 		}
 		
