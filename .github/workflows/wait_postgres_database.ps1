@@ -1,5 +1,5 @@
 $ContainerName = 'messenger-pgsql-db'
-$ContainerLogPatternForDatabaseReady = "SQL Server is now ready for client connections. This is an informational message; no user action is required."
+$ContainerLogPatternForDatabaseReady = "database system is ready to accept connections"
         
 for(;;) {
     $isDatabaseReady = 
