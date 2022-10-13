@@ -1,0 +1,52 @@
+﻿name: Run Build and Test
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches: [ develop ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test-dotnet:
+    name: Run Build and Test .NET
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v2
+
+      - name: Setup .NET 6.0 SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore Nuget Packages
+        run: dotnet restore
+
+      - name: Build .NET Solution
+        run: |
+          dotnet build --no-restore /p:ContinuousIntegrationBuild=true --configuration Release
+
+      - name: Start PostgreSQL container
+        run: |
+          docker run --name "messenger-pgsql-db" -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:latest
+
+      - name: Wait for database to be ready
+        working-directory: ./.github/workflows
+        run: pwsh ./wait_postgres_database.ps1
+
+      - name: Run Integration Tests
+        working-directory: ./Messenger.IntegrationTests
+        run: dotnet test Messenger.IntegrationTests.csproj  /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
+
+      - name: Run .NET Publish
+        run: |
+          dotnet publish "Messenger.WebApi/Messenger.WebApi.csproj" -r "linux-x64" -o "messenger-linux-build/src"
+
+      - name: Drop Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: messenger-linux-build
+          path: messenger-linux-build/src
