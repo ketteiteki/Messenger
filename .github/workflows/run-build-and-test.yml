@@ -2,9 +2,11 @@
 
 on:
   push:
-    branches: [ ci-cd ]
+    branches:
+      - master
+      - develop
   pull_request:
-    branches: [ ci-cd ]
+    branches: [ develop ]
   workflow_dispatch:
 
 jobs:
