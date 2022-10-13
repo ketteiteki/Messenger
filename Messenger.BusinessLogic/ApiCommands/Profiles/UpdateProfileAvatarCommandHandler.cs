@@ -26,13 +26,13 @@ public class UpdateProfileAvatarCommandHandler : IRequestHandler<UpdateProfileAv
 
 		if (user.AvatarLink != null)
 		{
-			_fileService.DeleteFile(Path.Combine(EnvironmentConstants.GetPathWWWRoot(), user.AvatarLink.Split("/")[^1]));
+			_fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), user.AvatarLink.Split("/")[^1]));
 			user.AvatarLink = null;
 		}
 
 		if (request.AvatarFile != null)
 		{
-			var avatarLink = await _fileService.CreateFileAsync(EnvironmentConstants.GetPathWWWRoot(), request.AvatarFile);
+			var avatarLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), request.AvatarFile);
 
 			user.AvatarLink = avatarLink;
 		}

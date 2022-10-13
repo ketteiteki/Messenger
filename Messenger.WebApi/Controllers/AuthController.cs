@@ -3,7 +3,7 @@ using Messenger.BusinessLogic.ApiCommands.Auth;
 using Messenger.BusinessLogic.ApiQueries.Auth;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Messanger.Controllers;
+namespace Messenger.WebApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

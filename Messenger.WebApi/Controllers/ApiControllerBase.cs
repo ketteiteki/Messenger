@@ -2,7 +2,7 @@ using MediatR;
 using Messenger.BusinessLogic.Responses;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Messanger.Controllers;
+namespace Messenger.WebApi.Controllers;
 
 public class ApiControllerBase : ControllerBase
 {

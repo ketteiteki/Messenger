@@ -5,7 +5,8 @@ namespace Messenger.Application.Interfaces;
 
 public interface ITokenService
 {
-	public string CreateAccessToken(User user);
+    public string CreateAccessToken(User user, string signKey = "secretAccessTokenKey_1231");
 
-	public bool TryValidateAccessToken(string token, out JwtSecurityToken validatedJwtToken);
+    public bool TryValidateAccessToken(string token, out JwtSecurityToken validatedJwtToken,
+        string signKey = "secretAccessTokenKey_1231");
 }

@@ -1,4 +1,3 @@
-using Messenger.Domain.Constants;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,11 +6,17 @@ namespace Messenger.BusinessLogic.DependencyInjection;
 
 public static class DatabaseDependencyInjection
 {
-	public static IServiceCollection AddDatabaseServices(this IServiceCollection serviceCollection)
-	{
-		serviceCollection.AddDbContext<DatabaseContext>(opt =>
-			opt.UseNpgsql(EnvironmentConstants.DatabaseConnectionString), ServiceLifetime.Transient);
+    private const string DefaultConnectionString =
+        "Server=localhost;User Id=postgres;Password=postgres;Database=MessengerDev;";
 
-		return serviceCollection;
-	}
+    public static IServiceCollection AddDatabaseServices(
+        this IServiceCollection serviceCollection,
+        string connectionString = DefaultConnectionString)
+    {
+        var connStr = connectionString ?? DefaultConnectionString;
+
+        serviceCollection.AddDbContext<DatabaseContext>(opt => opt.UseNpgsql(connStr));
+
+        return serviceCollection;
+    }
 }

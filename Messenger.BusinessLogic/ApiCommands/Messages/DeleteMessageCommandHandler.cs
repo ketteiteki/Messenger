@@ -31,7 +31,7 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 			{
 				foreach (var attachment in message.Attachments)
 				{
-					_fileService.DeleteFile(Path.Combine(EnvironmentConstants.GetPathWWWRoot(), attachment.Link.Split("/")[^1]));
+					_fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), attachment.Link.Split("/")[^1]));
 				}
 			
 				_context.Messages.Remove(message);

@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Messanger.Controllers;
+namespace Messenger.WebApi.Controllers;
 
 [Route("[controller]")]
 [ApiController]

@@ -1,42 +1,46 @@
 using Messenger.BusinessLogic.DependencyInjection;
 using Messenger.BusinessLogic.Middlewares;
 
-namespace Messanger;
+namespace Messenger.WebApi;
 
 public class Startup
 {
-	public void ConfigureServices(IServiceCollection serviceCollection)
-	{
-		serviceCollection.AddControllers();
+    private readonly IConfiguration _configuration;
 
-		serviceCollection.AddDatabaseServices();
-		
-		serviceCollection.AddInfrastructureServices();
+    public Startup(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
 
-		serviceCollection.AddMessengerServices();
-		
-		serviceCollection.AddSwagger();
-	}
+    public void ConfigureServices(IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddControllers();
 
-	public void Configure(IApplicationBuilder applicationBuilder, IHostEnvironment environment)
-	{
-		if (environment.IsDevelopment())
-		{
-			applicationBuilder.UseSwagger();
-			applicationBuilder.UseSwaggerUI();
-		}
-		applicationBuilder.UseHttpsRedirection();
-		
-		applicationBuilder.UseRouting();
-		
-		applicationBuilder.UseAuthentication();
-		applicationBuilder.UseAuthorization();
-		
-		applicationBuilder.UseMiddleware<ExceptionMiddleware>();
-		
-		applicationBuilder.UseEndpoints(options =>
-		{
-			options.MapControllers();
-		});
-	}
+        var connectionStr = _configuration.GetConnectionString("DatabaseConnectionString");
+
+        serviceCollection.AddDatabaseServices(connectionStr);
+
+        serviceCollection.AddInfrastructureServices();
+
+        serviceCollection.AddMessengerServices();
+
+        serviceCollection.AddSwagger();
+    }
+
+    public void Configure(IApplicationBuilder applicationBuilder, IHostEnvironment environment)
+    {
+        applicationBuilder.UseSwagger();
+        applicationBuilder.UseSwaggerUI();
+
+        applicationBuilder.UseHttpsRedirection();
+
+        applicationBuilder.UseRouting();
+
+        applicationBuilder.UseAuthentication();
+        applicationBuilder.UseAuthorization();
+
+        applicationBuilder.UseMiddleware<ExceptionMiddleware>();
+
+        applicationBuilder.UseEndpoints(options => { options.MapControllers(); });
+    }
 }
