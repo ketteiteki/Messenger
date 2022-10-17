@@ -24,12 +24,12 @@ public class BanUserInConversationCommandHandler : IRequestHandler<BanUserInConv
 		var chatUserByRequestor = await _context.ChatUsers
 			.Include(c => c.Role)
 			.Include(c => c.Chat)
-			.FirstOrDefaultAsync(c => c.UserId == request.RequestorId && c.ChatId == request.ChatId, cancellationToken);
+			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequestor == null)
 			return new Result<UserDto>(new ForbiddenError("No requestor in the chat"));
 		
-		if (chatUserByRequestor.Role is { CanBanUser: true } || chatUserByRequestor.Chat.OwnerId == request.RequestorId)
+		if (chatUserByRequestor.Role is { CanBanUser: true } || chatUserByRequestor.Chat.OwnerId == request.RequesterId)
 		{
 			var chatUser = await _context.ChatUsers
 				.Include(c => c.User)

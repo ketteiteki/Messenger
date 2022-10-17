@@ -21,13 +21,13 @@ public class AddUserToConversationCommandHandler : IRequestHandler<AddUserToConv
 		var chatUserByRequester = await _context.ChatUsers
 			.Include(c => c.Role)
 			.Include(c => c.Chat)
-			.FirstOrDefaultAsync(c => c.UserId == request.RequestorId && c.ChatId == request.ChatId, cancellationToken);
+			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
 			return new Result<UserDto>(new ForbiddenError("No requester in the chat"));
 
 		if (chatUserByRequester.Role is { CanAddAndRemoveUserToConversation: true } ||
-		    chatUserByRequester.Chat.OwnerId == request.RequestorId)
+		    chatUserByRequester.Chat.OwnerId == request.RequesterId)
 		{
 			var user = await _context.Users
 				.AsNoTracking()

@@ -10,7 +10,7 @@ namespace Messenger.Application.Services;
 
 public class TokenService : ITokenService
 {
-    public string CreateAccessToken(User user, string signKey = "secretAccessTokenKey_1231")
+    public string CreateAccessToken(User user, string signKey)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -30,8 +30,7 @@ public class TokenService : ITokenService
         return tokenHandler.WriteToken(jwtToken);
     }
 
-    public bool TryValidateAccessToken(string token, out JwtSecurityToken validatedJwtToken,
-        string signKey = "secretAccessTokenKey_1231")
+    public bool TryValidateAccessToken(string token, string signKey, out JwtSecurityToken validatedJwtToken)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.Default.GetBytes(signKey);

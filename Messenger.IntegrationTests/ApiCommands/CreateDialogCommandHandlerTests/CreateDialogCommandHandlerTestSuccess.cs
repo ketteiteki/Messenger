@@ -12,11 +12,11 @@ public class CreateDialogCommandHandlerTestSuccess : IntegrationTestBase, IInteg
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		
 		var createDialogCommand = new CreateDialogCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21th.Value.Id,
 			UserId: alice.Value.Id);
 
 		var dialog = await MessengerModule.RequestAsync(createDialogCommand, CancellationToken.None);

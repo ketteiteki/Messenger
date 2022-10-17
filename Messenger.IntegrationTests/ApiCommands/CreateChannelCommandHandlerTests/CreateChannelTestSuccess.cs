@@ -11,10 +11,10 @@ public class CreateChannelTestSuccess : IntegrationTestBase, IIntegrationTest
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
 		var command = new CreateChannelCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			Name: "convers",
 			Title: "21ths den",
 			AvatarFile: null);

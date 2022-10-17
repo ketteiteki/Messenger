@@ -24,7 +24,7 @@ public class GetDialogQueryHandler : IRequestHandler<GetDialogQuery, Result<Chat
 					on new {x1 = chatUser1.UserId, x2 = chatUser1.ChatId} 
 					equals new {x1 = chatUser2.UserId, x2 = chatUser2.ChatId}
 				where chatUser1.Chat.Type == ChatType.Dialog &&
-				      chatUser1.User.Id == request.RequestorId && chatUser2.User.Id == request.WithWhomId
+				      chatUser1.User.Id == request.RequesterId && chatUser2.User.Id == request.WithWhomId
 				select new ChatDto
 			{
 				Id = chatUser2.Chat.Id,

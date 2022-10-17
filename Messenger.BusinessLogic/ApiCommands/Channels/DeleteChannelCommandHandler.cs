@@ -23,7 +23,7 @@ public class DeleteChannelCommandHandler : IRequestHandler<DeleteChannelCommand,
 
 		if (channel == null) return new Result<ChatDto>(new DbEntityNotFoundError("Channel not found"));
 
-		if (channel.OwnerId != request.RequestorId) 
+		if (channel.OwnerId != request.RequesterId) 
 			return new Result<ChatDto>(new ForbiddenError("You cannot delete someone else's conference"));
 
 		if (channel.AvatarLink != null)

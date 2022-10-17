@@ -11,10 +11,10 @@ public class DeleteChannelTestSuccess : IntegrationTestBase, IIntegrationTest
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
 		var command = new CreateChannelCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21th.Value.Id,
 			Name: "convers",
 			Title: "21ths den",
 			AvatarFile: null);
@@ -22,7 +22,7 @@ public class DeleteChannelTestSuccess : IntegrationTestBase, IIntegrationTest
 		var channel = await MessengerModule.RequestAsync(command, CancellationToken.None);
 
 		var deleteChannelCommand = new DeleteChannelCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21th.Value.Id,
 			ChannelId: channel.Value.Id);
 		
 		var dialog = await MessengerModule.RequestAsync(deleteChannelCommand, CancellationToken.None);

@@ -2,9 +2,11 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models.RequestResponse;
 using Messenger.BusinessLogic.Responses;
+using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Messenger.BusinessLogic.ApiCommands.Auth;
 
@@ -13,12 +15,14 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 	private readonly DatabaseContext _context;
 	private readonly IHashService _hashService;
 	private readonly ITokenService _tokenService;
+	private readonly IConfiguration _configuration;
 
-	public RegistrationCommandHandler(DatabaseContext context, IHashService hashService, ITokenService tokenService)
+	public RegistrationCommandHandler(DatabaseContext context, IHashService hashService, ITokenService tokenService, IConfiguration configuration)
 	{
 		_context = context;
 		_hashService = hashService;
 		_tokenService = tokenService;
+		_configuration = configuration;
 	}
 	
 	public async Task<Result<RegistrationResponse>> Handle(RegistrationCommand request, CancellationToken cancellationToken)
@@ -39,7 +43,8 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 		_context.Users.Add(newUser);
 		await _context.SaveChangesAsync(cancellationToken);
 
-		var accessToken = _tokenService.CreateAccessToken(newUser);
+		var accessToken = _tokenService.CreateAccessToken(newUser,
+			_configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey]);
 		
 		return new Result<RegistrationResponse>(new RegistrationResponse(newUser, accessToken));
 	}

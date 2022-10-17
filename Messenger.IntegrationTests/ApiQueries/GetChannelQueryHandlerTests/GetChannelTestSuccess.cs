@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Channels;
+using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.BusinessLogic.ApiQueries.Channels;
 using Messenger.IntegrationTests.Abstraction;
@@ -13,12 +14,12 @@ public class GetChannelTestSuccess : IntegrationTestBase, IIntegrationTest
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
 		var createChannelCommand = new CreateChannelCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
 			AvatarFile: null);
@@ -26,29 +27,29 @@ public class GetChannelTestSuccess : IntegrationTestBase, IIntegrationTest
 		var channel = await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
 
 		await MessengerModule.RequestAsync(
-			new JoinToChannelCommand(
-				RequestorId: bob.Value.Id,
-				ChannelId: channel.Value.Id), CancellationToken.None);
+			new JoinToChatCommand(
+				RequesterId: bob.Value.Id,
+				ChatId: channel.Value.Id), CancellationToken.None);
 
 		var createPermissionsForBob = new CreatePermissionsUserInConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			UserId: bob.Value.Id,
 			ChatId: channel.Value.Id,
 			CanSendMedia: false);
 
 		await MessengerModule.RequestAsync(createPermissionsForBob, CancellationToken.None);
 		
-		var channelForRequestorQuery = new GetChannelQuery(
-			RequestorId: user21th.Value.Id,
+		var channelForRequesterQuery = new GetChannelQuery(
+			RequesterId: user21Th.Value.Id,
 			ChannelId: channel.Value.Id);
 		var channelForAliceQuery = new GetChannelQuery(
-			RequestorId: alice.Value.Id,
+			RequesterId: alice.Value.Id,
 			ChannelId: channel.Value.Id);
 		var channelForBobQuery = new GetChannelQuery(
-			RequestorId: bob.Value.Id,
+			RequesterId: bob.Value.Id,
 			ChannelId: channel.Value.Id);
 
-		var chatForRequester = await MessengerModule.RequestAsync(channelForRequestorQuery, CancellationToken.None);
+		var chatForRequester = await MessengerModule.RequestAsync(channelForRequesterQuery, CancellationToken.None);
 		var chatForAlice = await MessengerModule.RequestAsync(channelForAliceQuery, CancellationToken.None);
 		var chatForBob = await MessengerModule.RequestAsync(channelForBobQuery, CancellationToken.None);
 

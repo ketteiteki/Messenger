@@ -2,6 +2,7 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
+using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
 using Messenger.Services;
@@ -25,7 +26,7 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 		
 		if (message == null) return new Result<MessageDto>(new DbEntityNotFoundError("Message not found"));
 
-		if (message.OwnerId == request.RequestorId || message.Chat.Owner?.Id == request.RequestorId)
+		if (message.OwnerId == request.RequesterId || message.Chat.Owner?.Id == request.RequesterId)
 		{
 			if (request.IsDeleteForAll)
 			{
@@ -58,7 +59,7 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 			var deletedMessageByUser = new DeletedMessageByUser
 			{
 				MessageId = message.Id,
-				UserId = request.RequestorId
+				UserId = request.RequesterId
 			};
 			
 			_context.DeletedMessageByUsers.Add(deletedMessageByUser);

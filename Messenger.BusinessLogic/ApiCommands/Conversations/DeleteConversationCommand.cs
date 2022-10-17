@@ -6,5 +6,5 @@ namespace Messenger.BusinessLogic.ApiCommands.Conversations;
 
 public record DeleteConversationCommand(
 	Guid ChatId,
-	Guid RequestorId) 
+	Guid RequesterId) 
 	: IRequest<Result<ChatDto>>;

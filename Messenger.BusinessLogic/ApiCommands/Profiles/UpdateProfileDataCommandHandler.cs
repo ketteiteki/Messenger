@@ -17,7 +17,7 @@ public class UpdateProfileDataCommandHandler : IRequestHandler<UpdateProfileData
 	
 	public async Task<Result<UserDto>> Handle(UpdateProfileDataCommand request, CancellationToken cancellationToken)
 	{
-		var user = await _context.Users.FirstAsync(u => u.Id == request.RequestorId, cancellationToken);
+		var user = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, cancellationToken);
 		
 		var userByNickName =  await _context.Users
 			.FirstOrDefaultAsync(u => u.NickName == request.NickName, cancellationToken);

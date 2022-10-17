@@ -19,7 +19,7 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 	
 	public async Task<Result<ChatDto>> Handle(CreateDialogCommand request, CancellationToken cancellationToken)
 	{
-		var requestor = await _context.Users.FindAsync(request.RequestorId);
+		var requestor = await _context.Users.FindAsync(request.RequesterId);
 		
 		if (requestor == null) throw new Exception("Requestor not found");
 		
@@ -33,7 +33,7 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 					on new {x1 = chatUser1.UserId, x2 = chatUser1.ChatId} 
 					equals new {x1 = chatUser2.UserId, x2 = chatUser2.ChatId}
 				where chatUser1.Chat.Type == ChatType.Dialog &&
-				      chatUser1.UserId == request.RequestorId && chatUser2.UserId == request.UserId
+				      chatUser1.UserId == request.RequesterId && chatUser2.UserId == request.UserId
 				select chatUser2)
 			.FirstOrDefaultAsync(cancellationToken);
 
@@ -48,7 +48,7 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 			lastMessageId: null);
 		
 		_context.Chats.Add(newDialog);
-		_context.ChatUsers.Add(new ChatUser {ChatId = newDialog.Id, UserId = request.RequestorId});
+		_context.ChatUsers.Add(new ChatUser {ChatId = newDialog.Id, UserId = request.RequesterId});
 		_context.ChatUsers.Add(new ChatUser {ChatId = newDialog.Id, UserId = request.UserId});
 		await _context.SaveChangesAsync(cancellationToken);
 

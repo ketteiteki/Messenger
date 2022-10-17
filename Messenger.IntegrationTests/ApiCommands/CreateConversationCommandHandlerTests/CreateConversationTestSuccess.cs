@@ -11,10 +11,10 @@ public class CreateConversationTestSuccess : IntegrationTestBase, IIntegrationTe
 	[Fact]
 	public async Task Test()
 	{
-		var user = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
 		var command = new CreateConversationCommand(
-			RequestorId: user.Value.Id,
+			RequesterId: user.Value.Id,
 			Name: "qwerty",
 			Title: "qwery",
 			AvatarFile: null);

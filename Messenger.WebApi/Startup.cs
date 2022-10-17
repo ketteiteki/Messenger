@@ -1,5 +1,6 @@
 using Messenger.BusinessLogic.DependencyInjection;
 using Messenger.BusinessLogic.Middlewares;
+using Messenger.Domain.Constants;
 
 namespace Messenger.WebApi;
 
@@ -16,9 +17,9 @@ public class Startup
     {
         serviceCollection.AddControllers();
 
-        var connectionStr = _configuration.GetConnectionString("DatabaseConnectionString");
+        var databaseConnectionString = _configuration.GetConnectionString(AppSettingConstants.DatabaseConnectionString);
 
-        serviceCollection.AddDatabaseServices(connectionStr);
+        serviceCollection.AddDatabaseServices(databaseConnectionString);
 
         serviceCollection.AddInfrastructureServices();
 

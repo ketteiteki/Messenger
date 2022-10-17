@@ -29,7 +29,7 @@ public class CreateOrUpdateRoleUserInConversationCommandHandler
 		if (chatUser == null)
 			return new Result<RoleUserByChatDto>(new ForbiddenError("No user found in chat"));
 		
-		if (chatUser.Chat.OwnerId == request.RequestorId)
+		if (chatUser.Chat.OwnerId == request.RequesterId)
 		{
 			if (chatUser.Role == null)
 			{

@@ -19,7 +19,7 @@ public class LeaveFromConversationCommandHandler : IRequestHandler<LeaveFromConv
 	{
 		var chatUser = await _context.ChatUsers
 			.Include(c => c.Chat)
-			.FirstOrDefaultAsync(c => c.ChatId == request.ChatId && c.UserId == request.RequestorId, cancellationToken);
+			.FirstOrDefaultAsync(c => c.ChatId == request.ChatId && c.UserId == request.RequesterId, cancellationToken);
 
 		if (chatUser == null)
 			return new Result<ChatDto>(new ForbiddenError("No user found in chat"));
@@ -36,7 +36,7 @@ public class LeaveFromConversationCommandHandler : IRequestHandler<LeaveFromConv
 				Type = chatUser.Chat.Type,
 				AvatarLink = chatUser.Chat.AvatarLink,
 				CanSendMedia = chatUser.CanSendMedia,
-				IsOwner = chatUser.Chat.OwnerId == request.RequestorId,
+				IsOwner = chatUser.Chat.OwnerId == request.RequesterId,
 				IsMember = false,
 				MuteDateOfExpire = chatUser.MuteDateOfExpire,
 				BanDateOfExpire = null

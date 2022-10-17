@@ -21,12 +21,12 @@ public class GetConversationQueryHandler : IRequestHandler<GetConversationQuery,
 		var conversation = 
 			await (from chat in _context.Chats.AsNoTracking()
 					join chatUsers in _context.ChatUsers.AsNoTracking()
-						on new {x1 = request.RequestorId, x2 = chat.Id} 
+						on new {x1 = request.RequesterId, x2 = chat.Id} 
 						equals new {x1 = chatUsers.UserId, x2 = chatUsers.ChatId }
 						into chatUsersEnumerable
 					from chatUsersItem in chatUsersEnumerable.DefaultIfEmpty()
 					join banUserByChat in _context.BanUserByChats.AsNoTracking()
-						on new {x1 = request.RequestorId, x2 = chat.Id} 
+						on new {x1 = request.RequesterId, x2 = chat.Id} 
 						equals new {x1 = banUserByChat.UserId, x2 = banUserByChat.ChatId }
 						into banUserByChatEnumerable
 					from banUserByChatItem in banUserByChatEnumerable.DefaultIfEmpty()
@@ -40,7 +40,7 @@ public class GetConversationQueryHandler : IRequestHandler<GetConversationQuery,
 						AvatarLink = chat.AvatarLink,
 						MembersCount = chat.ChatUsers.Count,
 						CanSendMedia = chatUsersItem != null && chatUsersItem.CanSendMedia,
-						IsOwner = chat.OwnerId == request.RequestorId,
+						IsOwner = chat.OwnerId == request.RequesterId,
 						IsMember = chatUsersItem != null,
 						MuteDateOfExpire = chatUsersItem != null ? chatUsersItem.MuteDateOfExpire : null,
 						BanDateOfExpire = banUserByChatItem != null ? banUserByChatItem.BanDateOfExpire : null,

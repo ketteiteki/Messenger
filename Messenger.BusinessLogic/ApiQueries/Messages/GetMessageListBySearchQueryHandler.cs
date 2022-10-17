@@ -21,7 +21,7 @@ public class GetMessageListBySearchQueryHandler : IRequestHandler<GetMessageList
 		if (request.Limit > 60) return new Result<List<MessageDto>>(new BadRequestError("Limit exceeded. Limit: 60"));
 		
 		var banUserByChat = await _context.BanUserByChats
-			.FirstOrDefaultAsync(b => b.UserId == request.RequestorId && b.ChatId == request.ChatId, cancellationToken);
+			.FirstOrDefaultAsync(b => b.UserId == request.RequesterId && b.ChatId == request.ChatId, cancellationToken);
 
 		if (banUserByChat != null) return new Result<List<MessageDto>>(new ForbiddenError("You are banned"));
 		

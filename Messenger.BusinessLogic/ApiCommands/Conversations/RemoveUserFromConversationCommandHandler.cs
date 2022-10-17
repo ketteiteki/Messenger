@@ -21,13 +21,13 @@ public class RemoveUserFromConversationCommandHandler : IRequestHandler<RemoveUs
 			.Include(c => c.Chat)
 			.Include(c => c.User)
 			.Include(c => c.Role)
-			.FirstOrDefaultAsync(r => r.UserId == request.RequestorId && r.ChatId == request.ChatId, cancellationToken);
+			.FirstOrDefaultAsync(r => r.UserId == request.RequesterId && r.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
 			return new Result<UserDto>(new DbEntityNotFoundError("No requestor in the chat"));
 
 		if (chatUserByRequester.Role is { CanAddAndRemoveUserToConversation: true } ||
-		    chatUserByRequester.Chat.OwnerId == request.RequestorId)
+		    chatUserByRequester.Chat.OwnerId == request.RequesterId)
 		{
 			var chatUserByUser = await _context.ChatUsers
 				.Include(c => c.User)

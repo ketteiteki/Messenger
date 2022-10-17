@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
@@ -12,13 +13,14 @@ public class BanUserInConversationTestSuccess : IntegrationTestBase, IIntegratio
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+		if (user21Th == null) throw new ArgumentNullException(nameof(user21Th));
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 		var alex = await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
 			AvatarFile: null);
@@ -26,20 +28,20 @@ public class BanUserInConversationTestSuccess : IntegrationTestBase, IIntegratio
 		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
 		await MessengerModule.RequestAsync(
-			new JoinToConversationCommand(
-				RequestorId: alice.Value.Id,
+			new JoinToChatCommand(
+				RequesterId: alice.Value.Id,
 				ChatId: conversation.Value.Id), CancellationToken.None);
 		await MessengerModule.RequestAsync(
-			new JoinToConversationCommand(
-					RequestorId: bob.Value.Id,
+			new JoinToChatCommand(
+					RequesterId: bob.Value.Id,
 					ChatId: conversation.Value.Id), CancellationToken.None);
 		await MessengerModule.RequestAsync(
-			new JoinToConversationCommand(
-				RequestorId: alex.Value.Id,
+			new JoinToChatCommand(
+				RequesterId: alex.Value.Id,
 				ChatId: conversation.Value.Id), CancellationToken.None);
 
 		var createRoleBobInConversation = new CreateOrUpdateRoleUserInConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			UserId: bob.Value.Id,
 			ChatId: conversation.Value.Id,
 			RoleColor: RoleColor.Black,
@@ -51,29 +53,29 @@ public class BanUserInConversationTestSuccess : IntegrationTestBase, IIntegratio
 		
 		await MessengerModule.RequestAsync(createRoleBobInConversation, CancellationToken.None);
 
-		var banUserInConversationCommandForAliceBy21th = new BanUserInConversationCommand(
-			RequestorId: user21th.Value.Id,
+		var banUserInConversationCommandForAliceBy21Th = new BanUserInConversationCommand(
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alice.Value.Id,
 			BanDateOfExpire: DateTime.UtcNow.AddDays(2));
 
 		var banUserInConversationCommandForAlexByBob = new BanUserInConversationCommand(
-			RequestorId: bob.Value.Id,
+			RequesterId: bob.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alex.Value.Id,
 			BanDateOfExpire: DateTime.UtcNow.AddDays(2));
 
-		await MessengerModule.RequestAsync(banUserInConversationCommandForAliceBy21th, CancellationToken.None);
+		await MessengerModule.RequestAsync(banUserInConversationCommandForAliceBy21Th, CancellationToken.None);
 		await MessengerModule.RequestAsync(banUserInConversationCommandForAlexByBob, CancellationToken.None);
 
 		var joinInChatByAlice = await MessengerModule.RequestAsync(
-			new JoinToConversationCommand(
-				RequestorId: alice.Value.Id,
+			new JoinToChatCommand(
+				RequesterId: alice.Value.Id,
 				ChatId: conversation.Value.Id), CancellationToken.None);
 		
 		var joinInChatByAlex = await MessengerModule.RequestAsync(
-			new JoinToConversationCommand(
-				RequestorId: alex.Value.Id, 
+			new JoinToChatCommand(
+				RequesterId: alex.Value.Id, 
 				ChatId: conversation.Value.Id), CancellationToken.None);
 
 		joinInChatByAlice.IsSuccess.Should().BeFalse();

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.BusinessLogic.ApiQueries.Conversations;
 using Messenger.IntegrationTests.Abstraction;
@@ -12,12 +13,12 @@ public class GetConversationTestSuccess : IntegrationTestBase, IIntegrationTest
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 		
 		var createConversationCommand = new CreateConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
 			AvatarFile: null);
@@ -25,29 +26,29 @@ public class GetConversationTestSuccess : IntegrationTestBase, IIntegrationTest
 		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 		
 		await MessengerModule.RequestAsync(
-			new JoinToConversationCommand(
-				RequestorId: alice.Value.Id,
+			new JoinToChatCommand(
+				RequesterId: alice.Value.Id,
 				ChatId: conversation.Value.Id), CancellationToken.None);
 
-		var queryFor21th = new GetConversationQuery(
-			RequestorId: user21th.Value.Id,
+		var queryFor21Th = new GetConversationQuery(
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id);
 
 		var queryForAlice = new GetConversationQuery(
-			RequestorId: alice.Value.Id,
+			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id);
 		
 		var queryForBob =new GetConversationQuery(
-			RequestorId: bob.Value.Id,
+			RequesterId: bob.Value.Id,
 			ChatId: conversation.Value.Id);
 		
-		var resultFor21th = await MessengerModule.RequestAsync(queryFor21th, CancellationToken.None);
+		var resultFor21Th = await MessengerModule.RequestAsync(queryFor21Th, CancellationToken.None);
 		var resultForAlice = await MessengerModule.RequestAsync(queryForAlice, CancellationToken.None);
 		var resultForBob = await MessengerModule.RequestAsync(queryForBob, CancellationToken.None);
 
-		resultFor21th.Value.IsOwner.Should().BeTrue();
-		resultFor21th.Value.IsMember.Should().BeTrue();
-		resultFor21th.Value.MembersCount.Should().Be(2);
+		resultFor21Th.Value.IsOwner.Should().BeTrue();
+		resultFor21Th.Value.IsMember.Should().BeTrue();
+		resultFor21Th.Value.MembersCount.Should().Be(2);
 		
 		resultForAlice.Value.IsOwner.Should().BeFalse();
 		resultForAlice.Value.IsMember.Should().BeTrue();

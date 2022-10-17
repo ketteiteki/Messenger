@@ -5,6 +5,6 @@ using Messenger.BusinessLogic.Responses;
 namespace Messenger.BusinessLogic.ApiQueries.Conversations;
 
 public record GetConversationQuery(
-		Guid RequestorId,
+		Guid RequesterId,
 		Guid ChatId)
 	: IRequest<Result<ChatDto>>;

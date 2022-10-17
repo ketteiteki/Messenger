@@ -5,7 +5,7 @@ using Messenger.BusinessLogic.Responses;
 namespace Messenger.BusinessLogic.ApiCommands.Messages;
 
 public record UpdateMessageCommand(
-	Guid RequestorId,
+	Guid RequesterId,
 	Guid MessageId,
 	string Text) 
 	: IRequest<Result<MessageDto>>;

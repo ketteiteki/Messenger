@@ -2,11 +2,13 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
+using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
 using Messenger.Domain.Enum;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Messenger.BusinessLogic.ApiCommands.Conversations;
 
@@ -14,18 +16,20 @@ public class CreateConversationCommandHandler : IRequestHandler<CreateConversati
 {
 	private readonly DatabaseContext _context;
 	private readonly IFileService _fileService;
+	private readonly IConfiguration _configuration;
 	
-	public CreateConversationCommandHandler(DatabaseContext context, IFileService fileService)
+	public CreateConversationCommandHandler(DatabaseContext context, IFileService fileService, IConfiguration configuration)
 	{
 		_context = context;
 		_fileService = fileService;
+		_configuration = configuration;
 	}
 	
 	public async Task<Result<ChatDto>> Handle(CreateConversationCommand request, CancellationToken cancellationToken)
 	{
-		var requestor = await _context.Users.FindAsync(request.RequestorId);
+		var requester = await _context.Users.FindAsync(request.RequesterId);
 			
-		if (requestor == null) throw new Exception("Requester not found");
+		if (requester == null) throw new Exception("Requester not found");
 		
 		var conversationByName = await _context.Chats
 			.FirstOrDefaultAsync(c => c.Name == request.Name, cancellationToken);
@@ -35,7 +39,7 @@ public class CreateConversationCommandHandler : IRequestHandler<CreateConversati
 
 		var newConversation = new Chat(
 			name: request.Name,
-			ownerId: requestor.Id,
+			ownerId: requester.Id,
 			title: request.Title,
 			type: ChatType.Conversation,
 			avatarLink: null,
@@ -44,12 +48,13 @@ public class CreateConversationCommandHandler : IRequestHandler<CreateConversati
 
 		if (request.AvatarFile != null)
 		{
-			var avatarLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), request.AvatarFile);
+			var avatarLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), request.AvatarFile,
+				_configuration[AppSettingConstants.MessengerDomainName]);
 
 			newConversation.AvatarLink = avatarLink;
 		}
 
-		newConversation.ChatUsers.Add(new ChatUser {ChatId = newConversation.Id, UserId = requestor.Id});
+		newConversation.ChatUsers.Add(new ChatUser {ChatId = newConversation.Id, UserId = requester.Id});
 		
 		_context.Chats.Add(newConversation);
 		await _context.SaveChangesAsync(cancellationToken);

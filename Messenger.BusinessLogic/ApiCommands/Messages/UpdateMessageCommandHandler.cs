@@ -19,7 +19,7 @@ public class UpdateMessageCommandHandler : IRequestHandler<UpdateMessageCommand,
 		var message = await _context.Messages.FindAsync(request.MessageId);
 		if (message == null) return new Result<MessageDto>(new DbEntityNotFoundError("Message not found")); 
 
-		if (request.RequestorId != message.OwnerId)
+		if (request.RequesterId != message.OwnerId)
 			return new Result<MessageDto>(new ForbiddenError("It is forbidden to change someone else's message")); 
 		
 		message.Text = request.Text;

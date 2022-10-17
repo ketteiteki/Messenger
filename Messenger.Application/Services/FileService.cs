@@ -1,12 +1,11 @@
 using Messenger.Application.Interfaces;
-using Messenger.Domain.Constants;
 using Microsoft.AspNetCore.Http;
 
 namespace Messenger.Application.Services;
 
 public class FileService : IFileService
 {
-	public async Task<string> CreateFileAsync(string path, IFormFile file, string domainName = "localhost:7400")
+	public async Task<string> CreateFileAsync(string path, IFormFile file, string domainName)
 	{
 		var fileName = $"{Guid.NewGuid().ToString()}.jpeg";
 		Directory.CreateDirectory(path);
