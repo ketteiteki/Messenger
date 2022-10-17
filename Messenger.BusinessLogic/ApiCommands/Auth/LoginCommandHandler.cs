@@ -30,7 +30,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
 		var user = await _context.Users.FirstOrDefaultAsync(u => u.NickName == request.NickName, cancellationToken);
 		if (user == null) return new Result<LoginResponse>(new AuthenticationError("User does not exists"));
 
-		var f = _hashService.HMACSHA512CryptoHashWithSalt(request.Password, user.PasswordSalt);
+		var f = _hashService.Hmacsha512CryptoHashWithSalt(request.Password, user.PasswordSalt);
 		
 		if (user.PasswordHash != f)
 			return new Result<LoginResponse>(new AuthenticationError("Password is wrong"));

@@ -30,7 +30,7 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 		var findUser = await _context.Users.FirstOrDefaultAsync(u => u.NickName == request.Nickname, cancellationToken);
 		if (findUser != null) return new Result<RegistrationResponse>(new AuthenticationError("User already exists"));
 
-		var passwordHash = _hashService.HMACSHA512CryptoHash(request.Password, out var salt);
+		var passwordHash = _hashService.Hmacsha512CryptoHash(request.Password, out var salt);
 
 		var newUser = new User(
 			displayName: request.DisplayName,

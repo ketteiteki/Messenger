@@ -12,7 +12,7 @@ public class LoginResponse
 	
 	public string NickName { get; set; } = null!;
 
-	public string? AvatarLink { get; set; }
+	public string AvatarLink { get; set; }
 	
 	public LoginResponse(User user, string accessToken)
 	{

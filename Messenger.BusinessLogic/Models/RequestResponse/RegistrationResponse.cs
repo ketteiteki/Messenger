@@ -12,7 +12,7 @@ public class RegistrationResponse
 	
 	public string Nickname { get; set; } = null!;
 
-	public string? AvatarLink { get; set; }
+	public string AvatarLink { get; set; }
 
 	public RegistrationResponse(User user, string accessToken)
 	{

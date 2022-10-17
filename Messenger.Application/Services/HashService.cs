@@ -6,7 +6,7 @@ namespace Messenger.Application.Services;
 
 public class HashService : IHashService
 {
-	public string HMACSHA512CryptoHash(string value, out string salt)
+	public string Hmacsha512CryptoHash(string value, out string salt)
 	{
 		var hmac = new HMACSHA512();
 		var bytes = Encoding.Default.GetBytes(value);
@@ -16,7 +16,7 @@ public class HashService : IHashService
 		return Convert.ToBase64String(computeHash);
 	}
 
-	public string HMACSHA512CryptoHashWithSalt(string value, string salt)
+	public string Hmacsha512CryptoHashWithSalt(string value, string salt)
 	{
 		var key = Convert.FromBase64String(salt);	
 		var hmac = new HMACSHA512 {Key = key};

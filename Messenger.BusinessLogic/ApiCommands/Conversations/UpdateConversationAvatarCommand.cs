@@ -8,5 +8,5 @@ namespace Messenger.BusinessLogic.ApiCommands.Conversations;
 public record UpdateConversationAvatarCommand(
 		Guid RequesterId, 
 		Guid ChatId, 
-		IFormFile? AvatarFile) 
+		IFormFile AvatarFile) 
 	: IRequest<Result<ChatDto>>;

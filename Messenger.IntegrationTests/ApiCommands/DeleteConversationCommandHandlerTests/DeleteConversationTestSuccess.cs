@@ -12,10 +12,10 @@ public class DeleteConversationTestSuccess : IntegrationTestBase, IIntegrationTe
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
 		var command = new CreateConversationCommand(
-			RequesterId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			Name: "convers",
 			Title: "21ths den",
 			AvatarFile: null);
@@ -23,13 +23,13 @@ public class DeleteConversationTestSuccess : IntegrationTestBase, IIntegrationTe
 		var conversation = await MessengerModule.RequestAsync(command, CancellationToken.None);
 		
 		var deleteConversationCommand = new DeleteConversationCommand(
-			RequesterId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id);
 
 		await MessengerModule.RequestAsync(deleteConversationCommand, CancellationToken.None);
 
 		var conversationForCheckCommand = new GetConversationQuery(
-			RequesterId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id);
 
 		var conversationForCheck = await MessengerModule.RequestAsync(conversationForCheckCommand, CancellationToken.None);

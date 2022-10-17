@@ -8,5 +8,5 @@ public class ConversationCreateRequest
 
 	public string Nickname { get; set; } = null!;
 	
-	public IFormFile? AvatarFile { get; set; }
+	public IFormFile AvatarFile { get; set; }
 }

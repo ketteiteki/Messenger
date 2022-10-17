@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Messenger.IntegrationTests.ApiCommands.JoinToChatCommandHandlerTests;
 
-public class JoinToConversationTestSuccess : IntegrationTestBase, IIntegrationTest
+public class JoinToChatTestSuccess : IntegrationTestBase, IIntegrationTest
 {
 	[Fact]
 	public async Task Test()

@@ -2,6 +2,7 @@ using MediatR;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.BusinessLogic.ApiCommands.Messages;
 
@@ -16,7 +17,12 @@ public class UpdateMessageCommandHandler : IRequestHandler<UpdateMessageCommand,
 	
 	public async Task<Result<MessageDto>> Handle(UpdateMessageCommand request, CancellationToken cancellationToken)
 	{
-		var message = await _context.Messages.FindAsync(request.MessageId);
+		var message = await _context.Messages
+			.Include(m => m.Owner)
+			.Include(m => m.ReplyToMessage)
+			.ThenInclude(r => r.Owner)
+			.Include(m => m.Attachments)
+			.FirstOrDefaultAsync(m => m.Id == request.MessageId, cancellationToken);
 		if (message == null) return new Result<MessageDto>(new DbEntityNotFoundError("Message not found")); 
 
 		if (request.RequesterId != message.OwnerId)

@@ -20,6 +20,7 @@ public class DeleteDialogCommandHandler : IRequestHandler<DeleteDialogCommand, R
 	public async Task<Result<ChatDto>> Handle(DeleteDialogCommand request, CancellationToken cancellationToken)
 	{
 		var chatUser = await _context.ChatUsers
+			.Include(c => c.Chat)
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUser == null)

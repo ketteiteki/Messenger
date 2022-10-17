@@ -8,5 +8,5 @@ public record UpdateProfileDataCommand(
 	Guid RequesterId,
 	string DisplayName,
 	string NickName,
-	string? Bio
+	string Bio
 ) : IRequest<Result<UserDto>>;

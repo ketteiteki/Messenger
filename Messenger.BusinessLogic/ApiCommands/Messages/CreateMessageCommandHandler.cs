@@ -27,6 +27,7 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 	public async Task<Result<MessageDto>> Handle(CreateMessageCommand request, CancellationToken cancellationToken)
 	{
 		var chatUser = await _context.ChatUsers
+			.Include(c => c.Chat)
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
 
 		var banUserByChat = await _context.BanUserByChats
@@ -77,11 +78,21 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 				newMessage.Attachments.AddRange(attachments);
 			}
 
-			chatUser.Chat.LastMessageId = newMessage.Id;
 		
 			_context.Messages.Add(newMessage);
-			_context.ChatUsers.Update(chatUser);
+			
+			chatUser.Chat.LastMessageId = newMessage.Id;
+			
+			_context.Chats.Update(chatUser.Chat);
 			await _context.SaveChangesAsync(cancellationToken);
+
+			await _context.Entry(newMessage).Reference(m => m.Owner).LoadAsync(cancellationToken);
+			await _context.Entry(newMessage).Reference(m => m.ReplyToMessage).LoadAsync(cancellationToken);
+
+			if (newMessage.ReplyToMessage != null)
+			{
+				await _context.Entry(newMessage.ReplyToMessage).Reference(r => r.Owner).LoadAsync(cancellationToken);
+			}
 
 			return new Result<MessageDto>(
 				new MessageDto

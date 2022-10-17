@@ -9,5 +9,5 @@ public record CreateChannelCommand(
 		Guid RequesterId,
 		string Name, 
 		string Title,
-		IFormFile? AvatarFile)
+		IFormFile AvatarFile)
 	: IRequest<Result<ChatDto>>;

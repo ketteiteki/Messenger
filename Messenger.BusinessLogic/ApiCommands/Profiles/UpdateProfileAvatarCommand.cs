@@ -7,5 +7,5 @@ namespace Messenger.BusinessLogic.ApiCommands.Profiles;
 
 public record UpdateProfileAvatarCommand(
 	Guid RequesterId,
-	IFormFile? AvatarFile)
+	IFormFile AvatarFile)
 	: IRequest<Result<UserDto>>;

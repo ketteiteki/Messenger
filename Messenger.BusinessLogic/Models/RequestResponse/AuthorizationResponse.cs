@@ -12,7 +12,7 @@ public class AuthorizationResponse
 	
 	public string NickName { get; set; } = null!;
 
-	public string? AvatarLink { get; set; }
+	public string AvatarLink { get; set; }
 	
 	public AuthorizationResponse(User user, string accessToken)
 	{
