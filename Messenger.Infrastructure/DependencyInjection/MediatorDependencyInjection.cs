@@ -2,7 +2,7 @@ using MediatR;
 using Messenger.BusinessLogic.ApiCommands.Auth;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Messenger.BusinessLogic.DependencyInjection;
+namespace Messenger.Infrastructure.DependencyInjection;
 
 public static class MediatorDependencyInjection
 {

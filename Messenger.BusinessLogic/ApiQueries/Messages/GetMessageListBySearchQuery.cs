@@ -8,7 +8,6 @@ public record GetMessageListBySearchQuery(
 		Guid RequesterId,
 		Guid ChatId,
 		int Limit,
-		DateTime? FromMessageDateOfCreate,
-		Guid? FromUserId,
+		DateTime? FromMessageDateTime,
 		string SearchText) 
 	: IRequest<Result<List<MessageDto>>>;

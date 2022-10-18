@@ -1,7 +1,7 @@
 using MediatR;
-using Messenger.BusinessLogic.Configuration;
+using Messenger.Infrastructure.Configuration;
 
-namespace Messenger.BusinessLogic;
+namespace Messenger.Infrastructure;
 
 public class MessengerModule
 {

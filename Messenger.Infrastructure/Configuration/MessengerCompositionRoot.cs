@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Messenger.BusinessLogic.Configuration;
+namespace Messenger.Infrastructure.Configuration;
 
 public class MessengerCompositionRoot
 {

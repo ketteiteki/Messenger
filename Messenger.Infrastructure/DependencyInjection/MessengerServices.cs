@@ -1,7 +1,6 @@
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Messenger.BusinessLogic.DependencyInjection;
+namespace Messenger.Infrastructure.DependencyInjection;
 
 public static class MessengerServices
 {

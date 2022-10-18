@@ -1,4 +1,3 @@
-using System.Security.Authentication;
 using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models.RequestResponse;

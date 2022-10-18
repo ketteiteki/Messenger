@@ -1,4 +1,3 @@
-using Messenger.Domain.Entities;
 using Messenger.Domain.Enum;
 
 namespace Messenger.BusinessLogic.Models;

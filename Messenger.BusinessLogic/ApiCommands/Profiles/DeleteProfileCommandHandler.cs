@@ -3,7 +3,6 @@ using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.BusinessLogic.Services;
-using Messenger.Domain.Constants;
 using Messenger.Services;
 
 namespace Messenger.BusinessLogic.ApiCommands.Profiles;

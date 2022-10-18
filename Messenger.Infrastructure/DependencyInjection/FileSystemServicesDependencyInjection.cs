@@ -2,7 +2,7 @@ using Messenger.Application.Interfaces;
 using Messenger.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Messenger.BusinessLogic.DependencyInjection;
+namespace Messenger.Infrastructure.DependencyInjection;
 
 public static class FileSystemServicesDependencyInjection
 {

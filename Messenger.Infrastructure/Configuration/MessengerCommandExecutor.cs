@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Messenger.BusinessLogic.Configuration;
+namespace Messenger.Infrastructure.Configuration;
 
 public static class MessengerCommandExecutor
 {

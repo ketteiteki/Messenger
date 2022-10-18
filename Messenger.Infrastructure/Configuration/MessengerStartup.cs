@@ -1,8 +1,8 @@
-using Messenger.BusinessLogic.DependencyInjection;
+using Messenger.Infrastructure.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Messenger.BusinessLogic.Configuration;
+namespace Messenger.Infrastructure.Configuration;
 
 public static class MessengerStartup
 {

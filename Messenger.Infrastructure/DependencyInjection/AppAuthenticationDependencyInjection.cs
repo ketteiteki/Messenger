@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Messenger.BusinessLogic.DependencyInjection;
+namespace Messenger.Infrastructure.DependencyInjection;
 
 public static class AppAuthenticationDependencyInjection
 {

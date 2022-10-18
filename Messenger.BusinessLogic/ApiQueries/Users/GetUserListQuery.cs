@@ -6,6 +6,6 @@ namespace Messenger.BusinessLogic.ApiQueries.Users;
 
 public record GetUserListQuery(
 	string SearchText,
-	int Count,
+	int Limit,
 	int Page) 
 	: IRequest<Result<List<UserDto>>>;

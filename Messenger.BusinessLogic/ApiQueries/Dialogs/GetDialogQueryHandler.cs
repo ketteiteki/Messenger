@@ -21,10 +21,10 @@ public class GetDialogQueryHandler : IRequestHandler<GetDialogQuery, Result<Chat
 		var dialog = await (
 				from chatUser1 in _context.ChatUsers.AsNoTracking()
 				join chatUser2 in _context.ChatUsers.AsNoTracking()
-					on new {x1 = chatUser1.UserId, x2 = chatUser1.ChatId} 
-					equals new {x1 = chatUser2.UserId, x2 = chatUser2.ChatId}
-				where chatUser1.Chat.Type == ChatType.Dialog &&
-				      chatUser1.User.Id == request.RequesterId && chatUser2.User.Id == request.WithWhomId
+					on chatUser1.ChatId equals chatUser2.ChatId
+				where (int)chatUser1.Chat.Type == (int)ChatType.Dialog &&
+				      chatUser1.UserId == request.RequesterId && 
+				      chatUser2.UserId == request.WithWhomId
 				select new ChatDto
 			{
 				Id = chatUser2.Chat.Id,
@@ -33,7 +33,8 @@ public class GetDialogQueryHandler : IRequestHandler<GetDialogQuery, Result<Chat
 				Type = chatUser2.Chat.Type,
 				AvatarLink = chatUser2.User.AvatarLink,
 				MembersCount = 2,
-				IsMember = true
+				IsMember = true,
+				Members = chatUser1.Chat.ChatUsers.Select(c => new UserDto(c.User)).ToList()
 			})
 			.FirstOrDefaultAsync(cancellationToken);
 

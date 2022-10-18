@@ -2,7 +2,7 @@ using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Messenger.BusinessLogic.DependencyInjection;
+namespace Messenger.Infrastructure.DependencyInjection;
 
 public static class DatabaseDependencyInjection
 {

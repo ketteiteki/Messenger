@@ -1,7 +1,7 @@
-using Messenger.BusinessLogic;
-using Messenger.BusinessLogic.Configuration;
 using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Constants;
+using Messenger.Infrastructure;
+using Messenger.Infrastructure.Configuration;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
