@@ -2,6 +2,7 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
+using Messenger.BusinessLogic.Services;
 using Messenger.Services;
 
 namespace Messenger.BusinessLogic.ApiCommands.Channels;
@@ -27,7 +28,7 @@ public class DeleteChannelCommandHandler : IRequestHandler<DeleteChannelCommand,
 			return new Result<ChatDto>(new ForbiddenError("You cannot delete someone else's conference"));
 
 		if (channel.AvatarLink != null)
-			_fileService.DeleteFile(Path.Combine("", channel.AvatarLink.Split("/")[^1]));		
+			_fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), channel.AvatarLink.Split("/")[^1]));
 		
 		_context.Chats.Remove(channel);
 		await _context.SaveChangesAsync(cancellationToken);

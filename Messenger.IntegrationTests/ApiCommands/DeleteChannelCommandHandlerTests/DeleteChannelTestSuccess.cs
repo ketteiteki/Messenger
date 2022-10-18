@@ -25,8 +25,8 @@ public class DeleteChannelTestSuccess : IntegrationTestBase, IIntegrationTest
 			RequesterId: user21Th.Value.Id,
 			ChannelId: channel.Value.Id);
 		
-		var dialog = await MessengerModule.RequestAsync(deleteChannelCommand, CancellationToken.None);
+		var deletedChannel = await MessengerModule.RequestAsync(deleteChannelCommand, CancellationToken.None);
 
-		dialog.IsSuccess.Should().BeTrue();
+		deletedChannel.IsSuccess.Should().BeTrue();
 	}
 }

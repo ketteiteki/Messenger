@@ -41,6 +41,7 @@ public class UpdateConversationAvatarCommandHandler : IRequestHandler<UpdateConv
 				_fileService.DeleteFile(Path.Combine(
 					BaseDirService.GetPathWwwRoot(),
 					chatUserByRequester.Chat.AvatarLink.Split("/")[^1]));
+				
 				chatUserByRequester.Chat.AvatarLink = null;
 			}
 			

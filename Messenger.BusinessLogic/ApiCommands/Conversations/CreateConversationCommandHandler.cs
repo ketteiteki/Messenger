@@ -66,10 +66,11 @@ public class CreateConversationCommandHandler : IRequestHandler<CreateConversati
 				Name = newConversation.Name,
 				Title = newConversation.Title,
 				Type = newConversation.Type,
+				AvatarLink = newConversation.AvatarLink,
 				CanSendMedia = true,
 				IsOwner = true,
 				IsMember = true,
-				MembersCount = 1
+				MembersCount = 1,
 			});
 	}
 }

@@ -108,6 +108,7 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 					ReplyToMessageAuthorDisplayName = newMessage.ReplyToMessage?.Owner?.DisplayName,
 					ChatId = newMessage.ChatId,
 					DateOfCreate = newMessage.DateOfCreate,
+					Attachments = newMessage.Attachments.Select(a => new AttachmentDto(a)).ToList()
 				});
 		}
 
