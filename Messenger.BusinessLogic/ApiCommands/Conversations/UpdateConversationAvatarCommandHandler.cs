@@ -2,9 +2,11 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
+using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Constants;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Messenger.BusinessLogic.ApiCommands.Conversations;
 
@@ -12,11 +14,13 @@ public class UpdateConversationAvatarCommandHandler : IRequestHandler<UpdateConv
 {
 	private readonly DatabaseContext _context;
 	private readonly IFileService _fileService;
+	private readonly IConfiguration _configuration;
 	
-	public UpdateConversationAvatarCommandHandler(DatabaseContext context, IFileService fileService)
+	public UpdateConversationAvatarCommandHandler(DatabaseContext context, IFileService fileService, IConfiguration configuration)
 	{
 		_context = context;
 		_fileService = fileService;
+		_configuration = configuration;
 	}
 	
 	public async Task<Result<ChatDto>> Handle(UpdateConversationAvatarCommand request, CancellationToken cancellationToken)
@@ -24,25 +28,27 @@ public class UpdateConversationAvatarCommandHandler : IRequestHandler<UpdateConv
 		var chatUserByRequester = await _context.ChatUsers
 			.Include(c => c.Chat)
 			.Include(c => c.Role)
-			.FirstOrDefaultAsync(r => r.UserId == request.RequestorId && r.ChatId == request.ChatId, cancellationToken);
+			.FirstOrDefaultAsync(r => r.UserId == request.RequesterId && r.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
 			return new Result<ChatDto>(new DbEntityNotFoundError("No requestor in the chat"));
 		
 		if (chatUserByRequester.Role is { CanChangeChatData: true } || 
-		    chatUserByRequester.Chat.OwnerId == request.RequestorId)
+		    chatUserByRequester.Chat.OwnerId == request.RequesterId)
 		{
 			if (chatUserByRequester.Chat.AvatarLink != null)
 			{
 				_fileService.DeleteFile(Path.Combine(
 					BaseDirService.GetPathWwwRoot(),
 					chatUserByRequester.Chat.AvatarLink.Split("/")[^1]));
+				
 				chatUserByRequester.Chat.AvatarLink = null;
 			}
 			
 			if (request.AvatarFile != null)
 			{
-				var avatarLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), request.AvatarFile);
+				var avatarLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), request.AvatarFile,
+					_configuration[AppSettingConstants.MessengerDomainName]);
 				chatUserByRequester.Chat.AvatarLink = avatarLink;
 			}
 			
@@ -57,7 +63,7 @@ public class UpdateConversationAvatarCommandHandler : IRequestHandler<UpdateConv
 					Title = chatUserByRequester.Chat.Title,
 					Type = chatUserByRequester.Chat.Type,
 					AvatarLink = chatUserByRequester.Chat.AvatarLink,
-					IsOwner = chatUserByRequester.Chat.OwnerId == request.RequestorId,
+					IsOwner = chatUserByRequester.Chat.OwnerId == request.RequesterId,
 					IsMember = true,
 					MuteDateOfExpire = chatUserByRequester.MuteDateOfExpire,
 					BanDateOfExpire = null,

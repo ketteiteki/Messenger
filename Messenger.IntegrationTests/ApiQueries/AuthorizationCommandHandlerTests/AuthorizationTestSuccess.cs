@@ -11,7 +11,7 @@ public class AuthorizationTestSuccess : IntegrationTestBase, IIntegrationTest
 	public async Task Test()
 	{
 		var registrationUser = await MessengerModule.RequestAsync
-			(CommandHelper.Registration21thCommand(), CancellationToken.None);
+			(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
 		await MessengerModule.RequestAsync
 			(new AuthorizationCommand(

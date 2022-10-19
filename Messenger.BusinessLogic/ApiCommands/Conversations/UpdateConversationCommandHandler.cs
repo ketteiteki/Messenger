@@ -20,12 +20,12 @@ public class UpdateConversationCommandHandler : IRequestHandler<UpdateConversati
 		var chatUserByRequester = await _context.ChatUsers
 			.Include(c => c.Chat)
 			.Include(c => c.Role)
-			.FirstOrDefaultAsync(r => r.UserId == request.RequestorId && r.ChatId == request.ChatId, cancellationToken);
+			.FirstOrDefaultAsync(r => r.UserId == request.RequesterId && r.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
 			return new Result<ChatDto>(new DbEntityNotFoundError("No requestor in the chat"));
 
-		if (chatUserByRequester.Role is { CanChangeChatData: true } ||  chatUserByRequester.Chat.OwnerId == request.RequestorId)
+		if (chatUserByRequester.Role is { CanChangeChatData: true } ||  chatUserByRequester.Chat.OwnerId == request.RequesterId)
 		{
 			if (request.Name != chatUserByRequester.Chat.Name)
 			{
@@ -54,7 +54,7 @@ public class UpdateConversationCommandHandler : IRequestHandler<UpdateConversati
 					AvatarLink =  chatUserByRequester.Chat.AvatarLink,
 					MembersCount =  chatUserByRequester.Chat.ChatUsers.Count,
 					CanSendMedia = chatUserByRequester.CanSendMedia,
-					IsOwner =  chatUserByRequester.Chat.OwnerId == request.RequestorId,
+					IsOwner =  chatUserByRequester.Chat.OwnerId == request.RequesterId,
 					IsMember = true,
 					MuteDateOfExpire = chatUserByRequester.MuteDateOfExpire,
 					BanDateOfExpire = null,

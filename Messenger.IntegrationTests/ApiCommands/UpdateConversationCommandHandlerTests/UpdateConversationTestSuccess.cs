@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
@@ -12,11 +13,11 @@ public class UpdateConversationTestSuccess : IntegrationTestBase, IIntegrationTe
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
 			AvatarFile: null);
@@ -24,12 +25,12 @@ public class UpdateConversationTestSuccess : IntegrationTestBase, IIntegrationTe
 		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
 		await MessengerModule.RequestAsync(
-			new JoinToConversationCommand(
-			RequestorId: alice.Value.Id,
+			new JoinToChatCommand(
+			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id), CancellationToken.None);
 		
 		var createRoleAliceCommand = new CreateOrUpdateRoleUserInConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			UserId: alice.Value.Id,
 			ChatId: conversation.Value.Id,
 			RoleTitle: "moderator",
@@ -41,23 +42,23 @@ public class UpdateConversationTestSuccess : IntegrationTestBase, IIntegrationTe
 
 		await MessengerModule.RequestAsync(createRoleAliceCommand, CancellationToken.None);
 		
-		var updateConversationCommandBy21th = new UpdateConversationCommand(
-			RequestorId: user21th.Value.Id,
+		var updateConversationCommandBy21Th = new UpdateConversationCommand(
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			Name: "21thName",
 			Title: "21thTitle");
 		
 		var updateConversationCommandByAlice =new UpdateConversationCommand(
-			RequestorId: alice.Value.Id,
+			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id,
 			Name: "AliceName",
 			Title: "AliceTitle");
 
-		var conversationAfterUpdateBy21th = await MessengerModule.RequestAsync(updateConversationCommandBy21th,
+		var conversationAfterUpdateBy21Th = await MessengerModule.RequestAsync(updateConversationCommandBy21Th,
 			CancellationToken.None);
 
-		conversationAfterUpdateBy21th.Value.Name.Should().Be(updateConversationCommandBy21th.Name);
-		conversationAfterUpdateBy21th.Value.Title.Should().Be(updateConversationCommandBy21th.Title);
+		conversationAfterUpdateBy21Th.Value.Name.Should().Be(updateConversationCommandBy21Th.Name);
+		conversationAfterUpdateBy21Th.Value.Title.Should().Be(updateConversationCommandBy21Th.Title);
 		
 		var conversationAfterUpdateByAlice = await MessengerModule.RequestAsync(updateConversationCommandByAlice, 
 			CancellationToken.None);

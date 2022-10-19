@@ -2,7 +2,7 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.Domain.Constants;
+using Messenger.BusinessLogic.Services;
 using Messenger.Services;
 
 namespace Messenger.BusinessLogic.ApiCommands.Conversations;
@@ -24,7 +24,7 @@ public class DeleteConversationCommandHandler : IRequestHandler<DeleteConversati
 		if (conversation == null)
 			return new Result<ChatDto>(new DbEntityNotFoundError("Conversation not found"));
 
-		if (conversation.OwnerId != request.RequestorId)
+		if (conversation.OwnerId != request.RequesterId)
 			return new Result<ChatDto>(new ForbiddenError("It is forbidden to delete someone else's conversation"));
 		
 		if (conversation.AvatarLink != null)

@@ -21,7 +21,7 @@ public class GetChannelQueryHandler : IRequestHandler<GetChannelQuery, Result<Ch
 		var channel = 
 			await (from chat in _context.Chats.AsNoTracking()
 					join chatUsers in _context.ChatUsers.AsNoTracking()
-						on new {x1 = request.RequestorId, x2 = chat.Id} equals new {x1 = chatUsers.UserId,x2 = chatUsers.ChatId }
+						on new {x1 = request.RequesterId, x2 = chat.Id} equals new {x1 = chatUsers.UserId,x2 = chatUsers.ChatId }
 						into chatUsersEnumerable
 					from chatUsersItem in chatUsersEnumerable.DefaultIfEmpty()
 					where chat.Id == request.ChannelId && chat.Type == ChatType.Channel
@@ -34,7 +34,7 @@ public class GetChannelQueryHandler : IRequestHandler<GetChannelQuery, Result<Ch
 						AvatarLink = chat.AvatarLink,
 						MembersCount = chat.ChatUsers.Count,
 						CanSendMedia = chatUsersItem != null && chatUsersItem.CanSendMedia,
-						IsOwner = chat.OwnerId == request.RequestorId,
+						IsOwner = chat.OwnerId == request.RequesterId,
 						IsMember = chatUsersItem != null,
 					})
 				.FirstOrDefaultAsync(cancellationToken);

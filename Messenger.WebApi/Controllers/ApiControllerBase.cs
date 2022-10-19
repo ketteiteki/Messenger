@@ -6,17 +6,17 @@ namespace Messenger.WebApi.Controllers;
 
 public class ApiControllerBase : ControllerBase
 {
-	protected readonly IMediator _mediator;
+	protected readonly IMediator Mediator;
 
 	public ApiControllerBase(IMediator mediator)
 	{
-		_mediator = mediator;
+		Mediator = mediator;
 	}
 
 	protected async Task<IActionResult> RequestAsync<TValue>(
 		IRequest<Result<TValue>> request, CancellationToken cancellationToken)
 	{
-		var result = await _mediator.Send(request, cancellationToken);
+		var result = await Mediator.Send(request, cancellationToken);
 
 		return result.Error switch
 		{

@@ -5,7 +5,7 @@ using Messenger.BusinessLogic.Responses;
 namespace Messenger.BusinessLogic.ApiCommands.Conversations;
 
 public record UpdateConversationCommand(
-	Guid RequestorId,
+	Guid RequesterId,
 	Guid ChatId,
 	string Name,
 	string Title

@@ -31,7 +31,7 @@ public class RemoveRoleUserInConversationCommandHandler
 		if (chatUser.Role == null)
 			return new Result<RoleUserByChatDto>(new DbEntityNotFoundError("Role not found"));
 			
-		if (chatUser.Chat.OwnerId == request.RequestorId)
+		if (chatUser.Chat.OwnerId == request.RequesterId)
 		{
 			var role = chatUser.Role;
 			

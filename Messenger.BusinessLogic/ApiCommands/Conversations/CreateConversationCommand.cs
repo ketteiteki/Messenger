@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Http;
 namespace Messenger.BusinessLogic.ApiCommands.Conversations;
 
 public record CreateConversationCommand(
-		Guid RequestorId,
+		Guid RequesterId,
 		string Name,
 		string Title,
-		IFormFile? AvatarFile)
+		IFormFile AvatarFile)
 	: IRequest<Result<ChatDto>>;

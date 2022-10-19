@@ -6,7 +6,7 @@ namespace Messenger.Domain.Entities;
 
 public class Message : IBaseEntity
 {
-	public Guid Id { get; set; }
+	public Guid Id { get; set; } = new Guid();
 
 	public string Text { get; set; }
 	

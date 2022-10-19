@@ -11,15 +11,15 @@ public class MessageDto
 	
 	public Guid? OwnerId { get; init; }
 
-	public string? OwnerDisplayName { get; init; }
+	public string OwnerDisplayName { get; init; }
 	
-	public string? OwnerAvatarLink { get; init; }
+	public string OwnerAvatarLink { get; init; }
 
 	public Guid? ReplyToMessageId { get; init; }
 	
-	public string? ReplyToMessageText { get; init; }
+	public string ReplyToMessageText { get; init; }
 	
-	public string? ReplyToMessageAuthorDisplayName { get; init; }
+	public string ReplyToMessageAuthorDisplayName { get; init; }
 	
 	public List<AttachmentDto> Attachments { get; init; } 
 	

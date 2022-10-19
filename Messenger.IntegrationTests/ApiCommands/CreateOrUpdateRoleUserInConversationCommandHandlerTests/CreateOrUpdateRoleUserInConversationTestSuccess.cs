@@ -12,11 +12,11 @@ public class CreateOrUpdateRoleUserInConversationTestSuccess : IntegrationTestBa
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
 			AvatarFile: null);
@@ -24,14 +24,14 @@ public class CreateOrUpdateRoleUserInConversationTestSuccess : IntegrationTestBa
 		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
 		var addAliceInConversationCommand = new AddUserToConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alice.Value.Id);
 
 		await MessengerModule.RequestAsync(addAliceInConversationCommand, CancellationToken.None);
 		
 		var createOrUpdateRoleUserInConversation = new CreateOrUpdateRoleUserInConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alice.Value.Id,
 			RoleTitle: "moderator",

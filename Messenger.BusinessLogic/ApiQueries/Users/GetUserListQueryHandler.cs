@@ -21,8 +21,8 @@ public class GetUserListQueryHandler : IRequestHandler<GetUserListQuery, Result<
 		var users = await _context.Users
 			.AsNoTracking()
 			.Where(u => Regex.IsMatch(u.NickName, request.SearchText, RegexOptions.IgnoreCase))
-			.Skip((request.Page - 1) * request.Count)
-			.Take(request.Count)
+			.Skip((request.Page - 1) * request.Limit)
+			.Take(request.Limit)
 			.Select(u => new UserDto(u))
 			.ToListAsync(cancellationToken);
 		

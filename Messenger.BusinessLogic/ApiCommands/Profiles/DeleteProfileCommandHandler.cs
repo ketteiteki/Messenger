@@ -2,7 +2,7 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.Domain.Constants;
+using Messenger.BusinessLogic.Services;
 using Messenger.Services;
 
 namespace Messenger.BusinessLogic.ApiCommands.Profiles;
@@ -20,7 +20,7 @@ public class DeleteProfileCommandHandler : IRequestHandler<DeleteProfileCommand,
 	
 	public async Task<Result<UserDto>> Handle(DeleteProfileCommand request, CancellationToken cancellationToken)
 	{
-		var user = await _context.Users.FindAsync(request.RequestorId);
+		var user = await _context.Users.FindAsync(request.RequesterId);
 
 		if (user == null) return new Result<UserDto>(new DbEntityNotFoundError("User not found")); 
 

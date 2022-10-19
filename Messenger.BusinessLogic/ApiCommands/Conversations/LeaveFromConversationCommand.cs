@@ -5,6 +5,6 @@ using Messenger.BusinessLogic.Responses;
 namespace Messenger.BusinessLogic.ApiCommands.Conversations;
 
 public record LeaveFromConversationCommand(
-		Guid RequestorId,
+		Guid RequesterId,
 		Guid ChatId) 
 	: IRequest<Result<ChatDto>>;

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
@@ -12,25 +13,25 @@ public class RemoveRoleUserInConversationTestSuccess : IntegrationTestBase, IInt
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		
 		var command = new CreateConversationCommand(
-			RequestorId: user21th.Value.Id,
-			Name: "convers",
-			Title: "21ths den",
+			RequesterId: user21Th.Value.Id,
+			Name: "qwerty",
+			Title: "qwerty",
 			AvatarFile: null);
 
 		var conversation = await MessengerModule.RequestAsync(command, CancellationToken.None);
 		
-		var joinToConversationCommand = new JoinToConversationCommand(
-			RequestorId: alice.Value.Id,
+		var joinToConversationCommand = new JoinToChatCommand(
+			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id);
 
 		await MessengerModule.RequestAsync(joinToConversationCommand, CancellationToken.None);
 
 		var createOrUpdateRoleUserInConversation = new CreateOrUpdateRoleUserInConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alice.Value.Id,
 			RoleTitle: "moderator",
@@ -43,7 +44,7 @@ public class RemoveRoleUserInConversationTestSuccess : IntegrationTestBase, IInt
 		await MessengerModule.RequestAsync(createOrUpdateRoleUserInConversation, CancellationToken.None);
 
 		var removeRoleUserInConversationCommand = new RemoveRoleUserInConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alice.Value.Id);
 

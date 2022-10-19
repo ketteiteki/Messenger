@@ -5,7 +5,7 @@ using Messenger.BusinessLogic.Responses;
 namespace Messenger.BusinessLogic.ApiCommands.Conversations;
 
 public record RemoveRoleUserInConversationCommand(
-		Guid RequestorId,
+		Guid RequesterId,
 		Guid ChatId,
 		Guid UserId) 
 	: IRequest<Result<RoleUserByChatDto>>;

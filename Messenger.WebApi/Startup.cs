@@ -1,5 +1,5 @@
-using Messenger.BusinessLogic.DependencyInjection;
-using Messenger.BusinessLogic.Middlewares;
+using Messenger.Domain.Constants;
+using Messenger.Infrastructure.DependencyInjection;
 
 namespace Messenger.WebApi;
 
@@ -16,9 +16,9 @@ public class Startup
     {
         serviceCollection.AddControllers();
 
-        var connectionStr = _configuration.GetConnectionString("DatabaseConnectionString");
+        var databaseConnectionString = _configuration.GetConnectionString(AppSettingConstants.DatabaseConnectionString);
 
-        serviceCollection.AddDatabaseServices(connectionStr);
+        serviceCollection.AddDatabaseServices(databaseConnectionString);
 
         serviceCollection.AddInfrastructureServices();
 
@@ -38,8 +38,6 @@ public class Startup
 
         applicationBuilder.UseAuthentication();
         applicationBuilder.UseAuthorization();
-
-        applicationBuilder.UseMiddleware<ExceptionMiddleware>();
 
         applicationBuilder.UseEndpoints(options => { options.MapControllers(); });
     }

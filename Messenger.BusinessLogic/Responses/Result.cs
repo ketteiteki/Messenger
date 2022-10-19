@@ -8,7 +8,7 @@ public class Result<TValue>
 
 	public TValue Value { get; set; }
 	
-	public Error? Error { get; set; }
+	public Error Error { get; set; }
 
 	public Result(TValue value)
 	{

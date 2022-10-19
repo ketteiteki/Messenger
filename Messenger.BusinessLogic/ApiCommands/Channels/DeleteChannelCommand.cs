@@ -5,6 +5,6 @@ using Messenger.BusinessLogic.Responses;
 namespace Messenger.BusinessLogic.ApiCommands.Channels;
 
 public record DeleteChannelCommand(
-		Guid RequestorId,
+		Guid RequesterId,
 		Guid ChannelId)
 	: IRequest<Result<ChatDto>>;
