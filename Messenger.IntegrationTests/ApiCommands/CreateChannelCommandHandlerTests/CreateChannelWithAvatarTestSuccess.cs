@@ -15,7 +15,7 @@ public class CreateChannelWithAvatarTestSuccess : IntegrationTestBase, IIntegrat
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-        var fileStream = new FileStream(Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
+        await using var fileStream = new FileStream(Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
         
         var command = new CreateChannelCommand(
             RequesterId: user21Th.Value.Id,
