@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Chats;
-using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.BusinessLogic.ApiCommands.Messages;
+using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
@@ -15,58 +15,49 @@ public class CreateMessageTestSuccess : IntegrationTestBase, IIntegrationTest
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
         var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
-        var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
-        var conversation = await MessengerModule.RequestAsync(new CreateConversationCommand(
+        var createConversationCommand = new CreateChatCommand(
             RequesterId: user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            AvatarFile: null), CancellationToken.None);
+            Type: ChatType.Conversation,
+            AvatarFile: null);
+		
+        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
         await MessengerModule.RequestAsync(new JoinToChatCommand(
             RequesterId: alice.Value.Id,
             ChatId: conversation.Value.Id), CancellationToken.None);
 
-        var createdMessageBy21ThCommand = new CreateMessageCommand(
+        var createMessageBy21ThCommand = new CreateMessageCommand(
             RequesterId: user21Th.Value.Id,
             Text: "qwerty1",
             ReplyToId: null,
             ChatId: conversation.Value.Id,
             Files: null);
 
-        var createdMessageBy21Th = await MessengerModule.RequestAsync(createdMessageBy21ThCommand, CancellationToken.None);
+        var createMessageBy21ThResult = await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
         
-        var createdMessageByAliceCommand = new CreateMessageCommand(
+        var createMessageByAliceCommand = new CreateMessageCommand(
             RequesterId: alice.Value.Id,
             Text: "qwerty2",
-            ReplyToId: createdMessageBy21Th.Value.Id,
+            ReplyToId: createMessageBy21ThResult.Value.Id,
             ChatId: conversation.Value.Id,
             Files: null);
 
-        var createdMessageByBobCommand = new CreateMessageCommand(
-            RequesterId: bob.Value.Id,
-            Text: "qwerty3",
-            ReplyToId: null,
-            ChatId: conversation.Value.Id,
-            Files: null);
+        var createMessageByAliceResult = await MessengerModule.RequestAsync(createMessageByAliceCommand , CancellationToken.None);
         
-        var createdMessageByAlice = await MessengerModule.RequestAsync(createdMessageByAliceCommand , CancellationToken.None);
+        createMessageBy21ThResult.Value.Text.Should().Be(createMessageBy21ThCommand.Text);
+        createMessageBy21ThResult.Value.ChatId.Should().Be(createMessageBy21ThCommand.ChatId);
+        createMessageBy21ThResult.Value.OwnerDisplayName.Should().Be(user21Th.Value.DisplayName);
+        createMessageBy21ThResult.Value.OwnerAvatarLink.Should().Be(user21Th.Value.AvatarLink);
         
-        var createdMessageByBob = await MessengerModule.RequestAsync(createdMessageByBobCommand, CancellationToken.None);
-
-        createdMessageBy21Th.Value.Text.Should().Be(createdMessageBy21ThCommand.Text);
-        createdMessageBy21Th.Value.ChatId.Should().Be(createdMessageBy21ThCommand.ChatId);
-        createdMessageBy21Th.Value.OwnerDisplayName.Should().Be(user21Th.Value.DisplayName);
-        createdMessageBy21Th.Value.OwnerAvatarLink.Should().Be(user21Th.Value.AvatarLink);
-        
-        createdMessageByAlice.Value.Text.Should().Be(createdMessageByAliceCommand.Text);
-        createdMessageByAlice.Value.ChatId.Should().Be(createdMessageByAliceCommand.ChatId);
-        createdMessageByAlice.Value.OwnerDisplayName.Should().Be(alice.Value.DisplayName);
-        createdMessageByAlice.Value.OwnerAvatarLink.Should().Be(alice.Value.AvatarLink);
-        createdMessageByAlice.Value.ReplyToMessageId.Should().Be(createdMessageBy21Th.Value.Id);
-        createdMessageByAlice.Value.ReplyToMessageText.Should().Be(createdMessageBy21Th.Value.Text);
-        createdMessageByAlice.Value.ReplyToMessageAuthorDisplayName.Should().Be(user21Th.Value.DisplayName);
-        
-        createdMessageByBob.IsSuccess.Should().BeFalse();
+        createMessageByAliceResult.Value.Text.Should().Be(createMessageByAliceCommand.Text);
+        createMessageByAliceResult.Value.ChatId.Should().Be(createMessageByAliceCommand.ChatId);
+        createMessageByAliceResult.Value.OwnerDisplayName.Should().Be(alice.Value.DisplayName);
+        createMessageByAliceResult.Value.OwnerAvatarLink.Should().Be(alice.Value.AvatarLink);
+        createMessageByAliceResult.Value.ReplyToMessageId.Should().Be(createMessageBy21ThResult.Value.Id);
+        createMessageByAliceResult.Value.ReplyToMessageText.Should().Be(createMessageBy21ThResult.Value.Text);
+        createMessageByAliceResult.Value.ReplyToMessageAuthorDisplayName.Should().Be(user21Th.Value.DisplayName);
     }
 }

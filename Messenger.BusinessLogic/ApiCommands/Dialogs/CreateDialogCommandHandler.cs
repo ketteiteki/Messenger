@@ -19,24 +19,18 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 	
 	public async Task<Result<ChatDto>> Handle(CreateDialogCommand request, CancellationToken cancellationToken)
 	{
-		var requestor = await _context.Users.FindAsync(request.RequesterId);
-		
-		if (requestor == null) throw new Exception("Requestor not found");
-		
-		var user = await _context.Users.FindAsync(request.UserId);
+		var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.UserId, CancellationToken.None);
 
 		if (user == null) return new Result<ChatDto>(new DbEntityNotFoundError("User not found"));
 
 		var dialog = await (
-				from chatUser1 in _context.ChatUsers
-				join chatUser2 in _context.ChatUsers
-					on new {x1 = chatUser1.UserId, x2 = chatUser1.ChatId} 
-					equals new {x1 = chatUser2.UserId, x2 = chatUser2.ChatId}
-				where chatUser1.Chat.Type == ChatType.Dialog &&
-				      chatUser1.UserId == request.RequesterId && chatUser2.UserId == request.UserId
-				select chatUser2)
+				from chat in _context.Chats
+				where chat.ChatUsers.Any(c => c.UserId == request.RequesterId) &&
+				      chat.ChatUsers.Any(c => c.UserId == request.UserId) &&
+				      (int)chat.Type == (int)ChatType.Dialog
+				      select chat)
 			.FirstOrDefaultAsync(cancellationToken);
-
+		
 		if (dialog != null) return new Result<ChatDto>(new DbEntityExistsError("Dialog already exists"));
 
 		var newDialog = new Chat(
@@ -52,6 +46,13 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 		_context.ChatUsers.Add(new ChatUser {ChatId = newDialog.Id, UserId = request.UserId});
 		await _context.SaveChangesAsync(cancellationToken);
 
+		await _context.Entry(newDialog).Collection(d => d.ChatUsers).LoadAsync(cancellationToken);
+
+		foreach (var chatUser in newDialog.ChatUsers)
+		{
+			await _context.Entry(chatUser).Reference(c => c.User).LoadAsync(cancellationToken);
+		}
+		
 		return new Result<ChatDto>(
 			new ChatDto
 			{

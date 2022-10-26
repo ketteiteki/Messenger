@@ -17,7 +17,7 @@ public class GetUserTestSuccess : IntegrationTestBase, IIntegrationTest
             UserId: user21Th.Value.Id), CancellationToken.None);
 
         user.Value.Id.Should().Be(user21Th.Value.Id);
-        user.Value.Nickname.Should().Be(user21Th.Value.Nickname);
+        user.Value.Nickname.Should().Be(user21Th.Value.NickName);
         user.Value.DisplayName.Should().Be(user21Th.Value.DisplayName);
         user.Value.Bio.Should().Be(user21Th.Value.Bio);
     }

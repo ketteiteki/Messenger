@@ -1,6 +1,4 @@
 using Messenger.BusinessLogic.ApiCommands.Auth;
-using Messenger.BusinessLogic.ApiCommands.Conversations;
-using Microsoft.AspNetCore.Http;
 
 namespace Messenger.IntegrationTests.Helpers;
 
@@ -38,15 +36,4 @@ public static class CommandHelper
 			Nickname: "alex123",
 			Password: "765cs3131");
 	}
-	//conversation
-	public static CreateConversationCommand CreateConversationCommand(Guid requesterId, string title, string name,
-		IFormFile? avatarFile)
-	{
-		return new CreateConversationCommand(
-			RequesterId: requesterId,
-			Name: name, 
-			Title: title,
-			AvatarFile: avatarFile);
-	}
-	
 }

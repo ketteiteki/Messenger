@@ -1,6 +1,6 @@
 using MediatR;
 using Messenger.Application.Interfaces;
-using Messenger.BusinessLogic.Models.RequestResponse;
+using Messenger.BusinessLogic.Models.Responses;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Constants;
 using Messenger.Services;
@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Messenger.BusinessLogic.ApiCommands.Auth;
 
-public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginResponse>>
+public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<AuthorizationResponse>>
 {
 	private readonly DatabaseContext _context;
 	private readonly IHashService _hashService;
@@ -24,19 +24,19 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
 		_configuration = configuration;
 	}
 	
-	public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
+	public async Task<Result<AuthorizationResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
 	{
-		var user = await _context.Users.FirstOrDefaultAsync(u => u.NickName == request.NickName, cancellationToken);
-		if (user == null) return new Result<LoginResponse>(new AuthenticationError("User does not exists"));
+		var requester = await _context.Users.FirstOrDefaultAsync(u => u.NickName == request.NickName, cancellationToken);
+		if (requester == null) return new Result<AuthorizationResponse>(new AuthenticationError("User does not exists"));
 
-		var f = _hashService.Hmacsha512CryptoHashWithSalt(request.Password, user.PasswordSalt);
+		var f = _hashService.Hmacsha512CryptoHashWithSalt(request.Password, requester.PasswordSalt);
 		
-		if (user.PasswordHash != f)
-			return new Result<LoginResponse>(new AuthenticationError("Password is wrong"));
+		if (requester.PasswordHash != f)
+			return new Result<AuthorizationResponse>(new AuthenticationError("Password is wrong"));
 		
-		var accessToken = _tokenService.CreateAccessToken(user, 
-			_configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey]);
+		var accessToken = _tokenService.CreateAccessToken(
+			requester, _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey]);
 
-		return new Result<LoginResponse>(new LoginResponse(user, accessToken));
+		return new Result<AuthorizationResponse>(new AuthorizationResponse(requester, accessToken));
 	}
 }

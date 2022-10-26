@@ -23,13 +23,13 @@ public class JoinToChatCommandHandler : IRequestHandler<JoinToChatCommand, Resul
 			.Where(c => c.Type != ChatType.Dialog)
 			.FirstOrDefaultAsync(c => c.Id == request.ChatId, cancellationToken);
 
-		if (conversation == null) return new Result<ChatDto>(new DbEntityNotFoundError("Conversation not found"));
+		if (conversation == null) return new Result<ChatDto>(new DbEntityNotFoundError("Chat not found"));
 		
 		var chatUser = await _context.ChatUsers
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUser != null)
-			return new Result<ChatDto>(new DbEntityExistsError("User already exists in the conversation"));
+			return new Result<ChatDto>(new DbEntityExistsError("User already exists in the chat"));
 
 		var banUserByChat = await _context.BanUserByChats
 			.FirstOrDefaultAsync(b => b.UserId == request.RequesterId && b.ChatId == request.ChatId, cancellationToken);

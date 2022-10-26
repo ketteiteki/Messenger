@@ -1,6 +1,6 @@
 using MediatR;
 using Messenger.Application.Interfaces;
-using Messenger.BusinessLogic.Models.RequestResponse;
+using Messenger.BusinessLogic.Models.Responses;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
@@ -10,14 +10,15 @@ using Microsoft.Extensions.Configuration;
 
 namespace Messenger.BusinessLogic.ApiCommands.Auth;
 
-public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, Result<RegistrationResponse>>
+public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, Result<AuthorizationResponse>>
 {
 	private readonly DatabaseContext _context;
 	private readonly IHashService _hashService;
 	private readonly ITokenService _tokenService;
 	private readonly IConfiguration _configuration;
 
-	public RegistrationCommandHandler(DatabaseContext context, IHashService hashService, ITokenService tokenService, IConfiguration configuration)
+	public RegistrationCommandHandler(DatabaseContext context, IHashService hashService, ITokenService tokenService,
+		IConfiguration configuration)
 	{
 		_context = context;
 		_hashService = hashService;
@@ -25,10 +26,10 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 		_configuration = configuration;
 	}
 	
-	public async Task<Result<RegistrationResponse>> Handle(RegistrationCommand request, CancellationToken cancellationToken)
+	public async Task<Result<AuthorizationResponse>> Handle(RegistrationCommand request, CancellationToken cancellationToken)
 	{
 		var findUser = await _context.Users.FirstOrDefaultAsync(u => u.NickName == request.Nickname, cancellationToken);
-		if (findUser != null) return new Result<RegistrationResponse>(new AuthenticationError("User already exists"));
+		if (findUser != null) return new Result<AuthorizationResponse>(new AuthenticationError("User already exists"));
 
 		var passwordHash = _hashService.Hmacsha512CryptoHash(request.Password, out var salt);
 
@@ -46,6 +47,6 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 		var accessToken = _tokenService.CreateAccessToken(newUser,
 			_configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey]);
 		
-		return new Result<RegistrationResponse>(new RegistrationResponse(newUser, accessToken));
+		return new Result<AuthorizationResponse>(new AuthorizationResponse(newUser, accessToken));
 	}
 }

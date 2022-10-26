@@ -9,7 +9,8 @@ public static class MessengerStartup
 
 	public static void Initialize(
 		IConfigurationRoot configuration,
-		string databaseConnectionString)
+		string databaseConnectionString,
+		string signKey)
 	{
 		var serviceCollection = new ServiceCollection();
 
@@ -17,7 +18,7 @@ public static class MessengerStartup
 		
 		serviceCollection.AddDatabaseServices(databaseConnectionString);
 		
-		serviceCollection.AddInfrastructureServices();
+		serviceCollection.AddInfrastructureServices(signKey);
 	
 		serviceCollection.AddMessengerServices();
 		

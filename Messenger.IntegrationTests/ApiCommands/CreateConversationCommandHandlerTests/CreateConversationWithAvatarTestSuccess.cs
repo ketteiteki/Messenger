@@ -1,6 +1,7 @@
 using FluentAssertions;
-using Messenger.BusinessLogic.ApiCommands.Conversations;
+using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.Services;
+using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Microsoft.AspNetCore.Http;
@@ -17,19 +18,20 @@ public class CreateConversationWithAvatarTestSuccess : IntegrationTestBase, IInt
 
         await using var fileStream = new FileStream(Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
         
-        var command = new CreateConversationCommand(
+        var createConversationCommand = new CreateChatCommand(
             RequesterId: user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
+            Type: ChatType.Conversation,
             AvatarFile: new FormFile(
                 baseStream: fileStream,
                 baseStreamOffset: 0,
                 length: fileStream.Length,
                 name: "qwerty",
                 fileName: "qwerty"));
-            
-        var conversation = await MessengerModule.RequestAsync(command, CancellationToken.None);
 		
+        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        
         conversation.IsSuccess.Should().BeTrue();
         conversation.Value.IsOwner.Should().BeTrue();
         conversation.Value.IsMember.Should().BeTrue();

@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Messenger.BusinessLogic.ApiQueries.Auth;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
@@ -10,11 +11,13 @@ public class AuthorizationTestSuccess : IntegrationTestBase, IIntegrationTest
 	[Fact]
 	public async Task Test()
 	{
-		var registrationUser = await MessengerModule.RequestAsync
+		var user21Th = await MessengerModule.RequestAsync
 			(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-		await MessengerModule.RequestAsync
+		var authorizationResult = await MessengerModule.RequestAsync
 			(new AuthorizationCommand(
-				AuthorizationToken: registrationUser.Value.AccessToken), CancellationToken.None);
+				AuthorizationToken: user21Th.Value.AccessToken), CancellationToken.None);
+
+		authorizationResult.IsSuccess.Should().BeTrue();
 	}
 }

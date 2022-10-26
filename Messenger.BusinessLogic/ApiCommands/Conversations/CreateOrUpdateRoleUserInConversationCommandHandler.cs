@@ -27,7 +27,7 @@ public class CreateOrUpdateRoleUserInConversationCommandHandler
 			.FirstOrDefaultAsync(c => c.UserId == request.UserId && c.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUser == null)
-			return new Result<RoleUserByChatDto>(new ForbiddenError("No user found in chat"));
+			return new Result<RoleUserByChatDto>(new DbEntityNotFoundError("No user found in chat"));
 		
 		if (chatUser.Chat.OwnerId == request.RequesterId)
 		{

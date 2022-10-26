@@ -4,6 +4,7 @@ using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.BusinessLogic.Services;
 using Messenger.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.BusinessLogic.ApiCommands.Profiles;
 
@@ -20,19 +21,17 @@ public class DeleteProfileCommandHandler : IRequestHandler<DeleteProfileCommand,
 	
 	public async Task<Result<UserDto>> Handle(DeleteProfileCommand request, CancellationToken cancellationToken)
 	{
-		var user = await _context.Users.FindAsync(request.RequesterId);
+		var requester = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, CancellationToken.None);
 
-		if (user == null) return new Result<UserDto>(new DbEntityNotFoundError("User not found")); 
-
-		if (user.AvatarLink != null)
+		if (requester.AvatarLink != null)
 		{
-			_fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), user.AvatarLink.Split("/")[^1]));
-			user.AvatarLink = null;
+			_fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), requester.AvatarLink.Split("/")[^1]));
+			requester.AvatarLink = null;
 		}
 		
-		_context.Users.Remove(user);
+		_context.Users.Remove(requester);
 		await _context.SaveChangesAsync(cancellationToken);
 
-		return new Result<UserDto>(new UserDto(user));
+		return new Result<UserDto>(new UserDto(requester));
 	}
 }

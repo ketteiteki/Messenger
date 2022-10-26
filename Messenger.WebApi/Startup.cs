@@ -5,6 +5,7 @@ namespace Messenger.WebApi;
 
 public class Startup
 {
+    private const string CorsPolicyName = "DefaultCors";
     private readonly IConfiguration _configuration;
 
     public Startup(IConfiguration configuration)
@@ -16,26 +17,37 @@ public class Startup
     {
         serviceCollection.AddControllers();
 
-        var databaseConnectionString = _configuration.GetConnectionString(AppSettingConstants.DatabaseConnectionString);
+        var databaseConnectionString = _configuration[AppSettingConstants.DatabaseConnectionString];
+        var signKey = _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
+        var allowOrigins = _configuration[AppSettingConstants.AllowedHosts];
 
         serviceCollection.AddDatabaseServices(databaseConnectionString);
 
-        serviceCollection.AddInfrastructureServices();
+        serviceCollection.AddInfrastructureServices(signKey);
 
         serviceCollection.AddMessengerServices();
 
+        serviceCollection.ConfigureCors(CorsPolicyName, allowOrigins);
+        
         serviceCollection.AddSwagger();
     }
 
     public void Configure(IApplicationBuilder applicationBuilder, IHostEnvironment environment)
     {
-        applicationBuilder.UseSwagger();
-        applicationBuilder.UseSwaggerUI();
+        if (environment.IsDevelopment())
+        {
+            applicationBuilder.UseSwagger();
+            applicationBuilder.UseSwaggerUI();
+        }
+        
+        applicationBuilder.UseStaticFiles();
 
         applicationBuilder.UseHttpsRedirection();
 
         applicationBuilder.UseRouting();
 
+        applicationBuilder.UseCors(CorsPolicyName);
+        
         applicationBuilder.UseAuthentication();
         applicationBuilder.UseAuthorization();
 

@@ -16,25 +16,25 @@ public class DeleteDialogTestSuccess : IntegrationTestBase, IIntegrationTest
         var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
         var alex = await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
-        var dialog21ThAlice = await MessengerModule.RequestAsync(new CreateDialogCommand(
+        var dialog21ThAliceResult = await MessengerModule.RequestAsync(new CreateDialogCommand(
             RequesterId: user21Th.Value.Id,
             UserId: alice.Value.Id), CancellationToken.None);
         
-        var dialogBobAlex = await MessengerModule.RequestAsync(new CreateDialogCommand(
+        var dialogBobAlexResult = await MessengerModule.RequestAsync(new CreateDialogCommand(
             RequesterId: bob.Value.Id,
             UserId: alex.Value.Id), CancellationToken.None);
 
-        var deletedDialog21ThAlice = await MessengerModule.RequestAsync(new DeleteDialogCommand(
+        var deletedDialog21ThAliceResult = await MessengerModule.RequestAsync(new DeleteDialogCommand(
             RequesterId: user21Th.Value.Id,
-            ChatId: dialog21ThAlice.Value.Id,
+            ChatId: dialog21ThAliceResult.Value.Id,
             IsForBoth: false), CancellationToken.None);
         
-        var deletedDialogBobAlex = await MessengerModule.RequestAsync(new DeleteDialogCommand(
+        var deletedDialogBobAlexResult = await MessengerModule.RequestAsync(new DeleteDialogCommand(
             RequesterId: bob.Value.Id,
-            ChatId: dialogBobAlex.Value.Id,
+            ChatId: dialogBobAlexResult.Value.Id,
             IsForBoth: true), CancellationToken.None);
 
-        deletedDialog21ThAlice.IsSuccess.Should().BeTrue();
-        deletedDialogBobAlex.IsSuccess.Should().BeTrue();
+        deletedDialog21ThAliceResult.IsSuccess.Should().BeTrue();
+        deletedDialogBobAlexResult.IsSuccess.Should().BeTrue();
     }
 }

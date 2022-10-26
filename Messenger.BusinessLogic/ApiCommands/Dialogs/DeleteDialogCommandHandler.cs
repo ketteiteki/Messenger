@@ -24,7 +24,7 @@ public class DeleteDialogCommandHandler : IRequestHandler<DeleteDialogCommand, R
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUser == null)
-			return new Result<ChatDto>(new ForbiddenError("Dialog not found"));
+			return new Result<ChatDto>(new DbEntityNotFoundError("Dialog not found"));
 		
 		var deletedDialogByUsers = await _context.DeletedDialogByUsers
 			.Where(d => d.ChatId == request.ChatId && d.Chat.Type == ChatType.Dialog)

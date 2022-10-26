@@ -22,9 +22,9 @@ public class GetDialogQueryHandler : IRequestHandler<GetDialogQuery, Result<Chat
 				from chatUser1 in _context.ChatUsers.AsNoTracking()
 				join chatUser2 in _context.ChatUsers.AsNoTracking()
 					on chatUser1.ChatId equals chatUser2.ChatId
-				where (int)chatUser1.Chat.Type == (int)ChatType.Dialog &&
-				      chatUser1.UserId == request.RequesterId && 
-				      chatUser2.UserId == request.WithWhomId
+				where chatUser1.Chat.Type == ChatType.Dialog 
+				where chatUser1.UserId == request.RequesterId
+				where chatUser2.UserId == request.UserId
 				select new ChatDto
 			{
 				Id = chatUser2.Chat.Id,

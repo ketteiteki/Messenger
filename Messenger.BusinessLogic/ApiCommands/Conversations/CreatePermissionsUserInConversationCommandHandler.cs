@@ -26,7 +26,7 @@ public class CreatePermissionsUserInConversationCommandHandler
 			.FirstOrDefaultAsync(c => c.ChatId == request.ChatId && c.UserId == request.RequesterId, cancellationToken);
 
 		if (chatUserByRequester == null)
-			return new Result<PermissionDto>(new DbEntityNotFoundError("No requestor found in chat"));
+			return new Result<PermissionDto>(new ForbiddenError("No requester found in chat"));
 
 		if (chatUserByRequester.Role is { CanGivePermissionToUser: true } ||
 		    chatUserByRequester.Chat.OwnerId == request.RequesterId)

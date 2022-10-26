@@ -1,5 +1,5 @@
 using MediatR;
-using Messenger.BusinessLogic.Models.RequestResponse;
+using Messenger.BusinessLogic.Models.Responses;
 using Messenger.BusinessLogic.Responses;
 
 namespace Messenger.BusinessLogic.ApiQueries.Auth;

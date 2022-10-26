@@ -1,8 +1,6 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Authentication;
 using MediatR;
 using Messenger.Application.Interfaces;
-using Messenger.BusinessLogic.Models.RequestResponse;
+using Messenger.BusinessLogic.Models.Responses;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Constants;
 using Messenger.Services;
@@ -28,16 +26,16 @@ public class AuthorizationCommandHandler : IRequestHandler<AuthorizationCommand,
 	{
 		if (!_tokenService.TryValidateAccessToken(request.AuthorizationToken,
 			    _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey],
-				    out JwtSecurityToken validatedJwtToken))
-			throw new AuthenticationException("Incorrect token");
+			    out var validatedJwtToken))
+			return new Result<AuthorizationResponse>(new AuthenticationError("Incorrect token"));
 
 		var claimId = validatedJwtToken.Claims.First(c => c.Type == ClaimConstants.Id);
 
-		var findUser = await _context.Users.FirstAsync(u => u.Id.ToString() == claimId.Value, cancellationToken);
+		var requester = await _context.Users.FirstAsync(u => u.Id.ToString() == claimId.Value, cancellationToken);
 
-		var newAccessToken = _tokenService.CreateAccessToken(findUser,
+		var newAccessToken = _tokenService.CreateAccessToken(requester,
 			_configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey]);
 		
-		return new Result<AuthorizationResponse>(new AuthorizationResponse(findUser, newAccessToken));
+		return new Result<AuthorizationResponse>(new AuthorizationResponse(requester, newAccessToken));
 	}
 }

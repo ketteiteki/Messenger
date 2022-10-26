@@ -16,14 +16,15 @@ public class UpdateConversationTestSuccess : IntegrationTestBase, IIntegrationTe
 		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
-		var createConversationCommand = new CreateConversationCommand(
+		var createConversationCommand = new CreateChatCommand(
 			RequesterId: user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
+			Type: ChatType.Conversation,
 			AvatarFile: null);
 
 		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
-
+		
 		await MessengerModule.RequestAsync(
 			new JoinToChatCommand(
 			RequesterId: alice.Value.Id,
@@ -42,28 +43,28 @@ public class UpdateConversationTestSuccess : IntegrationTestBase, IIntegrationTe
 
 		await MessengerModule.RequestAsync(createRoleAliceCommand, CancellationToken.None);
 		
-		var updateConversationCommandBy21Th = new UpdateConversationCommand(
+		var updateConversationBy21ThCommand = new UpdateConversationCommand(
 			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			Name: "21thName",
 			Title: "21thTitle");
 		
-		var updateConversationCommandByAlice =new UpdateConversationCommand(
+		var updateConversationByAliceCommand =new UpdateConversationCommand(
 			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id,
 			Name: "AliceName",
 			Title: "AliceTitle");
 
-		var conversationAfterUpdateBy21Th = await MessengerModule.RequestAsync(updateConversationCommandBy21Th,
+		var updateConversationBy21ThResult = await MessengerModule.RequestAsync(updateConversationBy21ThCommand,
 			CancellationToken.None);
 
-		conversationAfterUpdateBy21Th.Value.Name.Should().Be(updateConversationCommandBy21Th.Name);
-		conversationAfterUpdateBy21Th.Value.Title.Should().Be(updateConversationCommandBy21Th.Title);
+		updateConversationBy21ThResult.Value.Name.Should().Be(updateConversationBy21ThCommand.Name);
+		updateConversationBy21ThResult.Value.Title.Should().Be(updateConversationBy21ThCommand.Title);
 		
-		var conversationAfterUpdateByAlice = await MessengerModule.RequestAsync(updateConversationCommandByAlice, 
+		var updateConversationByAliceResult = await MessengerModule.RequestAsync(updateConversationByAliceCommand, 
 			CancellationToken.None);
 		
-		conversationAfterUpdateByAlice.Value.Name.Should().Be(updateConversationCommandByAlice.Name);
-		conversationAfterUpdateByAlice.Value.Title.Should().Be(updateConversationCommandByAlice.Title);
+		updateConversationByAliceResult.Value.Name.Should().Be(updateConversationByAliceCommand.Name);
+		updateConversationByAliceResult.Value.Title.Should().Be(updateConversationByAliceCommand.Title);
 	}
 }

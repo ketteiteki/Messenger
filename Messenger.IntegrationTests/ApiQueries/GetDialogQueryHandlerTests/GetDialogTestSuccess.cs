@@ -19,24 +19,24 @@ public class GetDialogTestSuccess : IntegrationTestBase, IIntegrationTest
             RequesterId: user21Th.Value.Id,
             UserId: alice.Value.Id), CancellationToken.None);
         
-        var dialogFor21Th = await MessengerModule.RequestAsync(new GetDialogQuery(
+        var getDialogBy21ThResult = await MessengerModule.RequestAsync(new GetDialogQuery(
             RequesterId: user21Th.Value.Id,
-            WithWhomId: alice.Value.Id), CancellationToken.None);
+            UserId: alice.Value.Id), CancellationToken.None);
         
-        var dialogForAlice = await MessengerModule.RequestAsync(new GetDialogQuery(
+        var getDialogByAliceResult = await MessengerModule.RequestAsync(new GetDialogQuery(
             RequesterId: alice.Value.Id,
-            WithWhomId: user21Th.Value.Id), CancellationToken.None);
+            UserId: user21Th.Value.Id), CancellationToken.None);
 
-        dialogFor21Th.Value.Members.Count.Should().Be(2);
-        dialogFor21Th.Value.Members.First(m => m.Id != user21Th.Value.Id).Id.Should().Be(alice.Value.Id);
-        dialogFor21Th.Value.Members.First(m => m.Id != user21Th.Value.Id).Nickname.Should().Be(alice.Value.Nickname);
-        dialogFor21Th.Value.Members.First(m => m.Id != user21Th.Value.Id).DisplayName.Should().Be(alice.Value.DisplayName);
-        dialogFor21Th.Value.Members.First(m => m.Id != user21Th.Value.Id).Bio.Should().Be(alice.Value.Bio);
+        getDialogBy21ThResult.Value.Members.Count.Should().Be(2);
+        getDialogBy21ThResult.Value.Members.First(m => m.Id != user21Th.Value.Id).Id.Should().Be(alice.Value.Id);
+        getDialogBy21ThResult.Value.Members.First(m => m.Id != user21Th.Value.Id).Nickname.Should().Be(alice.Value.NickName);
+        getDialogBy21ThResult.Value.Members.First(m => m.Id != user21Th.Value.Id).DisplayName.Should().Be(alice.Value.DisplayName);
+        getDialogBy21ThResult.Value.Members.First(m => m.Id != user21Th.Value.Id).Bio.Should().Be(alice.Value.Bio);
         
-        dialogForAlice.Value.Members.Count.Should().Be(2);
-        dialogForAlice.Value.Members.First(m => m.Id != alice.Value.Id).Id.Should().Be(user21Th.Value.Id);
-        dialogForAlice.Value.Members.First(m => m.Id != alice.Value.Id).Nickname.Should().Be(user21Th.Value.Nickname);
-        dialogForAlice.Value.Members.First(m => m.Id != alice.Value.Id).DisplayName.Should().Be(user21Th.Value.DisplayName);
-        dialogForAlice.Value.Members.First(m => m.Id != alice.Value.Id).Bio.Should().Be(user21Th.Value.Bio);
+        getDialogByAliceResult.Value.Members.Count.Should().Be(2);
+        getDialogByAliceResult.Value.Members.First(m => m.Id != alice.Value.Id).Id.Should().Be(user21Th.Value.Id);
+        getDialogByAliceResult.Value.Members.First(m => m.Id != alice.Value.Id).Nickname.Should().Be(user21Th.Value.NickName);
+        getDialogByAliceResult.Value.Members.First(m => m.Id != alice.Value.Id).DisplayName.Should().Be(user21Th.Value.DisplayName);
+        getDialogByAliceResult.Value.Members.First(m => m.Id != alice.Value.Id).Bio.Should().Be(user21Th.Value.Bio);
     }
 }

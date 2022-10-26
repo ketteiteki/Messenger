@@ -24,7 +24,7 @@ public class RemoveUserFromConversationCommandHandler : IRequestHandler<RemoveUs
 			.FirstOrDefaultAsync(r => r.UserId == request.RequesterId && r.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
-			return new Result<UserDto>(new DbEntityNotFoundError("No requestor in the chat"));
+			return new Result<UserDto>(new DbEntityNotFoundError("No requester in the chat"));
 
 		if (chatUserByRequester.Role is { CanAddAndRemoveUserToConversation: true } ||
 		    chatUserByRequester.Chat.OwnerId == request.RequesterId)

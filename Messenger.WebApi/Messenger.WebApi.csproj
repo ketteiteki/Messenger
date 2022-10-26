@@ -18,8 +18,4 @@
       <ProjectReference Include="..\Messenger.Persistence\Messenger.Persistence.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="wwwroot" />
-    </ItemGroup>
-
 </Project>

@@ -78,7 +78,6 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 				newMessage.Attachments.AddRange(attachments);
 			}
 
-		
 			_context.Messages.Add(newMessage);
 			
 			chatUser.Chat.LastMessageId = newMessage.Id;
