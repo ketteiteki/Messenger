@@ -31,7 +31,9 @@ public class UpdateConversationAvatarCommandHandler : IRequestHandler<UpdateConv
 			.FirstOrDefaultAsync(r => r.UserId == request.RequesterId && r.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
-			return new Result<ChatDto>(new DbEntityNotFoundError("No requestor in the chat"));
+		{
+			return new Result<ChatDto>(new DbEntityNotFoundError("No requester in the chat"));
+		}
 		
 		if (chatUserByRequester.Role is { CanChangeChatData: true } || 
 		    chatUserByRequester.Chat.OwnerId == request.RequesterId)

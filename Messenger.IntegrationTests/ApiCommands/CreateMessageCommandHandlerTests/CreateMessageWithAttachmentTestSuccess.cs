@@ -1,7 +1,8 @@
 using FluentAssertions;
-using Messenger.BusinessLogic.ApiCommands.Conversations;
+using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Messages;
 using Messenger.BusinessLogic.Services;
+using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Microsoft.AspNetCore.Http;
@@ -18,13 +19,16 @@ public class CreateMessageWithAttachmentTestSuccess : IntegrationTestBase, IInte
 
         await using var fileStream = new FileStream(Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
         
-        var conversation = await MessengerModule.RequestAsync(new CreateConversationCommand(
+        var createConversationCommand = new CreateChatCommand(
             RequesterId: user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            AvatarFile: null), CancellationToken.None);
+            Type: ChatType.Conversation,
+            AvatarFile: null);
+		
+        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-        var createdMessageBy21ThCommand = new CreateMessageCommand(
+        var createMessageBy21ThCommand = new CreateMessageCommand(
             RequesterId: user21Th.Value.Id,
             Text: "qwerty1",
             ReplyToId: null,
@@ -36,18 +40,18 @@ public class CreateMessageWithAttachmentTestSuccess : IntegrationTestBase, IInte
                     baseStreamOffset: 0,
                     length: fileStream.Length,
                     name: "qwerty",
-                    fileName: "qwerty"),
+                    fileName: "qwerty.jpg"),
                 new FormFile(
                     baseStream: fileStream,
                     baseStreamOffset: 0,
                     length: fileStream.Length,
                     name: "qwerty",
-                    fileName: "qwerty")
+                    fileName: "qwerty.jpg")
             });
 
-        var createdMessageBy21Th = await MessengerModule.RequestAsync(createdMessageBy21ThCommand, CancellationToken.None);
+        var createMessageBy21ThResult = await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
 
-        foreach (var attachment in createdMessageBy21Th.Value.Attachments)
+        foreach (var attachment in createMessageBy21ThResult.Value.Attachments)
         {
             var pathAvatar = Path.Combine(BaseDirService.GetPathWwwRoot(), attachment.Link.Split("/")[^1]);
         

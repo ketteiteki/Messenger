@@ -7,5 +7,5 @@ namespace Messenger.BusinessLogic.ApiCommands.Dialogs;
 public record DeleteDialogCommand(
 		Guid RequesterId,
 		Guid ChatId,
-		bool IsForBoth) 
+		bool IsDeleteForAll) 
 	: IRequest<Result<ChatDto>>;

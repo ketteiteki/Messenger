@@ -18,67 +18,84 @@ public class GetMessageListBySearchQueryHandler : IRequestHandler<GetMessageList
 	
 	public async Task<Result<List<MessageDto>>> Handle(GetMessageListBySearchQuery request, CancellationToken cancellationToken)
 	{
-		if (request.Limit > 60) return new Result<List<MessageDto>>(new BadRequestError("Limit exceeded. Limit: 60"));
+		if (request.Limit > 60)
+		{
+			return new Result<List<MessageDto>>(new BadRequestError("Limit exceeded. Limit: 60"));
+		}
 		
 		var banUserByChat = await _context.BanUserByChats
 			.FirstOrDefaultAsync(b => b.UserId == request.RequesterId && b.ChatId == request.ChatId, cancellationToken);
 
-		if (banUserByChat != null) return new Result<List<MessageDto>>(new ForbiddenError("You are banned"));
+		if (banUserByChat != null)
+		{
+			return new Result<List<MessageDto>>(new ForbiddenError("You are banned"));
+		}
 		
 		if (request.FromMessageDateTime != null)
 		{
-			var messagesFromMessageId = await _context.Messages
-				.AsNoTracking()
-				.Where(m => m.ChatId == request.ChatId 
-				            && m.DateOfCreate < request.FromMessageDateTime 
-				            && Regex.IsMatch(m.Text, $"{request.SearchText}", RegexOptions.IgnoreCase))
-				.OrderBy(m => m.DateOfCreate)
-				.Take(request.Limit)
-				.Select(m => new MessageDto
-				{
-					Id = m.Id,
-					Text = m.Text,
-					IsEdit = m.IsEdit,
-					OwnerId = m.OwnerId,
-					OwnerDisplayName = m.Owner != null ? m.Owner.DisplayName : null,
-					OwnerAvatarLink = m.Owner != null ? m.Owner.AvatarLink : null,
-					ReplyToMessageId = m.ReplyToMessageId,
-					ReplyToMessageText = m.ReplyToMessage != null ? m.ReplyToMessage.Text : null,
-					ReplyToMessageAuthorDisplayName = m.ReplyToMessage != null && m.ReplyToMessage.Owner != null ? 
-						m.ReplyToMessage.Owner.DisplayName : null,
-					Attachments = m.Attachments.Select(a => new AttachmentDto(a)).ToList(),
-					ChatId = m.ChatId,
-					DateOfCreate = m.DateOfCreate
-				})
-				.ToListAsync(cancellationToken);
-			
-			return new Result<List<MessageDto>>(messagesFromMessageId);
+			var messageListFromDate =
+				await (from message in _context.Messages.AsNoTracking()
+						join deletedMessageByUsers in _context.DeletedMessageByUsers.AsNoTracking()
+							on new { x1 = message.Id, x2 = message.OwnerId }
+							equals new { x1 = deletedMessageByUsers.MessageId, x2 = (Guid?)deletedMessageByUsers.UserId }
+							into deletedMessageByUsersEnumerable
+						from deletedMessageByUsersItem in deletedMessageByUsersEnumerable.DefaultIfEmpty()
+						where deletedMessageByUsersItem == null
+						where message.ChatId == request.ChatId
+						where message.DateOfCreate < request.FromMessageDateTime 
+						where Regex.IsMatch(message.Text, $"{request.SearchText}")
+						select new MessageDto
+						{
+							Id = message.Id,
+							Text = message.Text,
+							IsEdit = message.IsEdit,
+							OwnerId = message.OwnerId,
+							OwnerDisplayName = message.Owner != null ? message.Owner.DisplayName : null,
+							OwnerAvatarLink = message.Owner != null ? message.Owner.AvatarLink : null,
+							ReplyToMessageId = message.ReplyToMessageId,
+							ReplyToMessageText = message.ReplyToMessage != null ? message.ReplyToMessage.Text : null,
+							ReplyToMessageAuthorDisplayName = message.ReplyToMessage != null && message.ReplyToMessage.Owner != null ? 
+								message.ReplyToMessage.Owner.DisplayName : null,
+							Attachments = message.Attachments.Select(a => new AttachmentDto(a)).ToList(),
+							ChatId = message.ChatId,
+							DateOfCreate = message.DateOfCreate
+						}
+					)
+					.ToListAsync(cancellationToken);
+
+			return new Result<List<MessageDto>>(messageListFromDate);
 		}
-		
-		var messages = await _context.Messages
-			.AsNoTracking()
-			.Where(m => m.ChatId == request.ChatId 
-			            && Regex.IsMatch(m.Text, $"{request.SearchText}", RegexOptions.IgnoreCase))
-			.OrderBy(m => m.DateOfCreate)
-			.Take(request.Limit)
-			.Select(m => new MessageDto
-			{
-				Id = m.Id,
-				Text = m.Text,
-				IsEdit = m.IsEdit,
-				OwnerId = m.OwnerId,
-				OwnerDisplayName = m.Owner != null ? m.Owner.DisplayName : null,
-				OwnerAvatarLink = m.Owner != null ? m.Owner.AvatarLink : null,
-				ReplyToMessageId = m.ReplyToMessageId,
-				ReplyToMessageText = m.ReplyToMessage != null ? m.ReplyToMessage.Text : null,
-				ReplyToMessageAuthorDisplayName = m.ReplyToMessage != null && m.ReplyToMessage.Owner != null ? 
-					m.ReplyToMessage.Owner.DisplayName : null,
-				Attachments = m.Attachments.Select(a => new AttachmentDto(a)).ToList(),
-				ChatId = m.ChatId,
-				DateOfCreate = m.DateOfCreate
-			})
-			.ToListAsync(cancellationToken);
-			
-		return new Result<List<MessageDto>>(messages);
+
+		var messageList =
+			await (from message in _context.Messages.AsNoTracking()
+					join deletedMessageByUsers in _context.DeletedMessageByUsers.AsNoTracking()
+						on new { x1 = message.Id, x2 = message.OwnerId }
+						equals new { x1 = deletedMessageByUsers.MessageId, x2 = (Guid?)deletedMessageByUsers.UserId }
+						into deletedMessageByUsersEnumerable
+					from deletedMessageByUsersItem in deletedMessageByUsersEnumerable.DefaultIfEmpty()
+					where deletedMessageByUsersItem == null
+					where message.ChatId == request.ChatId
+					where Regex.IsMatch(message.Text, $"{request.SearchText}")
+					select new MessageDto
+					{
+						Id = message.Id,
+						Text = message.Text,
+						IsEdit = message.IsEdit,
+						OwnerId = message.OwnerId,
+						OwnerDisplayName = message.Owner != null ? message.Owner.DisplayName : null,
+						OwnerAvatarLink = message.Owner != null ? message.Owner.AvatarLink : null,
+						ReplyToMessageId = message.ReplyToMessageId,
+						ReplyToMessageText = message.ReplyToMessage != null ? message.ReplyToMessage.Text : null,
+						ReplyToMessageAuthorDisplayName = message.ReplyToMessage != null && message.ReplyToMessage.Owner != null ? 
+							message.ReplyToMessage.Owner.DisplayName : null,
+						Attachments = message.Attachments.Select(a => new AttachmentDto(a)).ToList(),
+						ChatId = message.ChatId,
+						DateOfCreate = message.DateOfCreate
+					}
+				)
+				.Take(request.Limit)
+				.ToListAsync(cancellationToken);
+
+		return new Result<List<MessageDto>>(messageList);
 	}
 }

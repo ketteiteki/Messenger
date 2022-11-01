@@ -5,6 +5,7 @@ using Messenger.BusinessLogic.Responses;
 using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Constants;
 using Messenger.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace Messenger.BusinessLogic.ApiCommands.Profiles;
@@ -24,14 +25,12 @@ public class UpdateProfileAvatarCommandHandler : IRequestHandler<UpdateProfileAv
 	
 	public async Task<Result<UserDto>> Handle(UpdateProfileAvatarCommand request, CancellationToken cancellationToken)
 	{
-		var user = await _context.Users.FindAsync(request.RequesterId);
+		var requester = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, CancellationToken.None);
 
-		if (user == null) return new Result<UserDto>(new DbEntityNotFoundError("User not found")); 
-
-		if (user.AvatarLink != null)
+		if (requester.AvatarLink != null)
 		{
-			_fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), user.AvatarLink.Split("/")[^1]));
-			user.AvatarLink = null;
+			_fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), requester.AvatarLink.Split("/")[^1]));
+			requester.AvatarLink = null;
 		}
 
 		if (request.AvatarFile != null)
@@ -39,12 +38,12 @@ public class UpdateProfileAvatarCommandHandler : IRequestHandler<UpdateProfileAv
 			var avatarLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), request.AvatarFile,
 				_configuration[AppSettingConstants.MessengerDomainName]);
 
-			user.AvatarLink = avatarLink;
+			requester.AvatarLink = avatarLink;
 		}
 
-		_context.Users.Update(user);
+		_context.Users.Update(requester);
 		await _context.SaveChangesAsync(cancellationToken);
 
-		return new Result<UserDto>(new UserDto(user));
+		return new Result<UserDto>(new UserDto(requester));
 	}
 }

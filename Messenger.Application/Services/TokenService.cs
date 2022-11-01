@@ -13,16 +13,17 @@ public class TokenService : ITokenService
     public string CreateAccessToken(User user, string signKey)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-
         var key = Encoding.Default.GetBytes(signKey);
 
         var claims = new[]
         {
             new Claim(ClaimConstants.Id, user.Id.ToString()),
-            new Claim(ClaimConstants.Login, user.NickName)
+            new Claim(ClaimConstants.Login, user.Nickname),
+            new Claim(ClaimConstants.RandomToken, Guid.NewGuid().ToString())
         };
 
         var jwtToken = new JwtSecurityToken(
+            expires: DateTime.UtcNow.AddMinutes(15),
             claims: claims,
             signingCredentials: new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256));
@@ -42,10 +43,10 @@ public class TokenService : ITokenService
                 ValidateAudience = false,
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                ValidateLifetime = false,
+                ValidateLifetime = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ClockSkew = TimeSpan.Zero
-            }, out SecurityToken validatedToken);
+            }, out var validatedToken);
 
             validatedJwtToken = (JwtSecurityToken)validatedToken;
 

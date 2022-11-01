@@ -16,13 +16,14 @@ public class RemoveRoleUserInConversationTestSuccess : IntegrationTestBase, IInt
 		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		
-		var command = new CreateConversationCommand(
+		var createConversationCommand = new CreateChatCommand(
 			RequesterId: user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
+			Type: ChatType.Conversation,
 			AvatarFile: null);
 
-		var conversation = await MessengerModule.RequestAsync(command, CancellationToken.None);
+		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 		
 		var joinToConversationCommand = new JoinToChatCommand(
 			RequesterId: alice.Value.Id,
@@ -30,7 +31,7 @@ public class RemoveRoleUserInConversationTestSuccess : IntegrationTestBase, IInt
 
 		await MessengerModule.RequestAsync(joinToConversationCommand, CancellationToken.None);
 
-		var createOrUpdateRoleUserInConversation = new CreateOrUpdateRoleUserInConversationCommand(
+		var createRoleUserAliceInConversationBy21ThCommand = new CreateOrUpdateRoleUserInConversationCommand(
 			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alice.Value.Id,
@@ -41,15 +42,15 @@ public class RemoveRoleUserInConversationTestSuccess : IntegrationTestBase, IInt
 			CanAddAndRemoveUserToConversation: false,
 			CanGivePermissionToUser:false);
 
-		await MessengerModule.RequestAsync(createOrUpdateRoleUserInConversation, CancellationToken.None);
+		await MessengerModule.RequestAsync(createRoleUserAliceInConversationBy21ThCommand, CancellationToken.None);
 
 		var removeRoleUserInConversationCommand = new RemoveRoleUserInConversationCommand(
 			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alice.Value.Id);
 
-		var role = await MessengerModule.RequestAsync(removeRoleUserInConversationCommand, CancellationToken.None);
+		var removeRoleUserInConversationResult = await MessengerModule.RequestAsync(removeRoleUserInConversationCommand, CancellationToken.None);
 
-		role.IsSuccess.Should().BeTrue();
+		removeRoleUserInConversationResult.IsSuccess.Should().BeTrue();
 	}
 }

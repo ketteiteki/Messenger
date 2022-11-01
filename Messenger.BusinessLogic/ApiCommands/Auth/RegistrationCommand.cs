@@ -1,5 +1,5 @@
 using MediatR;
-using Messenger.BusinessLogic.Models.RequestResponse;
+using Messenger.BusinessLogic.Models.Responses;
 using Messenger.BusinessLogic.Responses;
 
 namespace Messenger.BusinessLogic.ApiCommands.Auth;
@@ -7,5 +7,7 @@ namespace Messenger.BusinessLogic.ApiCommands.Auth;
 public record RegistrationCommand(
 		string DisplayName,
 		string Nickname, 
-		string Password)
-	: IRequest<Result<RegistrationResponse>>;
+		string Password,
+		string UserAgent,
+		string Ip)
+	: IRequest<Result<AuthorizationResponse>>;

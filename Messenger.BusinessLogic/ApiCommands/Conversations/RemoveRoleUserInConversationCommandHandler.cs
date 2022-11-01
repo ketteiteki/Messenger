@@ -26,10 +26,14 @@ public class RemoveRoleUserInConversationCommandHandler
 			.FirstOrDefaultAsync(r => r.UserId == request.UserId && r.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUser == null)
+		{
 			return new Result<RoleUserByChatDto>(new DbEntityNotFoundError("No requester in the chat"));
+		}
 
 		if (chatUser.Role == null)
+		{
 			return new Result<RoleUserByChatDto>(new DbEntityNotFoundError("Role not found"));
+		}
 			
 		if (chatUser.Chat.OwnerId == request.RequesterId)
 		{

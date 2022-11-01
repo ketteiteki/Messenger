@@ -22,5 +22,8 @@ public class DeletedMessageByUserConfiguration : IEntityTypeConfiguration<Delete
 			.WithMany(u => u.DeletedMessageByUsers)
 			.HasForeignKey(p => p.UserId)
 			.OnDelete(DeleteBehavior.Cascade);
+		
+		builder.Property(x => x.MessageId).IsRequired();
+		builder.Property(x => x.UserId).IsRequired();
 	}
 }

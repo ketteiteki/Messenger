@@ -1,26 +1,48 @@
 using MediatR;
+using Messenger.BusinessLogic.ApiQueries.Users;
+using Messenger.BusinessLogic.Models;
+using Messenger.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Messenger.WebApi.Controllers;
 
 [Route("api/[controller]")]
+[Authorize]
 [ApiController]
 public class UsersController : ApiControllerBase
 {
 	public UsersController(IMediator mediator) : base(mediator) {}
 	
-	[Authorize]
+	[ProducesResponseType(typeof(List<UserDto>), 200)]
 	[HttpGet]
-	public async Task<IActionResult> GetUsers([FromQuery] string search, [FromQuery] int count = 10, [FromQuery] int page = 1)
+	public async Task<IActionResult> GetUserListBySearch(
+		[FromQuery] string search,
+		CancellationToken cancellationToken, 
+		[FromQuery] int limit = 10, 
+		[FromQuery] int page = 1)
 	{
-		throw new NotImplementedException();
+		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
+		
+		var query = new GetUserListBySearchQuery(
+			RequesterId: requesterId,
+			SearchText: search,
+			Limit: limit,
+			Page: page);
+		
+		return await RequestAsync(query, cancellationToken);
 	}
 	
-	[Authorize]
+	[ProducesResponseType(typeof(ErrorModel), 404)]
+	[ProducesResponseType(typeof(UserDto), 200)]
 	[HttpGet("{userId}")]
-	public async Task<IActionResult> GetUser(Guid userId)
+	public async Task<IActionResult> GetUser(
+		Guid userId,
+		CancellationToken cancellationToken)
 	{
-		throw new NotImplementedException();
+		var query = new GetUserQuery(
+			UserId: userId);
+		
+		return await RequestAsync(query, cancellationToken);
 	}
 }

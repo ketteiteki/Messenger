@@ -12,37 +12,41 @@ public class GetUserListTestSuccess : IntegrationTestBase, IIntegrationTest
     public async Task Test()
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
-        var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
-        var alex = await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
+        await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+        await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
+        await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
-        var usersLimit2Page1 = await MessengerModule.RequestAsync(new GetUserListQuery(
+        var getUserListLimit2Page1Result = await MessengerModule.RequestAsync(new GetUserListBySearchQuery(
+            RequesterId: user21Th.Value.Id,
             Limit: 2,
             Page: 1,
             SearchText: null), CancellationToken.None);
         
-        var usersLimit2Page2 = await MessengerModule.RequestAsync(new GetUserListQuery(
+        var getUserListLimit2Page2Result = await MessengerModule.RequestAsync(new GetUserListBySearchQuery(
+            RequesterId: user21Th.Value.Id,
             Limit: 2,
             Page: 2,
             SearchText: null), CancellationToken.None);
         
-        var usersLimit2Page3 = await MessengerModule.RequestAsync(new GetUserListQuery(
+        var getUserListLimit2Page3Result = await MessengerModule.RequestAsync(new GetUserListBySearchQuery(
+            RequesterId: user21Th.Value.Id,
             Limit: 2,
             Page: 3,
             SearchText: null), CancellationToken.None);
 
-        var userWhoContains123InNickname = await MessengerModule.RequestAsync(new GetUserListQuery(
+        var getUserListBySearchResult = await MessengerModule.RequestAsync(new GetUserListBySearchQuery(
+            RequesterId: user21Th.Value.Id,
             Limit: 20,
             Page: 1,
             SearchText: "123"), CancellationToken.None);
         
-        for (var i = 0; i < usersLimit2Page1.Value.Count; i++)
+        for (var i = 0; i < getUserListLimit2Page1Result.Value.Count; i++)
         {
-            usersLimit2Page1.Value[i].Id.Should().NotBe(usersLimit2Page2.Value[i].Id);
+            getUserListLimit2Page1Result.Value[i].Id.Should().NotBe(getUserListLimit2Page2Result.Value[i].Id);
         }
 
-        usersLimit2Page3.Value.Count.Should().Be(0);
+        getUserListLimit2Page3Result.Value.Count.Should().Be(0);
 
-        userWhoContains123InNickname.Value.Count.Should().Be(3);
+        getUserListBySearchResult.Value.Count.Should().Be(3);
     }
 }

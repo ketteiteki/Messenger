@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Chats;
-using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.BusinessLogic.ApiCommands.Dialogs;
 using Messenger.BusinessLogic.ApiQueries.Chats;
 using Messenger.Domain.Enum;
@@ -18,31 +17,34 @@ public class GetChatListTestSuccess : IntegrationTestBase, IIntegrationTest
 		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
-		var createConversationCommand1 = new CreateConversationCommand(
+		var createFirstConversationCommand = new CreateChatCommand(
 			RequesterId: user21Th.Value.Id,
 			Name: "conv1",
 			Title: "conv1",
+			Type: ChatType.Conversation,
 			AvatarFile: null);
 		
-		var createConversationCommand2 = new CreateConversationCommand(
+		var createSecondConversationCommand = new CreateChatCommand(
 			RequesterId: user21Th.Value.Id,
 			Name: "conv2",
 			Title: "conv2",
+			Type: ChatType.Conversation,
 			AvatarFile: null);
 		
-		var createConversationCommand3 = new CreateConversationCommand(
+		var createThirdConversationCommand = new CreateChatCommand(
 			RequesterId: user21Th.Value.Id,
 			Name: "conv3",
 			Title: "conv3",
+			Type: ChatType.Conversation,
 			AvatarFile: null);
 
 		var createDialogCommand = new CreateDialogCommand(
 			RequesterId: user21Th.Value.Id,
 			UserId: alice.Value.Id);
 
-		await MessengerModule.RequestAsync(createConversationCommand1, CancellationToken.None);
-		await MessengerModule.RequestAsync(createConversationCommand2, CancellationToken.None);
-		var conversation3 = await MessengerModule.RequestAsync(createConversationCommand3, CancellationToken.None);
+		await MessengerModule.RequestAsync(createFirstConversationCommand, CancellationToken.None);
+		await MessengerModule.RequestAsync(createSecondConversationCommand, CancellationToken.None);
+		var conversation3 = await MessengerModule.RequestAsync(createThirdConversationCommand, CancellationToken.None);
 		await MessengerModule.RequestAsync(createDialogCommand, CancellationToken.None);
 
 		await MessengerModule.RequestAsync(
@@ -50,13 +52,12 @@ public class GetChatListTestSuccess : IntegrationTestBase, IIntegrationTest
 				RequesterId: alice.Value.Id,
 				ChatId: conversation3.Value.Id), CancellationToken.None);
 
-		var queryFor21Th = new GetChatListQuery(RequesterId: user21Th.Value.Id);
-		var queryForAlice = new GetChatListQuery(RequesterId: alice.Value.Id);
+		var getChatListBy21ThResult = await MessengerModule.RequestAsync(new GetChatListQuery(
+			RequesterId: user21Th.Value.Id), CancellationToken.None);
+		var getChatListByAliceResult = await MessengerModule.RequestAsync(new GetChatListQuery(
+			RequesterId: alice.Value.Id), CancellationToken.None);
 
-		var chatListFor21Th = await MessengerModule.RequestAsync(queryFor21Th, CancellationToken.None);
-		var chatListForAlice = await MessengerModule.RequestAsync(queryForAlice, CancellationToken.None);
-
-		foreach (var chat in chatListFor21Th.Value)
+		foreach (var chat in getChatListBy21ThResult.Value)
 		{
 			if (chat.Type == ChatType.Dialog)
 			{
@@ -71,7 +72,7 @@ public class GetChatListTestSuccess : IntegrationTestBase, IIntegrationTest
 			chat.IsOwner.Should().Be(true);
 		}
 		
-		foreach (var chat in chatListForAlice.Value)
+		foreach (var chat in getChatListByAliceResult.Value)
 		{
 			chat.IsMember.Should().Be(true);
 			chat.IsOwner.Should().Be(false);

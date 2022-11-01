@@ -23,14 +23,20 @@ public class UpdateMessageCommandHandler : IRequestHandler<UpdateMessageCommand,
 			.ThenInclude(r => r.Owner)
 			.Include(m => m.Attachments)
 			.FirstOrDefaultAsync(m => m.Id == request.MessageId, cancellationToken);
-		if (message == null) return new Result<MessageDto>(new DbEntityNotFoundError("Message not found")); 
+		
+		if (message == null)
+		{
+			return new Result<MessageDto>(new DbEntityNotFoundError("Message not found"));
+		}
 
 		if (request.RequesterId != message.OwnerId)
+		{
 			return new Result<MessageDto>(new ForbiddenError("It is forbidden to change someone else's message")); 
+		}
 		
 		message.Text = request.Text;
 		message.IsEdit = true;
-		
+
 		_context.Messages.Update(message);
 		await _context.SaveChangesAsync(cancellationToken);
 		

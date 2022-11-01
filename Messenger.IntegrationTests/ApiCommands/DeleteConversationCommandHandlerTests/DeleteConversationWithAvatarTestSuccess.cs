@@ -1,6 +1,7 @@
 using FluentAssertions;
-using Messenger.BusinessLogic.ApiCommands.Conversations;
+using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.Services;
+using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Microsoft.AspNetCore.Http;
@@ -15,35 +16,35 @@ public class DeleteConversationWithAvatarTestSuccess : IntegrationTestBase, IInt
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-        using (var fileStream = new FileStream(Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"),
-                   FileMode.Open))
-        {
-            var command = new CreateConversationCommand(
-                RequesterId: user21Th.Value.Id,
-                Name: "convers",
-                Title: "21ths den",
-                AvatarFile: new FormFile(
-                    baseStream: fileStream,
-                    baseStreamOffset: 0,
-                    length: fileStream.Length,
-                    name: "qwerty",
-                    fileName: "qwerty"));
+        await using var fileStream = new FileStream(Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"),
+            FileMode.Open);
+        
+        var createConversationCommand = new CreateChatCommand(
+            RequesterId: user21Th.Value.Id,
+            Name: "qwerty",
+            Title: "qwerty",
+            Type: ChatType.Conversation,
+            AvatarFile: new FormFile(
+                baseStream: fileStream,
+                baseStreamOffset: 0,
+                length: fileStream.Length,
+                name: "qwerty",
+                fileName: "qwerty.jpg"));
 
-            var conversation = await MessengerModule.RequestAsync(command, CancellationToken.None);
+        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 		
-            var pathAvatar = Path.Combine(BaseDirService.GetPathWwwRoot(), conversation.Value.AvatarLink.Split("/")[^1]);
+        var pathAvatar = Path.Combine(BaseDirService.GetPathWwwRoot(), conversation.Value.AvatarLink.Split("/")[^1]);
         
-            File.Exists(pathAvatar).Should().BeTrue();
+        File.Exists(pathAvatar).Should().BeTrue();
         
-            var deleteConversationCommand = new DeleteConversationCommand(
-                RequesterId: user21Th.Value.Id,
-                ChatId: conversation.Value.Id);
+        var deleteConversationCommand = new DeleteChatCommand(
+            RequesterId: user21Th.Value.Id,
+            ChatId: conversation.Value.Id);
 
-            var deletedConversation = await MessengerModule.RequestAsync(deleteConversationCommand, CancellationToken.None);
+        var deletedConversation = await MessengerModule.RequestAsync(deleteConversationCommand, CancellationToken.None);
 
-            deletedConversation.IsSuccess.Should().BeTrue();
+        deletedConversation.IsSuccess.Should().BeTrue();
         
-            File.Exists(pathAvatar).Should().BeFalse();
-        }
+        File.Exists(pathAvatar).Should().BeFalse();
     }
 }

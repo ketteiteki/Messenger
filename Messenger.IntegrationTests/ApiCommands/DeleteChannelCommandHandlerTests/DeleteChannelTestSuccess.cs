@@ -1,5 +1,6 @@
 using FluentAssertions;
-using Messenger.BusinessLogic.ApiCommands.Channels;
+using Messenger.BusinessLogic.ApiCommands.Chats;
+using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
@@ -13,20 +14,21 @@ public class DeleteChannelTestSuccess : IntegrationTestBase, IIntegrationTest
 	{
 		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-		var command = new CreateChannelCommand(
+		var createChannelCommand = new CreateChatCommand(
 			RequesterId: user21Th.Value.Id,
-			Name: "convers",
-			Title: "21ths den",
+			Name: "qwerty",
+			Title: "qwerty",
+			Type: ChatType.Channel,
 			AvatarFile: null);
-
-		var channel = await MessengerModule.RequestAsync(command, CancellationToken.None);
-
-		var deleteChannelCommand = new DeleteChannelCommand(
-			RequesterId: user21Th.Value.Id,
-			ChannelId: channel.Value.Id);
 		
-		var deletedChannel = await MessengerModule.RequestAsync(deleteChannelCommand, CancellationToken.None);
+		var channel = await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
+		
+		var deleteChannelCommand = new DeleteChatCommand(
+			RequesterId: user21Th.Value.Id,
+			ChatId: channel.Value.Id);
+		
+		var deletedChannelResult = await MessengerModule.RequestAsync(deleteChannelCommand, CancellationToken.None);
 
-		deletedChannel.IsSuccess.Should().BeTrue();
+		deletedChannelResult.IsSuccess.Should().BeTrue();
 	}
 }

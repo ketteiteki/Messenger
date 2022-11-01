@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Auth;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
@@ -10,10 +11,14 @@ public class LoginTestSuccess : IntegrationTestBase, IIntegrationTest
 	[Fact]
 	public async Task Test()
 	{
-		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+		await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-		await MessengerModule.RequestAsync(new LoginCommand(
-			NickName: user21Th.Value.Nickname,
-			Password: "1234567890"), CancellationToken.None);
+		var loginResult = await MessengerModule.RequestAsync(new LoginCommand(
+			Nickname: CommandHelper.Registration21ThCommand().Nickname,
+			Password: CommandHelper.Registration21ThCommand().Password,
+			UserAgent: "Mozilla",
+			Ip: "323.432.21.542"), CancellationToken.None);
+
+		loginResult.IsSuccess.Should().BeTrue();
 	}
 }

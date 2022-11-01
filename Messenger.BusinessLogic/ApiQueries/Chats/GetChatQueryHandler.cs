@@ -30,28 +30,33 @@ public class GetChatQueryHandler : IRequestHandler<GetChatQuery, Result<ChatDto>
 						equals new {x1 = banUserByChat.UserId, x2 = banUserByChat.ChatId }
 						into banUserByChatEnumerable
 					from banUserByChatItem in banUserByChatEnumerable.DefaultIfEmpty()
-					where chatUsersItem.UserId == request.RequesterId &&
-					      chatUsersItem.ChatId == request.ChatId
+					where chat.Id == request.ChatId
+					where chatUsersItem != null && chat.Type == ChatType.Dialog || 
+					      chat.Type != ChatType.Dialog
 					select new ChatDto
 					{
 						Id = chat.Id,
-						Name = (int)chat.Type != (int)ChatType.Dialog ? chat.Name : null,
+						Name = chat.Type != ChatType.Dialog ? chat.Name : null,
 						Title = chat.Title,
 						Type = chat.Type,
-						AvatarLink = (int)chat.Type != (int)ChatType.Dialog ? chat.AvatarLink : null,
+						AvatarLink = chat.Type != ChatType.Dialog ? chat.AvatarLink : null,
 						MembersCount = chat.ChatUsers.Count,
-						CanSendMedia = chatUsersItem.CanSendMedia,
+						CanSendMedia = chatUsersItem != null && chatUsersItem.CanSendMedia,
 						IsOwner = chat.OwnerId == request.RequesterId,
 						IsMember = chatUsersItem != null,
 						MuteDateOfExpire = chatUsersItem != null ? chatUsersItem.MuteDateOfExpire : null,
 						BanDateOfExpire = banUserByChatItem != null ? banUserByChatItem.BanDateOfExpire : null,
-						RoleUser = chatUsersItem.Role != null ? new RoleUserByChatDto(chatUsersItem.Role) : null,
-						Members = (int)chat.Type == (int)ChatType.Dialog ? 
-							chat.ChatUsers.Select(c => new UserDto(c.User)).ToList() : new()
+						RoleUser = chatUsersItem != null && chatUsersItem.Role != null ?
+							new RoleUserByChatDto(chatUsersItem.Role) : null,
+						Members = chat.Type == ChatType.Dialog ? 
+							chat.ChatUsers.Select(c => new UserDto(c.User)).ToList() : new List<UserDto>()
 					})
 				.FirstOrDefaultAsync(cancellationToken);
 
-		if (chatItem == null) return new Result<ChatDto>(new DbEntityNotFoundError("Chat not found"));
+		if (chatItem == null)
+		{
+			return new Result<ChatDto>(new DbEntityNotFoundError("Chat not found"));
+		}
 		
 		return new Result<ChatDto>(chatItem);
 	}

@@ -15,6 +15,7 @@ public class DatabaseContext : DbContext
 	public DbSet<DeletedMessageByUser> DeletedMessageByUsers { get; set; } = null!;
 	public DbSet<DeletedDialogByUser> DeletedDialogByUsers { get; set; } = null!;
 	public DbSet<BanUserByChat> BanUserByChats { get; set; } = null!;
+	public DbSet<Session> Sessions { get; set; } = null!;
 
 	public DatabaseContext(DbContextOptions<DatabaseContext> dbContextOptions) : base(dbContextOptions)
 	{

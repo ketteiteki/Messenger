@@ -22,5 +22,8 @@ public class ChatUserConfiguration : IEntityTypeConfiguration<ChatUser>
 			.WithMany(u => u.ChatUsers)
 			.HasForeignKey(p => p.UserId)
 			.OnDelete(DeleteBehavior.Cascade);
+		
+		builder.Property(x => x.ChatId).IsRequired();
+		builder.Property(x => x.UserId).IsRequired();
 	}
 }

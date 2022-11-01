@@ -27,12 +27,13 @@ public class IntegrationTestBase : IAsyncLifetime
 			.AddJsonFile(pathAppSettingsDevelopment)
 			.Build();
 
-		var databaseConnectionString =
-			configuration[AppSettingConstants.DatabaseConnectionStringForIntegrationTests];
+		var databaseConnectionString = configuration[AppSettingConstants.DatabaseConnectionStringForIntegrationTests];
+		var signKey = configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
 
 		MessengerStartup.Initialize(
 			configuration,
-			databaseConnectionString);
+			databaseConnectionString,
+			signKey);
 
 		ServiceProvider = MessengerCompositionRoot.Provider;
 

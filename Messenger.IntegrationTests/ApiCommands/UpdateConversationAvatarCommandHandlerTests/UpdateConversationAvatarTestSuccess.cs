@@ -18,14 +18,15 @@ public class UpdateConversationAvatarTestSuccess : IntegrationTestBase, IIntegra
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
-		var createConversationCommand = new CreateConversationCommand(
+		var createConversationCommand = new CreateChatCommand(
 			RequesterId: user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
+			Type: ChatType.Conversation,
 			AvatarFile: null);
 
 		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
-
+		
 		await MessengerModule.RequestAsync(
 			new JoinToChatCommand(
 			RequesterId: alice.Value.Id,
@@ -45,7 +46,8 @@ public class UpdateConversationAvatarTestSuccess : IntegrationTestBase, IIntegra
 		await MessengerModule.RequestAsync(createRoleAliceCommand, CancellationToken.None);
 
 		await using var fileStream = new FileStream(Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
-		var updateAvatarConversationCommandBy21Th = new UpdateConversationAvatarCommand(
+		
+		var updateAvatarConversationBy21ThCommand = new UpdateConversationAvatarCommand(
 			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			AvatarFile: new FormFile(
@@ -53,9 +55,9 @@ public class UpdateConversationAvatarTestSuccess : IntegrationTestBase, IIntegra
 				baseStreamOffset: 0,
 				length: fileStream.Length,
 				name: "qwerty",
-				fileName: "qwerty"));
+				fileName: "qwerty.jpg"));
 		
-		var updateAvatarConversationCommandByAlice =new UpdateConversationAvatarCommand(
+		var updateAvatarConversationByAliceCommand =new UpdateConversationAvatarCommand(
 			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id,
 			AvatarFile: new FormFile(
@@ -63,26 +65,25 @@ public class UpdateConversationAvatarTestSuccess : IntegrationTestBase, IIntegra
 				baseStreamOffset: 0,
 				length: fileStream.Length,
 				name: "qwerty",
-				fileName: "qwerty"));
+				fileName: "qwerty.jpg"));
 
-		var conversationAfterUpdateAvatarBy21Th = await MessengerModule.RequestAsync(updateAvatarConversationCommandBy21Th,
-			CancellationToken.None);
+		var updateAvatarConversationBy21ThResult = 
+			await MessengerModule.RequestAsync(updateAvatarConversationBy21ThCommand, CancellationToken.None);
 
-		conversationAfterUpdateAvatarBy21Th.Value.AvatarLink.Should().NotBeNull();
+		updateAvatarConversationBy21ThResult.Value.AvatarLink.Should().NotBeNull();
 		
 		var pathAvatarAfterUpdateBy21Th = 
-			Path.Combine(BaseDirService.GetPathWwwRoot(), conversationAfterUpdateAvatarBy21Th.Value.AvatarLink.Split("/")[^1]);
+			Path.Combine(BaseDirService.GetPathWwwRoot(), updateAvatarConversationBy21ThResult.Value.AvatarLink.Split("/")[^1]);
 		
 		File.Exists(pathAvatarAfterUpdateBy21Th).Should().BeTrue();
 		
-		var conversationAfterUpdateAvatarByAlice = 
-			await MessengerModule.RequestAsync(updateAvatarConversationCommandByAlice, 
-				CancellationToken.None);
+		var updateAvatarConversationByAliceResult = 
+			await MessengerModule.RequestAsync(updateAvatarConversationByAliceCommand, CancellationToken.None);
 		
-		conversationAfterUpdateAvatarByAlice.Value.AvatarLink.Should().NotBeNull();
+		updateAvatarConversationByAliceResult.Value.AvatarLink.Should().NotBeNull();
 		
 		var pathAvatarAfterUpdateByAlice = 
-			Path.Combine(BaseDirService.GetPathWwwRoot(), conversationAfterUpdateAvatarByAlice.Value.AvatarLink.Split("/")[^1]);
+			Path.Combine(BaseDirService.GetPathWwwRoot(), updateAvatarConversationByAliceResult.Value.AvatarLink.Split("/")[^1]);
 		
 		File.Exists(pathAvatarAfterUpdateBy21Th).Should().BeFalse();
 		File.Exists(pathAvatarAfterUpdateByAlice).Should().BeTrue();

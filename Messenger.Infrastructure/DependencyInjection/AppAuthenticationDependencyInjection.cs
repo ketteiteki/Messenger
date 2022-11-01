@@ -8,10 +8,8 @@ namespace Messenger.Infrastructure.DependencyInjection;
 public static class AppAuthenticationDependencyInjection
 {
     public static IServiceCollection AddAppAuthentication(this IServiceCollection serviceCollection,
-        string signKey = null)
+        string signKey)
     {
-        var key = signKey ?? "secretAccessTokenKey_1231";
-
         serviceCollection.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(opt =>
             {
@@ -19,9 +17,9 @@ public static class AppAuthenticationDependencyInjection
                 {
                     ValidateAudience = false,
                     ValidateIssuer = false,
-                    ValidateLifetime = false,
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.Default.GetBytes(key)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.Default.GetBytes(signKey)),
                     ClockSkew = TimeSpan.Zero
                 };
             });

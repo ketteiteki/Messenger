@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Messenger.Infrastructure.Configuration;
 
-public class MessengerCompositionRoot
+public static class MessengerCompositionRoot
 {
 	public static IServiceProvider Provider { get; set; }
 

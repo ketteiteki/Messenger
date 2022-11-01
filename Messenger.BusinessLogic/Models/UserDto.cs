@@ -18,7 +18,7 @@ public class UserDto
 	{
 		Id = user.Id;
 		DisplayName = user.DisplayName;
-		Nickname = user.NickName;
+		Nickname = user.Nickname;
 		Bio = user.Bio;
 		AvatarLink = user.AvatarLink;
 	}

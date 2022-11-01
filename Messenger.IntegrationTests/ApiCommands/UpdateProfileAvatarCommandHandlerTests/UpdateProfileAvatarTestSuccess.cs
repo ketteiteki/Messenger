@@ -15,18 +15,19 @@ public class UpdateProfileAvatarTestSuccess : IntegrationTestBase, IIntegrationT
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-        await using var fileStream = new FileStream(Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
+        await using var fileStream = new FileStream(
+            Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
         
-        var userAfterUpdateAvatar = await MessengerModule.RequestAsync(new UpdateProfileAvatarCommand(
+        var userAfterUpdateAvatarResult = await MessengerModule.RequestAsync(new UpdateProfileAvatarCommand(
             RequesterId: user21Th.Value.Id,
             AvatarFile: new FormFile(
                 baseStream: fileStream,
                 baseStreamOffset: 0,
                 length: fileStream.Length,
                 name: "qwerty",
-                fileName: "qwerty")), CancellationToken.None);
+                fileName: "qwerty.png")), CancellationToken.None);
         
-        var pathAvatar = Path.Combine(BaseDirService.GetPathWwwRoot(), userAfterUpdateAvatar.Value.AvatarLink.Split("/")[^1]);
+        var pathAvatar = Path.Combine(BaseDirService.GetPathWwwRoot(), userAfterUpdateAvatarResult.Value.AvatarLink.Split("/")[^1]);
         
         File.Exists(pathAvatar).Should().BeTrue();
         

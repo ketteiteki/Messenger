@@ -23,8 +23,10 @@ public class UpdateConversationCommandHandler : IRequestHandler<UpdateConversati
 			.FirstOrDefaultAsync(r => r.UserId == request.RequesterId && r.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
-			return new Result<ChatDto>(new DbEntityNotFoundError("No requestor in the chat"));
-
+		{
+			return new Result<ChatDto>(new DbEntityNotFoundError("No requester in the chat"));
+		}
+		
 		if (chatUserByRequester.Role is { CanChangeChatData: true } ||  chatUserByRequester.Chat.OwnerId == request.RequesterId)
 		{
 			if (request.Name != chatUserByRequester.Chat.Name)
@@ -32,16 +34,18 @@ public class UpdateConversationCommandHandler : IRequestHandler<UpdateConversati
 				var conversationByName = await _context.Chats
 					.AsNoTracking()
 					.FirstOrDefaultAsync(c => c.Name == request.Name, cancellationToken);
-			
-				if (conversationByName != null && conversationByName.Id != chatUserByRequester.Chat.Id) 
-					return new Result<ChatDto>(new DbEntityExistsError("Сonference with that name already exists"));
+
+				if (conversationByName != null && conversationByName.Id != chatUserByRequester.Chat.Id)
+				{
+					return new Result<ChatDto>(new DbEntityExistsError("Conversation with that name already exists"));
+				}
 			
 				chatUserByRequester.Chat.Name = request.Name;
 			}
 			
 			chatUserByRequester.Chat.Title = request.Title;
 			
-			_context.Chats.Update( chatUserByRequester.Chat);
+			_context.Chats.Update(chatUserByRequester.Chat);
 			await _context.SaveChangesAsync(cancellationToken);
 			
 			return new Result<ChatDto>(

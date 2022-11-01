@@ -24,16 +24,26 @@ public class DeleteDialogCommandHandler : IRequestHandler<DeleteDialogCommand, R
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUser == null)
-			return new Result<ChatDto>(new ForbiddenError("Dialog not found"));
+		{
+			return new Result<ChatDto>(new DbEntityNotFoundError("Dialog not found"));
+		}
 		
 		var deletedDialogByUsers = await _context.DeletedDialogByUsers
 			.Where(d => d.ChatId == request.ChatId && d.Chat.Type == ChatType.Dialog)
 			.ToListAsync(cancellationToken);
 		
-		if (request.IsForBoth || deletedDialogByUsers.Count == 1)
+		if (request.IsDeleteForAll || deletedDialogByUsers.Count == 1)
 		{
+			var chatUsers = await _context.ChatUsers
+				.Where(c => c.ChatId == request.ChatId)
+				.ToListAsync(cancellationToken);
+			
 			_context.DeletedDialogByUsers.RemoveRange(deletedDialogByUsers);
-			_context.ChatUsers.Remove(chatUser);
+			_context.ChatUsers.RemoveRange(chatUsers);
+			foreach (var chatUserItem in chatUsers)
+			{
+				_context.Chats.Remove(chatUserItem.Chat);
+			}
 			
 			await _context.SaveChangesAsync(cancellationToken);
 

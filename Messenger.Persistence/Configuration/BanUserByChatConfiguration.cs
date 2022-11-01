@@ -22,5 +22,9 @@ public class BanUserByChatConfiguration : IEntityTypeConfiguration<BanUserByChat
 			.WithMany(c => c.BanUserByChats)
 			.HasForeignKey(b => b.UserId)
 			.OnDelete(DeleteBehavior.Cascade);
+		
+		builder.Property(x => x.ChatId).IsRequired();
+		builder.Property(x => x.UserId).IsRequired();
+		builder.Property(x => x.BanDateOfExpire).IsRequired();
 	}
 }

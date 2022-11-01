@@ -6,5 +6,5 @@ namespace Messenger.BusinessLogic.ApiQueries.Dialogs;
 
 public record GetDialogQuery(
 	Guid RequesterId,
-	Guid WithWhomId)
+	Guid UserId)
 	: IRequest<Result<ChatDto>>;
