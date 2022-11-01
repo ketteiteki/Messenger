@@ -15,7 +15,7 @@ namespace Messenger.Services.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DisplayName = table.Column<string>(type: "text", nullable: false),
-                    NickName = table.Column<string>(type: "text", nullable: false),
+                    Nickname = table.Column<string>(type: "text", nullable: false),
                     Bio = table.Column<string>(type: "text", nullable: true),
                     AvatarLink = table.Column<string>(type: "text", nullable: true),
                     PasswordHash = table.Column<string>(type: "text", nullable: false),
@@ -24,6 +24,30 @@ namespace Messenger.Services.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Sessions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AccessToken = table.Column<string>(type: "text", nullable: false),
+                    RefreshToken = table.Column<Guid>(type: "uuid", nullable: false),
+                    Ip = table.Column<string>(type: "text", nullable: false),
+                    UserAgent = table.Column<string>(type: "text", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sessions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Sessions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -79,7 +103,8 @@ namespace Messenger.Services.Migrations
                         name: "FK_Chats_Users_OwnerId",
                         column: x => x.OwnerId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -139,7 +164,7 @@ namespace Messenger.Services.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Text = table.Column<string>(type: "text", nullable: false),
                     IsEdit = table.Column<bool>(type: "boolean", nullable: false),
-                    OwnerId = table.Column<Guid>(type: "uuid", nullable: true),
+                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
                     ReplyToMessageId = table.Column<Guid>(type: "uuid", nullable: true),
                     ChatId = table.Column<Guid>(type: "uuid", nullable: false),
                     DateOfCreate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -157,12 +182,14 @@ namespace Messenger.Services.Migrations
                         name: "FK_Messages_Messages_ReplyToMessageId",
                         column: x => x.ReplyToMessageId,
                         principalTable: "Messages",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Messages_Users_OwnerId",
                         column: x => x.OwnerId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -183,22 +210,10 @@ namespace Messenger.Services.Migrations
                 {
                     table.PrimaryKey("PK_RoleUserByChats", x => new { x.ChatId, x.UserId });
                     table.ForeignKey(
-                        name: "FK_RoleUserByChats_Chats_ChatId",
-                        column: x => x.ChatId,
-                        principalTable: "Chats",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_RoleUserByChats_ChatUsers_ChatId_UserId",
                         columns: x => new { x.ChatId, x.UserId },
                         principalTable: "ChatUsers",
                         principalColumns: new[] { "ChatId", "UserId" },
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_RoleUserByChats_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -275,11 +290,12 @@ namespace Messenger.Services.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_ReplyToMessageId",
                 table: "Messages",
-                column: "ReplyToMessageId");
+                column: "ReplyToMessageId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_RoleUserByChats_UserId",
-                table: "RoleUserByChats",
+                name: "IX_Sessions_UserId",
+                table: "Sessions",
                 column: "UserId");
 
             migrationBuilder.AddForeignKey(
@@ -327,6 +343,9 @@ namespace Messenger.Services.Migrations
 
             migrationBuilder.DropTable(
                 name: "RoleUserByChats");
+
+            migrationBuilder.DropTable(
+                name: "Sessions");
 
             migrationBuilder.DropTable(
                 name: "ChatUsers");

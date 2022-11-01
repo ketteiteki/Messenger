@@ -6,9 +6,9 @@ using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
 
-namespace Messenger.IntegrationTests.ApiCommands.UpdateConversationCommandHandlerTests;
+namespace Messenger.IntegrationTests.ApiCommands.UpdateConversationDataCommandHandlerTests;
 
-public class UpdateConversationTestSuccess : IntegrationTestBase, IIntegrationTest
+public class UpdateConversationDataTestSuccess : IntegrationTestBase, IIntegrationTest
 {
 	[Fact]
 	public async Task Test()

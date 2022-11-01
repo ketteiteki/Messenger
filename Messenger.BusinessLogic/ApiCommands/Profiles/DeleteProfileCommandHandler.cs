@@ -21,7 +21,9 @@ public class DeleteProfileCommandHandler : IRequestHandler<DeleteProfileCommand,
 	
 	public async Task<Result<UserDto>> Handle(DeleteProfileCommand request, CancellationToken cancellationToken)
 	{
-		var requester = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, CancellationToken.None);
+		var requester = await _context.Users
+			.Include(u => u.ChatUsers)
+			.FirstAsync(u => u.Id == request.RequesterId, CancellationToken.None);
 
 		if (requester.AvatarLink != null)
 		{

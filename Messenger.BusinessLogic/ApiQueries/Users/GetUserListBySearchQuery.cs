@@ -4,7 +4,8 @@ using Messenger.BusinessLogic.Responses;
 
 namespace Messenger.BusinessLogic.ApiQueries.Users;
 
-public record GetUserListQuery(
+public record GetUserListBySearchQuery(
+	Guid RequesterId,
 	string SearchText,
 	int Limit,
 	int Page) 

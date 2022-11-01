@@ -29,7 +29,7 @@ public class DeleteChannelWithAvatarTestSuccess : IntegrationTestBase, IIntegrat
                 baseStreamOffset: 0,
                 length: fileStream.Length,
                 name: "qwerty",
-                fileName: "qwerty"));
+                fileName: "qwerty.jpg"));
 		
         var channel = await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
 

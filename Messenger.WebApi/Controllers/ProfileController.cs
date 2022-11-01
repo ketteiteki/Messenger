@@ -17,7 +17,7 @@ public class ProfileController : ApiControllerBase
 	
 	[ProducesResponseType(typeof(ErrorModel), 409)]
 	[ProducesResponseType(typeof(UserDto), 200)]
-	[HttpPut]
+	[HttpPut("update")]
 	public async Task<IActionResult> UpdateProfileData(
 		[FromBody] UpdateProfileData request,
 		CancellationToken cancellationToken)
@@ -27,7 +27,7 @@ public class ProfileController : ApiControllerBase
 		var command = new UpdateProfileDataCommand(
 			RequesterId: requesterId,
 			DisplayName: request.DisplayName,
-			NickName: request.NickName,
+			Nickname: request.NickName,
 			Bio: request.Bio);
 			
 		return await RequestAsync(command, cancellationToken);
@@ -54,10 +54,10 @@ public class ProfileController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
-		var query = new DeleteProfileCommand(
+		var command = new DeleteProfileCommand(
 			RequesterId: requesterId);
 			
-		return await RequestAsync(query, cancellationToken);
+		return await RequestAsync(command, cancellationToken);
 	}
 	
 	[ProducesResponseType(typeof(UserDto), 403)]
@@ -67,9 +67,9 @@ public class ProfileController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
-		var query = new DeleteProfileAvatarCommand(
+		var command = new DeleteProfileAvatarCommand(
 			RequesterId: requesterId);
 			
-		return await RequestAsync(query, cancellationToken);
+		return await RequestAsync(command, cancellationToken);
 	}
 }

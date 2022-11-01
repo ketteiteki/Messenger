@@ -7,20 +7,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.BusinessLogic.ApiQueries.Users;
 
-public class GetUserListQueryHandler : IRequestHandler<GetUserListQuery, Result<List<UserDto>>>
+public class GetUserListBySearchQueryHandler : IRequestHandler<GetUserListBySearchQuery, Result<List<UserDto>>>
 {
 	private readonly DatabaseContext _context;
 
-	public GetUserListQueryHandler(DatabaseContext context)
+	public GetUserListBySearchQueryHandler(DatabaseContext context)
 	{
 		_context = context;
 	}
 	
-	public async Task<Result<List<UserDto>>> Handle(GetUserListQuery request, CancellationToken cancellationToken)
+	public async Task<Result<List<UserDto>>> Handle(GetUserListBySearchQuery request, CancellationToken cancellationToken)
 	{
 		var users = await _context.Users
 			.AsNoTracking()
-			.Where(u => Regex.IsMatch(u.NickName, request.SearchText, RegexOptions.IgnoreCase))
+			.Where(u => u.Id != request.RequesterId)
+			.Where(u => Regex.IsMatch(u.Nickname, request.SearchText))
 			.Skip((request.Page - 1) * request.Limit)
 			.Take(request.Limit)
 			.Select(u => new UserDto(u))

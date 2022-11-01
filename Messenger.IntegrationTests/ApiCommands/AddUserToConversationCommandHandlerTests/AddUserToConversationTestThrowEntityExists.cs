@@ -7,11 +7,11 @@ using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
 
-namespace Messenger.IntegrationTests.ApiCommands.UpdateConversationCommandHandlerTests;
+namespace Messenger.IntegrationTests.ApiCommands.AddUserToConversationCommandHandlerTests;
 
-public class UpdateConversationTestThrowForbidden : IntegrationTestBase, IIntegrationTest
+public class AddUserToConversationTestThrowEntityExists : IntegrationTestBase, IIntegrationTest
 {
-    [Fact]
+	[Fact]
     public async Task Test()
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
@@ -23,23 +23,19 @@ public class UpdateConversationTestThrowForbidden : IntegrationTestBase, IIntegr
 			Title: "qwerty",
 			Type: ChatType.Conversation,
 			AvatarFile: null);
-
+		
 		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
-		
-		await MessengerModule.RequestAsync(
-			new JoinToChatCommand(
-			RequesterId: alice.Value.Id,
-			ChatId: conversation.Value.Id), CancellationToken.None);
-		
-		var updateConversationByAliceCommand =new UpdateConversationCommand(
-			RequesterId: alice.Value.Id,
+
+		var addUserAliceToConversationBy21ThCommand = new AddUserToConversationCommand(
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
-			Name: "AliceName",
-			Title: "AliceTitle");
+			UserId: alice.Value.Id);
+		
+	    await MessengerModule.RequestAsync(addUserAliceToConversationBy21ThCommand, CancellationToken.None);
+		
+		var secondAddUserAliceToConversationBy21ThResult = 
+			await MessengerModule.RequestAsync(addUserAliceToConversationBy21ThCommand, CancellationToken.None);
 
-		var updateConversationByAliceResult = await MessengerModule.RequestAsync(updateConversationByAliceCommand, 
-			CancellationToken.None);
-
-		updateConversationByAliceResult.Error.Should().BeOfType<ForbiddenError>();
+		secondAddUserAliceToConversationBy21ThResult.Error.Should().BeOfType<DbEntityExistsError>();
     }
 }

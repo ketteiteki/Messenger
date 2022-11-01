@@ -26,8 +26,10 @@ public class LeaveFromChatCommandHandler : IRequestHandler<LeaveFromChatCommand,
                 c.Chat.Type != ChatType.Dialog, cancellationToken);
 
         if (chatUser == null)
+        {
             return new Result<ChatDto>(new ForbiddenError("No user found in chat"));
-		
+        }
+        
         _context.ChatUsers.Remove(chatUser);
         await _context.SaveChangesAsync(cancellationToken);
 

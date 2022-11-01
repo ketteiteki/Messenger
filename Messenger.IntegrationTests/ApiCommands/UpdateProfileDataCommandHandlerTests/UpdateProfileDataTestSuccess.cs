@@ -16,13 +16,13 @@ public class UpdateProfileDataTestSuccess : IntegrationTestBase, IIntegrationTes
         var updateProfileCommand = new UpdateProfileDataCommand(
             RequesterId: user21Th.Value.Id,
             DisplayName: "qwerty",
-            NickName: "zxcvbn",
+            Nickname: "liza",
             Bio: "i love your mom");
         
         var updatedProfile = await MessengerModule.RequestAsync(updateProfileCommand, CancellationToken.None);
 
         updatedProfile.Value.DisplayName.Should().Be(updateProfileCommand.DisplayName);
-        updatedProfile.Value.Nickname.Should().Be(updateProfileCommand.NickName);
+        updatedProfile.Value.Nickname.Should().Be(updateProfileCommand.Nickname);
         updatedProfile.Value.Bio.Should().Be(updateProfileCommand.Bio);
     }
 }

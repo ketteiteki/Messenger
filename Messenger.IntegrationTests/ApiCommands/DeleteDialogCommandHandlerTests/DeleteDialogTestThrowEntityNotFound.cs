@@ -23,7 +23,7 @@ public class DeleteDialogTestThrowEntityNotFound : IntegrationTestBase, IIntegra
         var deletedDialog21ThAliceByBobResult = await MessengerModule.RequestAsync(new DeleteDialogCommand(
             RequesterId: bob.Value.Id,
             ChatId: dialog21ThAliceResult.Value.Id,
-            IsForBoth: true), CancellationToken.None);
+            IsDeleteForAll: true), CancellationToken.None);
 
         deletedDialog21ThAliceByBobResult.Error.Should().BeOfType<DbEntityNotFoundError>();
     }

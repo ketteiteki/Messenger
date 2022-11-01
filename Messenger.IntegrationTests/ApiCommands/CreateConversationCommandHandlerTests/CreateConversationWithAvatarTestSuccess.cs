@@ -28,7 +28,7 @@ public class CreateConversationWithAvatarTestSuccess : IntegrationTestBase, IInt
                 baseStreamOffset: 0,
                 length: fileStream.Length,
                 name: "qwerty",
-                fileName: "qwerty"));
+                fileName: "qwerty.jpg"));
 		
         var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
         

@@ -19,7 +19,9 @@ public class BanUserInConversationCommandHandler : IRequestHandler<BanUserInConv
 	public async Task<Result<UserDto>> Handle(BanUserInConversationCommand request, CancellationToken cancellationToken)
 	{
 		if (DateTime.UtcNow > request.BanDateOfExpire)
+		{
 			return new Result<UserDto>(new BadRequestError("The ban time must be longer than the current time"));
+		}
 
 		var chatUserByRequester = await _context.ChatUsers
 			.Include(c => c.Role)
@@ -27,7 +29,9 @@ public class BanUserInConversationCommandHandler : IRequestHandler<BanUserInConv
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
+		{
 			return new Result<UserDto>(new ForbiddenError("No requester in the chat"));
+		}
 		
 		if (chatUserByRequester.Role is { CanBanUser: true } || chatUserByRequester.Chat.OwnerId == request.RequesterId)
 		{
@@ -35,11 +39,18 @@ public class BanUserInConversationCommandHandler : IRequestHandler<BanUserInConv
 				.Include(c => c.User)
 				.FirstOrDefaultAsync(b => b.UserId == request.UserId && b.ChatId == request.ChatId, cancellationToken);
 
-			if (chatUser == null) 
+			if (chatUser == null)
+			{
 				return new Result<UserDto>(new DbEntityNotFoundError("User is not in this chat"));
+			}
 			
-			_context.BanUserByChats.Add(
-				new BanUserByChat {UserId = request.UserId, ChatId = request.ChatId, BanDateOfExpire = request.BanDateOfExpire});
+			_context.BanUserByChats.Add(new BanUserByChat
+			{
+				UserId = request.UserId, 
+				ChatId = request.ChatId, 
+				BanDateOfExpire = request.BanDateOfExpire
+			});
+			
 			_context.ChatUsers.Remove(chatUser);
 			await _context.SaveChangesAsync(cancellationToken);
 			

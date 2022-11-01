@@ -17,7 +17,7 @@ public static class AppAuthenticationDependencyInjection
                 {
                     ValidateAudience = false,
                     ValidateIssuer = false,
-                    ValidateLifetime = false,
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.Default.GetBytes(signKey)),
                     ClockSkew = TimeSpan.Zero

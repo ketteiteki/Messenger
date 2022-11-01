@@ -25,7 +25,7 @@ public class UpdateProfileAvatarTestSuccess : IntegrationTestBase, IIntegrationT
                 baseStreamOffset: 0,
                 length: fileStream.Length,
                 name: "qwerty",
-                fileName: "qwerty")), CancellationToken.None);
+                fileName: "qwerty.png")), CancellationToken.None);
         
         var pathAvatar = Path.Combine(BaseDirService.GetPathWwwRoot(), userAfterUpdateAvatarResult.Value.AvatarLink.Split("/")[^1]);
         

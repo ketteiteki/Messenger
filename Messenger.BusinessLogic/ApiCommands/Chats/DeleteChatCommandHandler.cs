@@ -25,16 +25,24 @@ public class DeleteChatCommandHandler : IRequestHandler<DeleteChatCommand, Resul
         var chat = await _context.Chats.FirstOrDefaultAsync(c => c.Id == request.ChatId, CancellationToken.None);
 
         if (chat == null)
+        {
             return new Result<ChatDto>(new DbEntityNotFoundError("Chat not found"));
-        
+        }
+
         if (chat.Type == ChatType.Dialog)
-            return new Result<ChatDto>(new BadRequestError("You may delete only chat of type conversation and channel"));
+        {
+            return new Result<ChatDto>(new ForbiddenError("You may delete only chat of type conversation and channel"));
+        }
 
         if (chat.OwnerId != request.RequesterId)
+        {
             return new Result<ChatDto>(new ForbiddenError("It is forbidden to delete someone else's chat"));
-		
+        }
+
         if (chat.AvatarLink != null)
+        {
             _fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), chat.AvatarLink.Split("/")[^1]));
+        }
 		
         _context.Chats.Remove(chat);
         await _context.SaveChangesAsync(cancellationToken);

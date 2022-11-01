@@ -45,7 +45,7 @@ public class GetMessageListTestSuccess : IntegrationTestBase, IIntegrationTest
             ChatId: conversation.Value.Id,
             Files: null), CancellationToken.None);
 
-        var getMessageListByAliceResult = await MessengerModule.RequestAsync(new GetMessageListQuery(
+        var firstGetMessageListByAliceResult = await MessengerModule.RequestAsync(new GetMessageListQuery(
             RequesterId: alice.Value.Id,
             ChatId: conversation.Value.Id,
             Limit: 10,
@@ -66,18 +66,66 @@ public class GetMessageListTestSuccess : IntegrationTestBase, IIntegrationTest
             FromMessageDateTime: createMessageByAliceResult.Value.DateOfCreate 
         ), CancellationToken.None);
         
-        for (var i = 0; i < getMessageListByAliceResult.Value.Count; i++)
+        for (var i = 0; i < firstGetMessageListByAliceResult.Value.Count; i++)
         {
-            getMessageListByAliceResult.Value[i].Id.Should().Be(getMessageListByBobResult.Value[i].Id);
-            getMessageListByAliceResult.Value[i].Text.Should().Be(getMessageListByBobResult.Value[i].Text);
-            getMessageListByAliceResult.Value[i].ChatId.Should().Be(getMessageListByBobResult.Value[i].ChatId);
-            getMessageListByAliceResult.Value[i].OwnerId.Should().Be(getMessageListByBobResult.Value[i].OwnerId);
-            getMessageListByAliceResult.Value[i].ReplyToMessageId.Should().Be(getMessageListByBobResult.Value[i].ReplyToMessageId);
+            firstGetMessageListByAliceResult.Value[i].Id.Should().Be(getMessageListByBobResult.Value[i].Id);
+            firstGetMessageListByAliceResult.Value[i].Text.Should().Be(getMessageListByBobResult.Value[i].Text);
+            firstGetMessageListByAliceResult.Value[i].ChatId.Should().Be(getMessageListByBobResult.Value[i].ChatId);
+            firstGetMessageListByAliceResult.Value[i].OwnerId.Should().Be(getMessageListByBobResult.Value[i].OwnerId);
+            firstGetMessageListByAliceResult.Value[i].ReplyToMessageId.Should().Be(getMessageListByBobResult.Value[i].ReplyToMessageId);
         }
 
         getMessageListFromMessageDateTimeByAliceResult.Value.Count.Should().Be(1);
         getMessageListFromMessageDateTimeByAliceResult.Value[0].Id.Should().Be(createMessageBy21ThResult.Value.Id);
         getMessageListFromMessageDateTimeByAliceResult.Value[0].Text.Should().Be(createMessageBy21ThResult.Value.Text);
         getMessageListFromMessageDateTimeByAliceResult.Value[0].OwnerId.Should().Be(createMessageBy21ThResult.Value.OwnerId);
+
+        await MessengerModule.RequestAsync(new DeleteMessageCommand(
+            RequesterId: user21Th.Value.Id,
+            MessageId: createMessageBy21ThResult.Value.Id,
+            IsDeleteForAll: false), CancellationToken.None);
+        
+        var firstGetMessageListBy21ThResult = await MessengerModule.RequestAsync(new GetMessageListQuery(
+            RequesterId: user21Th.Value.Id,
+            ChatId: conversation.Value.Id,
+            Limit: 10,
+            FromMessageDateTime: null 
+        ), CancellationToken.None);
+        
+        var secondGetMessageListByAliceResult = await MessengerModule.RequestAsync(new GetMessageListQuery(
+            RequesterId: alice.Value.Id,
+            ChatId: conversation.Value.Id,
+            Limit: 10,
+            FromMessageDateTime: null 
+        ), CancellationToken.None);
+        
+        firstGetMessageListBy21ThResult.Value
+            .FirstOrDefault(m => m.Id == createMessageBy21ThResult.Value.Id).Should().BeNull();
+        secondGetMessageListByAliceResult.Value
+            .FirstOrDefault(m => m.Id == createMessageBy21ThResult.Value.Id).Should().NotBeNull();
+        
+        await MessengerModule.RequestAsync(new DeleteMessageCommand(
+            RequesterId: alice.Value.Id,
+            MessageId: createMessageByAliceResult.Value.Id,
+            IsDeleteForAll: true), CancellationToken.None);
+        
+        var secondGetMessageListBy21ThResult = await MessengerModule.RequestAsync(new GetMessageListQuery(
+            RequesterId: user21Th.Value.Id,
+            ChatId: conversation.Value.Id,
+            Limit: 10,
+            FromMessageDateTime: null 
+        ), CancellationToken.None);
+        
+        var thirdGetMessageListByAliceResult = await MessengerModule.RequestAsync(new GetMessageListQuery(
+            RequesterId: alice.Value.Id,
+            ChatId: conversation.Value.Id,
+            Limit: 10,
+            FromMessageDateTime: null 
+        ), CancellationToken.None);
+        
+        secondGetMessageListBy21ThResult.Value
+            .FirstOrDefault(m => m.Id == createMessageByAliceResult.Value.Id).Should().BeNull();
+        thirdGetMessageListByAliceResult.Value
+            .FirstOrDefault(m => m.Id == createMessageByAliceResult.Value.Id).Should().BeNull();
     }
 }

@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "Messanger": {
+    "Messenger": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

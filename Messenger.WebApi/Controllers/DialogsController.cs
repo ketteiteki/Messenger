@@ -19,7 +19,7 @@ public class DialogsController : ApiControllerBase
     [ProducesResponseType(typeof(ChatDto), 200)]
     [HttpGet("{userId}")]
     public async Task<IActionResult> GetDialog(
-        [FromQuery] Guid userId,
+        Guid userId,
         CancellationToken cancellationToken)
     {
         var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
@@ -35,7 +35,9 @@ public class DialogsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorModel), 404)]
     [ProducesResponseType(typeof(ChatDto), 200)]
     [HttpPost("createDialog")]
-    public async Task<IActionResult> CreateDialog([FromQuery] Guid userId, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateDialog(
+        [FromQuery] Guid userId,
+        CancellationToken cancellationToken)
     {
         var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
@@ -51,7 +53,7 @@ public class DialogsController : ApiControllerBase
     [HttpDelete("deleteDialog")]
     public async Task<IActionResult> DeleteDialog(
         [FromQuery] Guid dialogId, 
-        [FromQuery] bool isForBoth,
+        [FromQuery] bool isDeleteForAll,
         CancellationToken cancellationToken)
     {
         var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
@@ -59,7 +61,7 @@ public class DialogsController : ApiControllerBase
         var command = new DeleteDialogCommand(
             RequesterId: requesterId,
             ChatId: dialogId,
-            IsForBoth: isForBoth);
+            IsDeleteForAll: isDeleteForAll);
 		
         return await RequestAsync(command, cancellationToken);
     }

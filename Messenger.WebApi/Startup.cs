@@ -1,5 +1,6 @@
 using Messenger.Domain.Constants;
 using Messenger.Infrastructure.DependencyInjection;
+using Messenger.Infrastructure.Middlewares;
 
 namespace Messenger.WebApi;
 
@@ -26,9 +27,9 @@ public class Startup
         serviceCollection.AddInfrastructureServices(signKey);
 
         serviceCollection.AddMessengerServices();
-
-        serviceCollection.ConfigureCors(CorsPolicyName, allowOrigins);
         
+        serviceCollection.ConfigureCors(CorsPolicyName, allowOrigins);
+
         serviceCollection.AddSwagger();
     }
 
@@ -37,7 +38,11 @@ public class Startup
         if (environment.IsDevelopment())
         {
             applicationBuilder.UseSwagger();
-            applicationBuilder.UseSwaggerUI();
+            applicationBuilder.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Messenger Api v1");
+                options.RoutePrefix = "";
+            });
         }
         
         applicationBuilder.UseStaticFiles();
@@ -50,6 +55,8 @@ public class Startup
         
         applicationBuilder.UseAuthentication();
         applicationBuilder.UseAuthorization();
+        
+        applicationBuilder.UseMiddleware<ValidationMiddleware>();
 
         applicationBuilder.UseEndpoints(options => { options.MapControllers(); });
     }

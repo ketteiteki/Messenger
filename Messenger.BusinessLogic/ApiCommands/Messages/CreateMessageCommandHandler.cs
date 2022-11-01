@@ -5,6 +5,7 @@ using Messenger.BusinessLogic.Responses;
 using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
+using Messenger.Domain.Enum;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -30,10 +31,31 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 			.Include(c => c.Chat)
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
 
+		if (chatUser == null)
+		{
+			return new Result<MessageDto>(new ForbiddenError("You're not in the chat"));
+		}
+		
+		if (chatUser.Chat.Type == ChatType.Channel && request.RequesterId != chatUser.Chat.OwnerId)
+		{
+			return new Result<MessageDto>(new ForbiddenError("Only the owner can send messages to the channel"));
+		}
+		
 		var banUserByChat = await _context.BanUserByChats
 			.FirstOrDefaultAsync(b => b.UserId == request.RequesterId && b.ChatId == request.ChatId, cancellationToken);
+
+		if (request.ReplyToId != null)
+		{
+			var replyToMessage = await _context.Messages
+				.FirstOrDefaultAsync(m => m.Id == request.ReplyToId && m.ChatId == request.ChatId, cancellationToken);
+
+			if (replyToMessage == null)
+			{
+				return new Result<MessageDto>(new DbEntityNotFoundError("Reply To Message not found in this chat"));
+			}
+		} 
 		
-		if (chatUser?.MuteDateOfExpire < DateTime.UtcNow)
+		if (chatUser.MuteDateOfExpire < DateTime.UtcNow)
 		{
 			chatUser.MuteDateOfExpire = null;
 		}
@@ -49,7 +71,9 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 		    chatUser?.Chat.OwnerId == request.RequesterId)
 		{
 			if (request.Files?.Count > 4)
+			{
 				return new Result<MessageDto>(new ForbiddenError("You cannot send more than 4 files"));
+			}
 			
 			var newMessage = new Message(
 				text: request.Text,

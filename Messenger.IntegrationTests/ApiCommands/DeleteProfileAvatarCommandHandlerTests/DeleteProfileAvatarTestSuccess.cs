@@ -17,7 +17,7 @@ public class DeleteProfileAvatarTestSuccess : IntegrationTestBase, IIntegrationT
 
         await using var fileStream = new FileStream(
             Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
-        
+
         var updateProfileAvatarResult = await MessengerModule.RequestAsync(new UpdateProfileAvatarCommand(
             RequesterId: user21Th.Value.Id,
             AvatarFile: new FormFile(
@@ -25,7 +25,7 @@ public class DeleteProfileAvatarTestSuccess : IntegrationTestBase, IIntegrationT
                 baseStreamOffset: 0,
                 length: fileStream.Length,
                 name: "qwerty",
-                fileName: "qwerty")), CancellationToken.None);
+                fileName: "qwerty.jpg")), CancellationToken.None);
 
         var deleteProfileAvatarResult = await MessengerModule.RequestAsync(new DeleteProfileAvatarCommand(
             RequesterId: user21Th.Value.Id), CancellationToken.None);

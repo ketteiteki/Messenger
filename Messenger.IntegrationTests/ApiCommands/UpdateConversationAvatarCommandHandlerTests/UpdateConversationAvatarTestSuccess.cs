@@ -55,7 +55,7 @@ public class UpdateConversationAvatarTestSuccess : IntegrationTestBase, IIntegra
 				baseStreamOffset: 0,
 				length: fileStream.Length,
 				name: "qwerty",
-				fileName: "qwerty"));
+				fileName: "qwerty.jpg"));
 		
 		var updateAvatarConversationByAliceCommand =new UpdateConversationAvatarCommand(
 			RequesterId: alice.Value.Id,
@@ -65,7 +65,7 @@ public class UpdateConversationAvatarTestSuccess : IntegrationTestBase, IIntegra
 				baseStreamOffset: 0,
 				length: fileStream.Length,
 				name: "qwerty",
-				fileName: "qwerty"));
+				fileName: "qwerty.jpg"));
 
 		var updateAvatarConversationBy21ThResult = 
 			await MessengerModule.RequestAsync(updateAvatarConversationBy21ThCommand, CancellationToken.None);

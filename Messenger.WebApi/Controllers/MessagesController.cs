@@ -16,9 +16,9 @@ public class MessagesController : ApiControllerBase
 {
 	public MessagesController(IMediator mediator) : base(mediator) {}
 	
-	// [ProducesResponseType(typeof(ErrorModel), 403)]
-	// [ProducesResponseType(typeof(ErrorModel), 400)]
-	// [ProducesResponseType(typeof(List<MessageDto>), 200)]
+	[ProducesResponseType(typeof(ErrorModel), 403)]
+	[ProducesResponseType(typeof(ErrorModel), 400)]
+	[ProducesResponseType(typeof(List<MessageDto>), 200)]
 	[HttpGet]
 	public async Task<IActionResult> GetMessageList(
 		[FromQuery] Guid chatId, 
@@ -37,9 +37,9 @@ public class MessagesController : ApiControllerBase
 		return await RequestAsync(query, cancellationToken);
 	}
 	
-	// [ProducesResponseType(typeof(ErrorModel), 403)]
-	// [ProducesResponseType(typeof(ErrorModel), 400)]
-	// [ProducesResponseType(typeof(List<MessageDto>), 200)]
+	[ProducesResponseType(typeof(ErrorModel), 403)]
+	[ProducesResponseType(typeof(ErrorModel), 400)]
+	[ProducesResponseType(typeof(List<MessageDto>), 200)]
 	[HttpGet("search")]
 	public async Task<IActionResult> GetMessageListBySearch(
 		[FromQuery] Guid chatId, 
@@ -59,9 +59,9 @@ public class MessagesController : ApiControllerBase
 		return await RequestAsync(query, cancellationToken);
 	}
 	
-	// [ProducesResponseType(typeof(ErrorModel), 403)]
-	// [ProducesResponseType(typeof(MessageDto), 200)]
-	[HttpPost]
+	[ProducesResponseType(typeof(ErrorModel), 403)]
+	[ProducesResponseType(typeof(MessageDto), 200)]
+	[HttpPost("createMessage")]
 	public async Task<IActionResult> CreateMessage([FromForm] CreateMessageRequest request,
 		CancellationToken cancellationToken)
 	{
@@ -77,10 +77,10 @@ public class MessagesController : ApiControllerBase
 		return await RequestAsync(command, cancellationToken);
 	}
 	
-	// [ProducesResponseType(typeof(ErrorModel), 404)]
-	// [ProducesResponseType(typeof(ErrorModel), 403)]
-	// [ProducesResponseType(typeof(MessageDto), 200)]
-	[HttpPut]
+	[ProducesResponseType(typeof(ErrorModel), 404)]
+	[ProducesResponseType(typeof(ErrorModel), 403)]
+	[ProducesResponseType(typeof(MessageDto), 200)]
+	[HttpPut("updateMessage")]
 	public async Task<IActionResult> UpdateMessage(
 		[FromBody] UpdateMessageRequest request, 
 		CancellationToken cancellationToken)
@@ -95,9 +95,9 @@ public class MessagesController : ApiControllerBase
 		return await RequestAsync(command, cancellationToken);
 	}
 	
-	// [ProducesResponseType(typeof(ErrorModel), 404)]
-	// [ProducesResponseType(typeof(ErrorModel), 403)]
-	// [ProducesResponseType(typeof(MessageDto), 200)]
+	[ProducesResponseType(typeof(ErrorModel), 404)]
+	[ProducesResponseType(typeof(ErrorModel), 403)]
+	[ProducesResponseType(typeof(MessageDto), 200)]
 	[HttpDelete("{messageId}")]
 	public async Task<IActionResult> DeleteMessage(
 		Guid messageId,

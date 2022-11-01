@@ -2,8 +2,6 @@ namespace Messenger.BusinessLogic.Models.Requests;
 
 public class UpdateProfileData
 {
-    public Guid Id { get; set; }
-
     public string DisplayName { get; set; }
     
     public string NickName { get; set; }

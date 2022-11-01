@@ -7,7 +7,7 @@ using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace Messenger.BusinessLogic.ApiQueries.Auth;
+namespace Messenger.BusinessLogic.ApiCommands.Auth;
 
 public class AuthorizationCommandHandler : IRequestHandler<AuthorizationCommand, Result<AuthorizationResponse>>
 {
@@ -27,15 +27,33 @@ public class AuthorizationCommandHandler : IRequestHandler<AuthorizationCommand,
 		if (!_tokenService.TryValidateAccessToken(request.AuthorizationToken,
 			    _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey],
 			    out var validatedJwtToken))
+		{
 			return new Result<AuthorizationResponse>(new AuthenticationError("Incorrect token"));
+		}
 
-		var claimId = validatedJwtToken.Claims.First(c => c.Type == ClaimConstants.Id);
+		var requesterId = new Guid(validatedJwtToken.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
-		var requester = await _context.Users.FirstAsync(u => u.Id.ToString() == claimId.Value, cancellationToken);
+		var requester = await _context.Users.FirstAsync(u => u.Id == requesterId, cancellationToken);
 
-		var newAccessToken = _tokenService.CreateAccessToken(requester,
-			_configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey]);
+		var session = await _context.Sessions
+			.FirstOrDefaultAsync(s => s.AccessToken == request.AuthorizationToken && 
+			                          s.UserId == requesterId, cancellationToken);
+
+		if (session == null)
+		{
+			return new Result<AuthorizationResponse>(new AuthenticationError("Access token is not linked to any session"));
+		}
 		
-		return new Result<AuthorizationResponse>(new AuthorizationResponse(requester, newAccessToken));
+		var accessToken = _tokenService.CreateAccessToken(requester,
+			_configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey]);
+
+		session.AccessToken = accessToken;
+
+		await _context.SaveChangesAsync(cancellationToken);
+		
+		return new Result<AuthorizationResponse>(new AuthorizationResponse(
+			user: requester, 
+			accessToken: accessToken,
+			refreshToken: session.RefreshToken));
 	}
 }

@@ -42,7 +42,7 @@ public class UpdateConversationAvatarTestThrowForbidden : IntegrationTestBase, I
 				baseStreamOffset: 0,
 				length: fileStream.Length,
 				name: "qwerty",
-				fileName: "qwerty"));
+				fileName: "qwerty.jpg"));
 
 		var updateAvatarConversationByAliceResult = 
 			await MessengerModule.RequestAsync(updateAvatarConversationByAliceCommand, CancellationToken.None);

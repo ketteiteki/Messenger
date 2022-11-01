@@ -4,6 +4,7 @@ using Messenger.BusinessLogic.ApiQueries.Chats;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Models.Requests;
 using Messenger.Domain.Constants;
+using Messenger.Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,6 +43,21 @@ public class ChatsController : ApiControllerBase
 		return await RequestAsync(query, cancellationToken);
 	}
 	
+	[ProducesResponseType(typeof(List<ChatDto>), 200)]
+	[HttpGet("search")]
+	public async Task<IActionResult> GetChatListBySearch(
+		[FromQuery] string searchText,
+		CancellationToken cancellationToken)
+	{
+		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
+		
+		var query = new GetChatListBySearchQuery(
+			RequesterId: requesterId,
+			SearchText: searchText);
+
+		return await RequestAsync(query, cancellationToken);
+	}
+	
 	[ProducesResponseType(typeof(ErrorModel), 409)]
 	[ProducesResponseType(typeof(ErrorModel), 404)]
 	[ProducesResponseType(typeof(ErrorModel), 403)]
@@ -75,7 +91,6 @@ public class ChatsController : ApiControllerBase
 	}
 	
 	[ProducesResponseType(typeof(ErrorModel), 409)]
-	[ProducesResponseType(typeof(ErrorModel), 400)]
 	[ProducesResponseType(typeof(ChatDto), 200)]
 	[HttpPost("createChat")]
 	public async Task<IActionResult> CreateChat([FromForm] CreateChatRequest request, CancellationToken cancellationToken)
@@ -86,7 +101,7 @@ public class ChatsController : ApiControllerBase
 			RequesterId: requesterId,
 			Name: request.Name,
 			Title: request.Title,
-			Type: request.Type,
+			Type: (ChatType)request.Type,
 			AvatarFile: request.AvatarFile);
 
 		return await RequestAsync(command, cancellationToken);
@@ -94,7 +109,6 @@ public class ChatsController : ApiControllerBase
 	
 	[ProducesResponseType(typeof(ErrorModel), 404)]
 	[ProducesResponseType(typeof(ErrorModel), 401)]
-	[ProducesResponseType(typeof(ErrorModel), 400)]
 	[ProducesResponseType(typeof(ChatDto), 200)]
 	[HttpDelete("deleteChat")]
 	public async Task<IActionResult> DeleteChat([FromQuery] Guid chatId, CancellationToken cancellationToken)

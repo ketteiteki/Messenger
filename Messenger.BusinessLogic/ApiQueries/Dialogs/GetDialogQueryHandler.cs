@@ -34,11 +34,15 @@ public class GetDialogQueryHandler : IRequestHandler<GetDialogQuery, Result<Chat
 				AvatarLink = chatUser2.User.AvatarLink,
 				MembersCount = 2,
 				IsMember = true,
+				CanSendMedia = true,
 				Members = chatUser1.Chat.ChatUsers.Select(c => new UserDto(c.User)).ToList()
 			})
 			.FirstOrDefaultAsync(cancellationToken);
 
-		if (dialog == null) return new Result<ChatDto>(new DbEntityNotFoundError("Dialog not found")); 
+		if (dialog == null)
+		{
+			return new Result<ChatDto>(new DbEntityNotFoundError("Dialog not found")); 
+		}
 
 		return new Result<ChatDto>(dialog);
 	}

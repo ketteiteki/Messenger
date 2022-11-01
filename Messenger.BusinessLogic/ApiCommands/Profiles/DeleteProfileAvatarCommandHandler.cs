@@ -23,7 +23,10 @@ public class DeleteProfileAvatarCommandHandler : IRequestHandler<DeleteProfileAv
     {
         var requester = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, CancellationToken.None);
 
-        if (requester.AvatarLink == null) return new Result<UserDto>(new ForbiddenError("Avatar not exists"));
+        if (requester.AvatarLink == null)
+        {
+            return new Result<UserDto>(new ForbiddenError("Avatar not exists"));
+        }
 
         _fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), requester.AvatarLink.Split("/")[^1]));
         requester.AvatarLink = null;

@@ -25,12 +25,18 @@ public class GetChatListQueryHandler : IRequestHandler<GetChatListQuery, Result<
 						equals new {x1 = chatUsers.UserId, x2 = chatUsers.ChatId }
 						into chatUsersEnumerable
 					from chatUsersItem in chatUsersEnumerable.DefaultIfEmpty()
+					join deletedDialogByUsers in _context.DeletedDialogByUsers.AsNoTracking()
+						on new {x1 = chatUsersItem.UserId, x2 = chatUsersItem.ChatId} 
+						equals new {x1 = deletedDialogByUsers.UserId, x2 = deletedDialogByUsers.ChatId }
+						into deletedDialogByUsersEnumerable
+					from deletedDialogByUsersItem in deletedDialogByUsersEnumerable.DefaultIfEmpty()
 					join banUserByChat in _context.BanUserByChats.AsNoTracking()
 						on new {x1 = request.RequesterId, x2 = chat.Id} 
 						equals new {x1 = banUserByChat.UserId, x2 = banUserByChat.ChatId }
 						into banUserByChatEnumerable
 					from banUserByChatItem in banUserByChatEnumerable.DefaultIfEmpty()
-					where chatUsersItem.UserId == request.RequesterId 
+					where chatUsersItem.UserId == request.RequesterId
+					where deletedDialogByUsersItem == null
 					select new ChatDto
 					{
 						Id = chat.Id,

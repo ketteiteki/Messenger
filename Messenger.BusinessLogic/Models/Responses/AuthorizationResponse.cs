@@ -5,6 +5,8 @@ namespace Messenger.BusinessLogic.Models.Responses;
 public class AuthorizationResponse
 {
 	public string AccessToken { get; set; } 
+
+	public Guid RefreshToken { get; set; } 
 	
 	public Guid Id { get; set; }
 	
@@ -16,12 +18,13 @@ public class AuthorizationResponse
 
 	public string AvatarLink { get; set; }
 	
-	public AuthorizationResponse(User user, string accessToken)
+	public AuthorizationResponse(User user, string accessToken, Guid refreshToken)
 	{
 		AccessToken = accessToken;
+		RefreshToken = refreshToken;
 		Id = user.Id;
 		DisplayName = user.DisplayName;
-		NickName = user.NickName;
+		NickName = user.Nickname;
 		Bio = user.Bio;
 		AvatarLink = user.AvatarLink;
 	}

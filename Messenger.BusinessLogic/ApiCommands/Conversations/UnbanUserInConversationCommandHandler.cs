@@ -23,8 +23,10 @@ public class UnbanUserInConversationCommandHandler : IRequestHandler<UnbanUserIn
 			.FirstOrDefaultAsync(r => r.UserId == request.RequesterId && r.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
+		{
 			return new Result<UserDto>(new DbEntityNotFoundError("No requester in the chat"));
-
+		}
+		
 		if (chatUserByRequester.Role is { CanBanUser: true } || chatUserByRequester.Chat.OwnerId == request.RequesterId)
 		{
 			var banUserByChat = await _context.BanUserByChats
@@ -32,7 +34,9 @@ public class UnbanUserInConversationCommandHandler : IRequestHandler<UnbanUserIn
 				.FirstOrDefaultAsync(r => r.UserId == request.UserId && r.ChatId == request.ChatId, cancellationToken);
 
 			if (banUserByChat == null)
+			{
 				return new Result<UserDto>(new DbEntityNotFoundError("User is not banned"));
+			}
 			
 			_context.BanUserByChats.Remove(banUserByChat);
 			await _context.SaveChangesAsync(cancellationToken);

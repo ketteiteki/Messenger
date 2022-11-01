@@ -27,12 +27,12 @@ public class DeleteDialogTestSuccess : IntegrationTestBase, IIntegrationTest
         var deletedDialog21ThAliceResult = await MessengerModule.RequestAsync(new DeleteDialogCommand(
             RequesterId: user21Th.Value.Id,
             ChatId: dialog21ThAliceResult.Value.Id,
-            IsForBoth: false), CancellationToken.None);
+            IsDeleteForAll: false), CancellationToken.None);
         
         var deletedDialogBobAlexResult = await MessengerModule.RequestAsync(new DeleteDialogCommand(
             RequesterId: bob.Value.Id,
             ChatId: dialogBobAlexResult.Value.Id,
-            IsForBoth: true), CancellationToken.None);
+            IsDeleteForAll: true), CancellationToken.None);
 
         deletedDialog21ThAliceResult.IsSuccess.Should().BeTrue();
         deletedDialogBobAlexResult.IsSuccess.Should().BeTrue();

@@ -6,18 +6,18 @@ namespace Messenger.WebApi.Controllers;
 
 public class ApiControllerBase : ControllerBase
 {
-	protected readonly IMediator Mediator;
+	private readonly IMediator _mediator;
 
 	public ApiControllerBase(IMediator mediator)
 	{
-		Mediator = mediator;
+		_mediator = mediator;
 	}
 
 	[NonAction]
 	protected async Task<IActionResult> RequestAsync<TValue>(
 		IRequest<Result<TValue>> request, CancellationToken cancellationToken)
 	{
-		var result = await Mediator.Send(request, cancellationToken);
+		var result = await _mediator.Send(request, cancellationToken);
 
 		return result.Error switch
 		{
@@ -29,7 +29,8 @@ public class ApiControllerBase : ControllerBase
 				new ObjectResult(new { dbEntityExistsError.Message }) { StatusCode = 409 },
 			DbEntityNotFoundError dbEntityNotFoundError => 
 				new ObjectResult(new { dbEntityNotFoundError.Message }) { StatusCode = 404 },
-			ForbiddenError => new ForbidResult(),
+			ForbiddenError forbiddenError =>
+				new ObjectResult(new { forbiddenError.Message }) {StatusCode = 403},
 			
 			_ => new ObjectResult(result.Value) { StatusCode = 200 }
 		};

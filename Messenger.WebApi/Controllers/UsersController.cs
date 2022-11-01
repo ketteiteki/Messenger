@@ -1,6 +1,7 @@
 using MediatR;
 using Messenger.BusinessLogic.ApiQueries.Users;
 using Messenger.BusinessLogic.Models;
+using Messenger.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,13 +16,16 @@ public class UsersController : ApiControllerBase
 	
 	[ProducesResponseType(typeof(List<UserDto>), 200)]
 	[HttpGet]
-	public async Task<IActionResult> GetUserList(
+	public async Task<IActionResult> GetUserListBySearch(
 		[FromQuery] string search,
 		CancellationToken cancellationToken, 
 		[FromQuery] int limit = 10, 
 		[FromQuery] int page = 1)
 	{
-		var query = new GetUserListQuery(
+		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
+		
+		var query = new GetUserListBySearchQuery(
+			RequesterId: requesterId,
 			SearchText: search,
 			Limit: limit,
 			Page: page);

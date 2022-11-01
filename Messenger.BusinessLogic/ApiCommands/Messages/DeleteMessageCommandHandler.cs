@@ -27,8 +27,11 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 			.Include(m => m.Owner)
 			.Include(m => m.Attachments)
 			.FirstOrDefaultAsync(m => m.Id == request.MessageId, cancellationToken);
-		
-		if (message == null) return new Result<MessageDto>(new DbEntityNotFoundError("Message not found"));
+
+		if (message == null)
+		{
+			return new Result<MessageDto>(new DbEntityNotFoundError("Message not found"));
+		}
 
 		if (message.OwnerId == request.RequesterId || message.Chat.OwnerId == request.RequesterId)
 		{

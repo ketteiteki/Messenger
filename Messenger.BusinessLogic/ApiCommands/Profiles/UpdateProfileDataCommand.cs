@@ -7,6 +7,6 @@ namespace Messenger.BusinessLogic.ApiCommands.Profiles;
 public record UpdateProfileDataCommand(
 	Guid RequesterId,
 	string DisplayName,
-	string NickName,
+	string Nickname,
 	string Bio
 ) : IRequest<Result<UserDto>>;

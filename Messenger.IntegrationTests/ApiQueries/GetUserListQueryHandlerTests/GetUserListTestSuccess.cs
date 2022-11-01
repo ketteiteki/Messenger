@@ -11,27 +11,31 @@ public class GetUserListTestSuccess : IntegrationTestBase, IIntegrationTest
     [Fact]
     public async Task Test()
     {
-        await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
         await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
         await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
         await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
-        var getUserListLimit2Page1Result = await MessengerModule.RequestAsync(new GetUserListQuery(
+        var getUserListLimit2Page1Result = await MessengerModule.RequestAsync(new GetUserListBySearchQuery(
+            RequesterId: user21Th.Value.Id,
             Limit: 2,
             Page: 1,
             SearchText: null), CancellationToken.None);
         
-        var getUserListLimit2Page2Result = await MessengerModule.RequestAsync(new GetUserListQuery(
+        var getUserListLimit2Page2Result = await MessengerModule.RequestAsync(new GetUserListBySearchQuery(
+            RequesterId: user21Th.Value.Id,
             Limit: 2,
             Page: 2,
             SearchText: null), CancellationToken.None);
         
-        var getUserListLimit2Page3Result = await MessengerModule.RequestAsync(new GetUserListQuery(
+        var getUserListLimit2Page3Result = await MessengerModule.RequestAsync(new GetUserListBySearchQuery(
+            RequesterId: user21Th.Value.Id,
             Limit: 2,
             Page: 3,
             SearchText: null), CancellationToken.None);
 
-        var getUserListBuSearchResult = await MessengerModule.RequestAsync(new GetUserListQuery(
+        var getUserListBySearchResult = await MessengerModule.RequestAsync(new GetUserListBySearchQuery(
+            RequesterId: user21Th.Value.Id,
             Limit: 20,
             Page: 1,
             SearchText: "123"), CancellationToken.None);
@@ -43,6 +47,6 @@ public class GetUserListTestSuccess : IntegrationTestBase, IIntegrationTest
 
         getUserListLimit2Page3Result.Value.Count.Should().Be(0);
 
-        getUserListBuSearchResult.Value.Count.Should().Be(3);
+        getUserListBySearchResult.Value.Count.Should().Be(3);
     }
 }

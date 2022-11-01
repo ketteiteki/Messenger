@@ -5,7 +5,6 @@ using Messenger.BusinessLogic.Responses;
 using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
-using Messenger.Domain.Enum;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,14 +26,14 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Resul
     
     public async Task<Result<ChatDto>> Handle(CreateChatCommand request, CancellationToken cancellationToken)
     {
-        if (request.Type == ChatType.Dialog)
-            return new Result<ChatDto>(new BadRequestError("Choose chat type between conversation and channel"));
-            
         var requester = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, cancellationToken);
 
         var chatByName = await _context.Chats.FirstOrDefaultAsync(c => c.Name == request.Name, cancellationToken);
-		
-        if (chatByName != null) return new Result<ChatDto>(new DbEntityExistsError("A chat by that name already exists"));
+
+        if (chatByName != null)
+        {
+            return new Result<ChatDto>(new DbEntityExistsError("A chat by that name already exists"));
+        }
 		
         var newChat = new Chat(
             name: request.Name,

@@ -12,15 +12,21 @@ public class LoginTestThrowAuthentication : IntegrationTestBase, IIntegrationTes
     [Fact]
     public async Task Test()
     {
+        const string loginIp = "323.432.21.542";
+        
         var firstLoginResult = await MessengerModule.RequestAsync(new LoginCommand(
-            NickName: CommandHelper.Registration21ThCommand().Nickname,
-            Password: CommandHelper.Registration21ThCommand().Password), CancellationToken.None);
+            Nickname: CommandHelper.Registration21ThCommand().Nickname,
+            Password: CommandHelper.Registration21ThCommand().Password,
+            UserAgent: "Mozilla",
+            Ip: loginIp), CancellationToken.None);
         
         await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
    
         var secondLoginResult = await MessengerModule.RequestAsync(new LoginCommand(
-            NickName: CommandHelper.Registration21ThCommand().Nickname,
-            Password: "wrong password"), CancellationToken.None);
+            Nickname: CommandHelper.Registration21ThCommand().Nickname,
+            Password: "wrong password",
+            UserAgent: "Mozilla",
+            Ip: loginIp), CancellationToken.None);
 
         firstLoginResult.Error.Should().BeOfType<AuthenticationError>();
         secondLoginResult.Error.Should().BeOfType<AuthenticationError>();

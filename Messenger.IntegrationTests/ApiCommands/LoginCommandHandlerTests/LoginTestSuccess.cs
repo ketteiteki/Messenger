@@ -14,8 +14,10 @@ public class LoginTestSuccess : IntegrationTestBase, IIntegrationTest
 		await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
 		var loginResult = await MessengerModule.RequestAsync(new LoginCommand(
-			NickName: CommandHelper.Registration21ThCommand().Nickname,
-			Password: CommandHelper.Registration21ThCommand().Password), CancellationToken.None);
+			Nickname: CommandHelper.Registration21ThCommand().Nickname,
+			Password: CommandHelper.Registration21ThCommand().Password,
+			UserAgent: "Mozilla",
+			Ip: "323.432.21.542"), CancellationToken.None);
 
 		loginResult.IsSuccess.Should().BeTrue();
 	}

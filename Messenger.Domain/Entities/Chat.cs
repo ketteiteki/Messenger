@@ -29,8 +29,6 @@ public class Chat : IBaseEntity
 	
 	public List<Message> Messages { get; set; } = new();
 
-	public List<RoleUserByChat> RoleUserByChats { get; set; } = new();
-	
 	public List<DeletedDialogByUser> DeletedDialogByUsers { get; set; } = new();
 
 	public List<BanUserByChat> BanUserByChats { get; set; } = new();

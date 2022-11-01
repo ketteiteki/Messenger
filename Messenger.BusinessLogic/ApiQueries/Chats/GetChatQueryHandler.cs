@@ -53,7 +53,10 @@ public class GetChatQueryHandler : IRequestHandler<GetChatQuery, Result<ChatDto>
 					})
 				.FirstOrDefaultAsync(cancellationToken);
 
-		if (chatItem == null) return new Result<ChatDto>(new DbEntityNotFoundError("Chat not found"));
+		if (chatItem == null)
+		{
+			return new Result<ChatDto>(new DbEntityNotFoundError("Chat not found"));
+		}
 		
 		return new Result<ChatDto>(chatItem);
 	}

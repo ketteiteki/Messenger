@@ -21,7 +21,10 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 	{
 		var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.UserId, CancellationToken.None);
 
-		if (user == null) return new Result<ChatDto>(new DbEntityNotFoundError("User not found"));
+		if (user == null)
+		{
+			return new Result<ChatDto>(new DbEntityNotFoundError("User not found"));
+		}
 
 		var dialog = await (
 				from chat in _context.Chats
@@ -30,8 +33,11 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 				      (int)chat.Type == (int)ChatType.Dialog
 				      select chat)
 			.FirstOrDefaultAsync(cancellationToken);
-		
-		if (dialog != null) return new Result<ChatDto>(new DbEntityExistsError("Dialog already exists"));
+
+		if (dialog != null)
+		{
+			return new Result<ChatDto>(new DbEntityExistsError("Dialog already exists"));
+		}
 
 		var newDialog = new Chat(
 			name: null,

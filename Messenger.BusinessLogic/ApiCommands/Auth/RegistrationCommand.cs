@@ -7,5 +7,7 @@ namespace Messenger.BusinessLogic.ApiCommands.Auth;
 public record RegistrationCommand(
 		string DisplayName,
 		string Nickname, 
-		string Password)
+		string Password,
+		string UserAgent,
+		string Ip)
 	: IRequest<Result<AuthorizationResponse>>;

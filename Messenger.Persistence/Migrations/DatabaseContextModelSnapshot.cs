@@ -168,6 +168,7 @@ namespace Messenger.Services.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<Guid?>("OwnerId")
+                        .IsRequired()
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("ReplyToMessageId")
@@ -183,7 +184,8 @@ namespace Messenger.Services.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.HasIndex("ReplyToMessageId");
+                    b.HasIndex("ReplyToMessageId")
+                        .IsUnique();
 
                     b.ToTable("Messages");
                 });
@@ -220,9 +222,44 @@ namespace Messenger.Services.Migrations
 
                     b.HasKey("ChatId", "UserId");
 
+                    b.ToTable("RoleUserByChats");
+                });
+
+            modelBuilder.Entity("Messenger.Domain.Entities.Session", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AccessToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Ip")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("RefreshToken")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UserAgent")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("RoleUserByChats");
+                    b.ToTable("Sessions");
                 });
 
             modelBuilder.Entity("Messenger.Domain.Entities.User", b =>
@@ -241,7 +278,7 @@ namespace Messenger.Services.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("NickName")
+                    b.Property<string>("Nickname")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -296,8 +333,9 @@ namespace Messenger.Services.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Messenger.Domain.Entities.User", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId");
+                        .WithMany("Chats")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("LastMessage");
 
@@ -372,11 +410,13 @@ namespace Messenger.Services.Migrations
                     b.HasOne("Messenger.Domain.Entities.User", "Owner")
                         .WithMany("Messages")
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Messenger.Domain.Entities.Message", "ReplyToMessage")
-                        .WithMany()
-                        .HasForeignKey("ReplyToMessageId");
+                        .WithOne()
+                        .HasForeignKey("Messenger.Domain.Entities.Message", "ReplyToMessageId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Chat");
 
@@ -387,18 +427,6 @@ namespace Messenger.Services.Migrations
 
             modelBuilder.Entity("Messenger.Domain.Entities.RoleUserByChat", b =>
                 {
-                    b.HasOne("Messenger.Domain.Entities.Chat", null)
-                        .WithMany("RoleUserByChats")
-                        .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Messenger.Domain.Entities.User", null)
-                        .WithMany("RoleUserByChats")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Messenger.Domain.Entities.ChatUser", "ChatUser")
                         .WithOne("Role")
                         .HasForeignKey("Messenger.Domain.Entities.RoleUserByChat", "ChatId", "UserId")
@@ -406,6 +434,17 @@ namespace Messenger.Services.Migrations
                         .IsRequired();
 
                     b.Navigation("ChatUser");
+                });
+
+            modelBuilder.Entity("Messenger.Domain.Entities.Session", b =>
+                {
+                    b.HasOne("Messenger.Domain.Entities.User", "User")
+                        .WithMany("Sessions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Messenger.Domain.Entities.Chat", b =>
@@ -417,8 +456,6 @@ namespace Messenger.Services.Migrations
                     b.Navigation("DeletedDialogByUsers");
 
                     b.Navigation("Messages");
-
-                    b.Navigation("RoleUserByChats");
                 });
 
             modelBuilder.Entity("Messenger.Domain.Entities.ChatUser", b =>
@@ -441,13 +478,15 @@ namespace Messenger.Services.Migrations
 
                     b.Navigation("ChatUsers");
 
+                    b.Navigation("Chats");
+
                     b.Navigation("DeletedDialogByUsers");
 
                     b.Navigation("DeletedMessageByUsers");
 
                     b.Navigation("Messages");
 
-                    b.Navigation("RoleUserByChats");
+                    b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618
         }
