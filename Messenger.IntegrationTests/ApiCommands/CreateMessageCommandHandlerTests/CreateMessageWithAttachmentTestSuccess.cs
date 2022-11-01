@@ -40,13 +40,13 @@ public class CreateMessageWithAttachmentTestSuccess : IntegrationTestBase, IInte
                     baseStreamOffset: 0,
                     length: fileStream.Length,
                     name: "qwerty",
-                    fileName: "qwerty"),
+                    fileName: "qwerty.jpg"),
                 new FormFile(
                     baseStream: fileStream,
                     baseStreamOffset: 0,
                     length: fileStream.Length,
                     name: "qwerty",
-                    fileName: "qwerty")
+                    fileName: "qwerty.jpg")
             });
 
         var createMessageBy21ThResult = await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);

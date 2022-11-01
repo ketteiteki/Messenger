@@ -51,13 +51,13 @@ public class DeleteMessageWithAttachmentsTestSuccess : IntegrationTestBase, IInt
                     baseStreamOffset: 0,
                     length: fileStream.Length,
                     name: "qwerty",
-                    fileName: "qwerty"),
+                    fileName: "qwerty.jpg"),
                 new FormFile(
                     baseStream: fileStream,
                     baseStreamOffset: 0,
                     length: fileStream.Length,
                     name: "qwerty",
-                    fileName: "qwerty")
+                    fileName: "qwerty.jpg")
             }), CancellationToken.None);
 
         var createSecondMessageByAliceResult = await MessengerModule.RequestAsync(new CreateMessageCommand(
@@ -72,13 +72,13 @@ public class DeleteMessageWithAttachmentsTestSuccess : IntegrationTestBase, IInt
                     baseStreamOffset: 0,
                     length: fileStream.Length,
                     name: "qwerty",
-                    fileName: "qwerty"),
+                    fileName: "qwerty.jpg"),
                 new FormFile(
                     baseStream: fileStream,
                     baseStreamOffset: 0,
                     length: fileStream.Length,
                     name: "qwerty",
-                    fileName: "qwerty")
+                    fileName: "qwerty.jpg")
             }), CancellationToken.None);
 
         foreach (var attachment in createFirstMessageByAliceResult.Value.Attachments)
