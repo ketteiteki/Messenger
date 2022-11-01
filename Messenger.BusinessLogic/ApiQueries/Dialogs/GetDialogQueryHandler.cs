@@ -21,10 +21,10 @@ public class GetDialogQueryHandler : IRequestHandler<GetDialogQuery, Result<Chat
 		var dialog = await (
 				from chatUser1 in _context.ChatUsers.AsNoTracking()
 				join chatUser2 in _context.ChatUsers.AsNoTracking()
-					on new {x1 = chatUser1.UserId, x2 = chatUser1.ChatId} 
-					equals new {x1 = chatUser2.UserId, x2 = chatUser2.ChatId}
-				where chatUser1.Chat.Type == ChatType.Dialog &&
-				      chatUser1.User.Id == request.RequestorId && chatUser2.User.Id == request.WithWhomId
+					on chatUser1.ChatId equals chatUser2.ChatId
+				where chatUser1.Chat.Type == ChatType.Dialog 
+				where chatUser1.UserId == request.RequesterId
+				where chatUser2.UserId == request.UserId
 				select new ChatDto
 			{
 				Id = chatUser2.Chat.Id,
@@ -33,11 +33,16 @@ public class GetDialogQueryHandler : IRequestHandler<GetDialogQuery, Result<Chat
 				Type = chatUser2.Chat.Type,
 				AvatarLink = chatUser2.User.AvatarLink,
 				MembersCount = 2,
-				IsMember = true
+				IsMember = true,
+				CanSendMedia = true,
+				Members = chatUser1.Chat.ChatUsers.Select(c => new UserDto(c.User)).ToList()
 			})
 			.FirstOrDefaultAsync(cancellationToken);
 
-		if (dialog == null) return new Result<ChatDto>(new DbEntityNotFoundError("Dialog not found")); 
+		if (dialog == null)
+		{
+			return new Result<ChatDto>(new DbEntityNotFoundError("Dialog not found")); 
+		}
 
 		return new Result<ChatDto>(dialog);
 	}

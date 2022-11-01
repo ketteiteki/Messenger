@@ -21,23 +21,38 @@ public class AddUserToConversationCommandHandler : IRequestHandler<AddUserToConv
 		var chatUserByRequester = await _context.ChatUsers
 			.Include(c => c.Role)
 			.Include(c => c.Chat)
-			.FirstOrDefaultAsync(c => c.UserId == request.RequestorId && c.ChatId == request.ChatId, cancellationToken);
+			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
+		{
 			return new Result<UserDto>(new ForbiddenError("No requester in the chat"));
-
+		}
+		
 		if (chatUserByRequester.Role is { CanAddAndRemoveUserToConversation: true } ||
-		    chatUserByRequester.Chat.OwnerId == request.RequestorId)
+		    chatUserByRequester.Chat.OwnerId == request.RequesterId)
 		{
 			var user = await _context.Users
 				.AsNoTracking()
 				.FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
 
-			if (user == null) 
+			if (user == null)
+			{
 				return new Result<UserDto>(new  DbEntityNotFoundError("User not found"));
+			}
 			
-			if (user.ChatUsers.Any(c => c.UserId == request.UserId && c.ChatId == request.ChatId)) 
+			var chatUserByUser = await _context.ChatUsers
+				.AsNoTracking()
+				.FirstOrDefaultAsync(c => c.UserId == request.UserId && c.ChatId == request.ChatId, cancellationToken);
+
+			if (chatUserByUser != null)
+			{
+				return new Result<UserDto>(new DbEntityExistsError("User already exists in conversation"));
+			}
+
+			if (user.ChatUsers.Any(c => c.UserId == request.UserId && c.ChatId == request.ChatId))
+			{
 				return new Result<UserDto>(new  DbEntityExistsError("User is already in the chat"));
+			}
 			
 			_context.ChatUsers.Add(new ChatUser {UserId = request.UserId, ChatId = request.ChatId});
 			await _context.SaveChangesAsync(cancellationToken);

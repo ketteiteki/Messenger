@@ -6,11 +6,11 @@ namespace Messenger.Domain.Entities;
 
 public class User : IBaseEntity
 {
-	public Guid Id { get; set; }
+	public Guid Id { get; set; } = Guid.NewGuid();
 	
 	public string DisplayName { get; set; }
 
-	public string NickName { get; set; }
+	public string Nickname { get; set; }
 	
 	public string? Bio { get; set; }
 
@@ -22,20 +22,22 @@ public class User : IBaseEntity
 
 	public List<Message> Messages { get; set; } = new();
 
+	public List<Chat> Chats { get; set; } = new();
+	
 	public List<ChatUser> ChatUsers { get; set; } = new();
 	
-	public List<RoleUserByChat> RoleUserByChats { get; set; } = new();
-
 	public List<DeletedMessageByUser> DeletedMessageByUsers { get; set; } = new();
 
 	public List<DeletedDialogByUser> DeletedDialogByUsers { get; set; } = new();
 	
 	public List<BanUserByChat> BanUserByChats { get; set; } = new();
 
-	public User(string displayName, string nickName, string? bio, string? avatarLink, string passwordHash, string passwordSalt)
+	public List<Session> Sessions { get; set; } = new();
+
+	public User(string displayName, string nickname, string? bio, string? avatarLink, string passwordHash, string passwordSalt)
 	{
 		DisplayName = displayName;
-		NickName = nickName;
+		Nickname = nickname;
 		Bio = bio;
 		AvatarLink = avatarLink;
 		PasswordHash = passwordHash;

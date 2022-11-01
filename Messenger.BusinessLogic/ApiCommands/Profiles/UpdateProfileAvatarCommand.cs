@@ -6,6 +6,6 @@ using Microsoft.AspNetCore.Http;
 namespace Messenger.BusinessLogic.ApiCommands.Profiles;
 
 public record UpdateProfileAvatarCommand(
-	Guid RequestorId,
-	IFormFile? AvatarFile)
+	Guid RequesterId,
+	IFormFile AvatarFile)
 	: IRequest<Result<UserDto>>;

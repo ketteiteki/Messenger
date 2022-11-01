@@ -17,15 +17,17 @@ public class UpdateProfileDataCommandHandler : IRequestHandler<UpdateProfileData
 	
 	public async Task<Result<UserDto>> Handle(UpdateProfileDataCommand request, CancellationToken cancellationToken)
 	{
-		var user = await _context.Users.FirstAsync(u => u.Id == request.RequestorId, cancellationToken);
+		var user = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, cancellationToken);
 		
-		var userByNickName =  await _context.Users
-			.FirstOrDefaultAsync(u => u.NickName == request.NickName, cancellationToken);
+		var userByNickname =  await _context.Users
+			.FirstOrDefaultAsync(u => u.Nickname == request.Nickname, cancellationToken);
 
-		if (userByNickName != null) 
+		if (userByNickname != null)
+		{
 			return new Result<UserDto>(new DbEntityExistsError("User with this nickname already exists")); 
+		}
 
-		user.NickName = request.NickName;
+		user.Nickname = request.Nickname;
 		user.DisplayName = request.DisplayName;
 		user.Bio = request.Bio;
 

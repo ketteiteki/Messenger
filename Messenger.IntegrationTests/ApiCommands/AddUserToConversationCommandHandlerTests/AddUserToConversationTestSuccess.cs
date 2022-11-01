@@ -1,6 +1,7 @@
 using FluentAssertions;
+using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
-using Messenger.BusinessLogic.ApiQueries.Conversations;
+using Messenger.BusinessLogic.ApiQueries.Chats;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
@@ -13,22 +14,29 @@ public class AddUserToConversationTestSuccess : IntegrationTestBase, IIntegratio
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
-		var conversation = await MessengerModule.RequestAsync(
-			CommandHelper.CreateConversationCommand(user21th.Value.Id, "qwerty", "qwerty", null), CancellationToken.None);
+		var createConversationCommand = new CreateChatCommand(
+			RequesterId: user21Th.Value.Id,
+			Name: "qwerty",
+			Title: "qwerty",
+			Type: ChatType.Conversation,
+			AvatarFile: null);
+		
+		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-		var AddUserToConversationBy21thCommand = new AddUserToConversationCommand(
-			RequestorId: user21th.Value.Id,
+		var addUserAliceToConversationBy21ThCommand = new AddUserToConversationCommand(
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alice.Value.Id);
 
-		await MessengerModule.RequestAsync(AddUserToConversationBy21thCommand, CancellationToken.None);
+		var addUserAliceToConversationBy21ThResult = 
+			await MessengerModule.RequestAsync(addUserAliceToConversationBy21ThCommand, CancellationToken.None);
 
 		var createRoleAliceInConversationCommand = new CreateOrUpdateRoleUserInConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			UserId: alice.Value.Id,
 			ChatId: conversation.Value.Id,
 			RoleColor: RoleColor.Red,
@@ -40,20 +48,24 @@ public class AddUserToConversationTestSuccess : IntegrationTestBase, IIntegratio
 
 		await MessengerModule.RequestAsync(createRoleAliceInConversationCommand, CancellationToken.None);
 
-		var AddUserToConversationByAliceCommand = new AddUserToConversationCommand(
-			RequestorId: alice.Value.Id,
+		var addUserBobToConversationByAliceCommand = new AddUserToConversationCommand(
+			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: bob.Value.Id);
 
-		await MessengerModule.RequestAsync(AddUserToConversationByAliceCommand, CancellationToken.None);
+		var addUserBobToConversationByAliceResult = 
+			await MessengerModule.RequestAsync(addUserBobToConversationByAliceCommand, CancellationToken.None);
 
-		var getConversationCommand = new GetConversationQuery(
-			RequestorId: bob.Value.Id,
+		var getConversationCommand = new GetChatQuery(
+			RequesterId: bob.Value.Id,
 			ChatId: conversation.Value.Id);
 
 		var conversationForCheck = await MessengerModule.RequestAsync(getConversationCommand, CancellationToken.None);
 		
 		conversationForCheck.Value.IsMember.Should().BeTrue();
 		conversationForCheck.Value.MembersCount.Should().Be(3);
+
+		addUserAliceToConversationBy21ThResult.Value.Id.Should().Be(alice.Value.Id);
+		addUserBobToConversationByAliceResult.Value.Id.Should().Be(bob.Value.Id);
 	}
 }

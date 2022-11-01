@@ -22,5 +22,8 @@ public class DeletedDialogByUserConfiguration : IEntityTypeConfiguration<Deleted
 			.WithMany(u => u.DeletedDialogByUsers)
 			.HasForeignKey(p => p.UserId)
 			.OnDelete(DeleteBehavior.Cascade);
+		
+		builder.Property(x => x.ChatId).IsRequired();
+		builder.Property(x => x.UserId).IsRequired();
 	}
 }

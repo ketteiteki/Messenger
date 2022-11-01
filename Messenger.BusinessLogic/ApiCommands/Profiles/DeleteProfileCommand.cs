@@ -5,5 +5,5 @@ using Messenger.BusinessLogic.Responses;
 namespace Messenger.BusinessLogic.ApiCommands.Profiles;
 
 public record DeleteProfileCommand(
-	Guid RequestorId) 
+	Guid RequesterId) 
 	: IRequest<Result<UserDto>>;

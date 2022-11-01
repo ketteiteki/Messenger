@@ -6,7 +6,7 @@ using Messenger.Domain.Enum;
 namespace Messenger.BusinessLogic.ApiCommands.Conversations;
 
 public record CreateOrUpdateRoleUserInConversationCommand(
-		Guid RequestorId,
+		Guid RequesterId,
 		Guid ChatId,
 		Guid UserId,
 		string RoleTitle,

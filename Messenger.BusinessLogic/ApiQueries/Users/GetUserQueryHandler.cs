@@ -1,11 +1,12 @@
 using MediatR;
+using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.Domain.Entities;
 using Messenger.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.BusinessLogic.ApiQueries.Users;
 
-public class GetUserQueryHandler : IRequestHandler<GetUserQuery, Result<User>>
+public class GetUserQueryHandler : IRequestHandler<GetUserQuery, Result<UserDto>>
 {
 	private readonly DatabaseContext _context;
 
@@ -14,12 +15,17 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, Result<User>>
 		_context = context;
 	}
 	
-	public async Task<Result<User>> Handle(GetUserQuery request, CancellationToken cancellationToken)
+	public async Task<Result<UserDto>> Handle(GetUserQuery request, CancellationToken cancellationToken)
 	{
-		var findUser = await _context.Users.FindAsync(request.UserId, cancellationToken);
+		var user = await _context.Users
+			.AsNoTracking()
+			.FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
 
-		if (findUser == null) return new Result<User>(new DbEntityNotFoundError("User not found"));
+		if (user == null)
+		{
+			return new Result<UserDto>(new DbEntityNotFoundError("User not found"));
+		}
 
-		return new Result<User>(findUser);
+		return new Result<UserDto>(new UserDto(user));
 	}
 }

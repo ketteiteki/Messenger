@@ -18,6 +18,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "items", "items", "{2B4345B4
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{CD5D3173-E469-496C-ACAC-EF31C95D06E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{5C25C588-05D0-46A1-91CC-AED392804EAD}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\run-build-and-test.yml = .github\workflows\run-build-and-test.yml
+		.github\workflows\wait_postgres_database.ps1 = .github\workflows\wait_postgres_database.ps1
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messenger.Infrastructure", "Messenger.Infrastructure\Messenger.Infrastructure.csproj", "{A523DA03-5478-4E7A-8040-4DB762FCDEEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +58,12 @@ Global
 		{ECFE25B9-287F-44AB-83C3-0607909C4303}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECFE25B9-287F-44AB-83C3-0607909C4303}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECFE25B9-287F-44AB-83C3-0607909C4303}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A523DA03-5478-4E7A-8040-4DB762FCDEEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A523DA03-5478-4E7A-8040-4DB762FCDEEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A523DA03-5478-4E7A-8040-4DB762FCDEEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A523DA03-5478-4E7A-8040-4DB762FCDEEC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5C25C588-05D0-46A1-91CC-AED392804EAD} = {CD5D3173-E469-496C-ACAC-EF31C95D06E8}
 	EndGlobalSection
 EndGlobal

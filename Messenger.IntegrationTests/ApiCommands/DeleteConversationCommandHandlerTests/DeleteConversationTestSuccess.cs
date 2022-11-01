@@ -1,6 +1,7 @@
 using FluentAssertions;
-using Messenger.BusinessLogic.ApiCommands.Conversations;
-using Messenger.BusinessLogic.ApiQueries.Conversations;
+using Messenger.BusinessLogic.ApiCommands.Chats;
+using Messenger.BusinessLogic.ApiQueries.Chats;
+using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
@@ -12,24 +13,25 @@ public class DeleteConversationTestSuccess : IntegrationTestBase, IIntegrationTe
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-		var command = new CreateConversationCommand(
-			RequestorId: user21th.Value.Id,
-			Name: "convers",
-			Title: "21ths den",
+		var createConversationCommand = new CreateChatCommand(
+			RequesterId: user21Th.Value.Id,
+			Name: "qwerty",
+			Title: "qwerty",
+			Type: ChatType.Conversation,
 			AvatarFile: null);
-
-		var conversation = await MessengerModule.RequestAsync(command, CancellationToken.None);
 		
-		var deleteConversationCommand = new DeleteConversationCommand(
-			RequestorId: user21th.Value.Id,
-			ChatId: conversation.Value.Id);
+		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
+		var deleteConversationCommand = new DeleteChatCommand(
+			RequesterId: user21Th.Value.Id,
+			ChatId: conversation.Value.Id);
+		
 		await MessengerModule.RequestAsync(deleteConversationCommand, CancellationToken.None);
 
-		var conversationForCheckCommand = new GetConversationQuery(
-			RequestorId: user21th.Value.Id,
+		var conversationForCheckCommand = new GetChatQuery(
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id);
 
 		var conversationForCheck = await MessengerModule.RequestAsync(conversationForCheckCommand, CancellationToken.None);

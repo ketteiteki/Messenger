@@ -5,7 +5,7 @@ using Messenger.BusinessLogic.Responses;
 namespace Messenger.BusinessLogic.ApiCommands.Conversations;
 
 public record AddUserToConversationCommand(
-		Guid RequestorId,
+		Guid RequesterId,
 		Guid ChatId,
 		Guid UserId)
 	: IRequest<Result<UserDto>>;

@@ -20,19 +20,23 @@ public class UnbanUserInConversationCommandHandler : IRequestHandler<UnbanUserIn
 		var chatUserByRequester = await _context.ChatUsers
 			.Include(c => c.Chat)
 			.Include(c => c.Role)
-			.FirstOrDefaultAsync(r => r.UserId == request.RequestorId && r.ChatId == request.ChatId, cancellationToken);
+			.FirstOrDefaultAsync(r => r.UserId == request.RequesterId && r.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
-			return new Result<UserDto>(new DbEntityNotFoundError("No requestor in the chat"));
-
-		if (chatUserByRequester.Role is { CanBanUser: true } || chatUserByRequester.Chat.OwnerId == request.RequestorId)
+		{
+			return new Result<UserDto>(new DbEntityNotFoundError("No requester in the chat"));
+		}
+		
+		if (chatUserByRequester.Role is { CanBanUser: true } || chatUserByRequester.Chat.OwnerId == request.RequesterId)
 		{
 			var banUserByChat = await _context.BanUserByChats
 				.Include(b => b.User)
 				.FirstOrDefaultAsync(r => r.UserId == request.UserId && r.ChatId == request.ChatId, cancellationToken);
 
 			if (banUserByChat == null)
+			{
 				return new Result<UserDto>(new DbEntityNotFoundError("User is not banned"));
+			}
 			
 			_context.BanUserByChats.Remove(banUserByChat);
 			await _context.SaveChangesAsync(cancellationToken);

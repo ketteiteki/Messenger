@@ -1,5 +1,6 @@
 using FluentAssertions;
-using Messenger.BusinessLogic.ApiCommands.Conversations;
+using Messenger.BusinessLogic.ApiCommands.Chats;
+using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
@@ -11,15 +12,16 @@ public class CreateConversationTestSuccess : IntegrationTestBase, IIntegrationTe
 	[Fact]
 	public async Task Test()
 	{
-		var user = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-		var command = new CreateConversationCommand(
-			RequestorId: user.Value.Id,
+		var createConversationCommand = new CreateChatCommand(
+			RequesterId: user21Th.Value.Id,
 			Name: "qwerty",
-			Title: "qwery",
+			Title: "qwerty",
+			Type: ChatType.Conversation,
 			AvatarFile: null);
-
-		var conversation = await MessengerModule.RequestAsync(command, CancellationToken.None);
+		
+		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 		
 		conversation.IsSuccess.Should().BeTrue();
 		conversation.Value.IsOwner.Should().BeTrue();

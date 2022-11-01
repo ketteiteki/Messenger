@@ -10,15 +10,15 @@ public class UserDto
 
 	public string Nickname { get; init; }
 
-	public string? Bio { get; init; }
+	public string Bio { get; init; }
 
-	public string? AvatarLink { get; init; }
+	public string AvatarLink { get; init; }
 
 	public UserDto(User user)
 	{
 		Id = user.Id;
 		DisplayName = user.DisplayName;
-		Nickname = user.NickName;
+		Nickname = user.Nickname;
 		Bio = user.Bio;
 		AvatarLink = user.AvatarLink;
 	}

@@ -12,20 +12,20 @@ public class CreateDialogCommandHandlerTestSuccess : IntegrationTestBase, IInteg
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		
 		var createDialogCommand = new CreateDialogCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			UserId: alice.Value.Id);
 
-		var dialog = await MessengerModule.RequestAsync(createDialogCommand, CancellationToken.None);
+		var createDialogResult = await MessengerModule.RequestAsync(createDialogCommand, CancellationToken.None);
 
-		dialog.IsSuccess.Should().BeTrue();
-		dialog.Value.MembersCount.Should().Be(2);
-		dialog.Value.Members.Count.Should().Be(2);
-		dialog.Value.Members.Exists(m => m.Id == user21th.Value.Id).Should().BeTrue();
-		dialog.Value.Members.Exists(m => m.Id != user21th.Value.Id).Should().BeTrue();
-		dialog.Value.Type.Should().Be(ChatType.Dialog);
+		createDialogResult.IsSuccess.Should().BeTrue();
+		createDialogResult.Value.MembersCount.Should().Be(2);
+		createDialogResult.Value.Members.Count.Should().Be(2);
+		createDialogResult.Value.Members.Exists(m => m.Id == user21Th.Value.Id).Should().BeTrue();
+		createDialogResult.Value.Members.Exists(m => m.Id != user21Th.Value.Id).Should().BeTrue();
+		createDialogResult.Value.Type.Should().Be(ChatType.Dialog);
 	}
 }

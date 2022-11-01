@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
@@ -12,31 +13,32 @@ public class RemoveUserFromConversationTestSuccess : IntegrationTestBase, IInteg
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 		var alex = await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
-		var createConversationCommand = new CreateConversationCommand(
-			RequestorId: user21th.Value.Id,
+		var createConversationCommand = new CreateChatCommand(
+			RequesterId: user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
+			Type: ChatType.Conversation,
 			AvatarFile: null);
 
 		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
-
+		
 		var addAliceInConversationCommand = new AddUserToConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alice.Value.Id);
 		
 		var addBobInConversationCommand = new AddUserToConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: bob.Value.Id);
 		
 		var addAlexInConversationCommand = new AddUserToConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alex.Value.Id);
 
@@ -45,7 +47,7 @@ public class RemoveUserFromConversationTestSuccess : IntegrationTestBase, IInteg
 		await MessengerModule.RequestAsync(addAlexInConversationCommand, CancellationToken.None);
 
 		var createRoleForBobCommand = new CreateOrUpdateRoleUserInConversationCommand(
-			RequestorId: user21th.Value.Id,
+			RequesterId: user21Th.Value.Id,
 			UserId: bob.Value.Id,
 			ChatId: conversation.Value.Id,
 			RoleTitle: "moderator",
@@ -57,20 +59,22 @@ public class RemoveUserFromConversationTestSuccess : IntegrationTestBase, IInteg
 
 		await MessengerModule.RequestAsync(createRoleForBobCommand, CancellationToken.None);
 
-		var removeUserFromConversationCommandForAlice = new RemoveUserFromConversationCommand(
-			RequestorId: user21th.Value.Id,
+		var removeUserAliceFromConversationBy21ThCommand= new RemoveUserFromConversationCommand(
+			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alice.Value.Id);
 		
-		var removeUserFromConversationCommandForAlex = new RemoveUserFromConversationCommand(
-			RequestorId: bob.Value.Id,
+		var removeUserAlexFromConversationByBobCommand = new RemoveUserFromConversationCommand(
+			RequesterId: bob.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alex.Value.Id);
 
-		var removedAlice = await MessengerModule.RequestAsync(removeUserFromConversationCommandForAlice, CancellationToken.None);
-		var removedAlex = await MessengerModule.RequestAsync(removeUserFromConversationCommandForAlex, CancellationToken.None);
+		var removeUserAliceFromConversationBy21ThResult =
+			await MessengerModule.RequestAsync(removeUserAliceFromConversationBy21ThCommand, CancellationToken.None);
+		var removeUserAlexFromConversationByBobResult =
+			await MessengerModule.RequestAsync(removeUserAlexFromConversationByBobCommand, CancellationToken.None);
 
-		removedAlice.IsSuccess.Should().BeTrue();
-		removedAlex.IsSuccess.Should().BeTrue();
+		removeUserAliceFromConversationBy21ThResult.IsSuccess.Should().BeTrue();
+		removeUserAlexFromConversationByBobResult.IsSuccess.Should().BeTrue();
 	}
 }

@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Http;
 namespace Messenger.BusinessLogic.ApiCommands.Messages;
 
 public record CreateMessageCommand(
-	Guid RequestorId,
+	Guid RequesterId,
 	string Text,
 	Guid? ReplyToId,
 	Guid ChatId,
-	IFormFileCollection? Files
+	IFormFileCollection Files
 	) : IRequest<Result<MessageDto>>;

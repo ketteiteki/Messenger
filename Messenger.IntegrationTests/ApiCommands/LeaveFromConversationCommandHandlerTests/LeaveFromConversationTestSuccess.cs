@@ -1,5 +1,6 @@
 using FluentAssertions;
-using Messenger.BusinessLogic.ApiCommands.Conversations;
+using Messenger.BusinessLogic.ApiCommands.Chats;
+using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
@@ -11,25 +12,26 @@ public class LeaveFromConversationTestSuccess : IntegrationTestBase, IIntegratio
 	[Fact]
 	public async Task Test()
 	{
-		var user21th = await MessengerModule.RequestAsync(CommandHelper.Registration21thCommand(), CancellationToken.None);
+		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		
-		var command = new CreateConversationCommand(
-			RequestorId: user21th.Value.Id,
+		var createConversationCommand = new CreateChatCommand(
+			RequesterId: user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
+			Type: ChatType.Conversation,
 			AvatarFile: null);
 
-		var conversation = await MessengerModule.RequestAsync(command, CancellationToken.None);
+		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 		
-		var joinToConversationCommand = new JoinToConversationCommand(
-			RequestorId: alice.Value.Id,
+		var joinToConversationCommand = new JoinToChatCommand(
+			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id);
 
 		await MessengerModule.RequestAsync(joinToConversationCommand, CancellationToken.None);
 		
-		var leaveFromConversationCommand = new LeaveFromConversationCommand(
-			RequestorId: alice.Value.Id,
+		var leaveFromConversationCommand = new LeaveFromChatCommand(
+			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id);
 
 		var conversationAfterLeave = await MessengerModule.RequestAsync(leaveFromConversationCommand, CancellationToken.None);

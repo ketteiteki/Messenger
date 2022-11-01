@@ -1,7 +1,10 @@
-using Messenger.BusinessLogic;
-using Messenger.BusinessLogic.Configuration;
+using Messenger.BusinessLogic.Services;
+using Messenger.Domain.Constants;
+using Messenger.Infrastructure;
+using Messenger.Infrastructure.Configuration;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -15,10 +18,22 @@ public class IntegrationTestBase : IAsyncLifetime
 	protected MessengerModule MessengerModule { get; }
 	
 	private IServiceProvider ServiceProvider { get; }
-	
+
 	protected IntegrationTestBase()
 	{
-		MessengerStartup.Initialize();
+		var pathAppSettingsDevelopment = BaseDirService.GetPathAppSettingsJson(true);
+
+		var configuration = new ConfigurationBuilder()
+			.AddJsonFile(pathAppSettingsDevelopment)
+			.Build();
+
+		var databaseConnectionString = configuration[AppSettingConstants.DatabaseConnectionStringForIntegrationTests];
+		var signKey = configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
+
+		MessengerStartup.Initialize(
+			configuration,
+			databaseConnectionString,
+			signKey);
 
 		ServiceProvider = MessengerCompositionRoot.Provider;
 

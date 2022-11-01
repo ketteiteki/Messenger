@@ -1,36 +1,47 @@
 using Messenger.BusinessLogic.ApiCommands.Auth;
-using Messenger.BusinessLogic.ApiCommands.Conversations;
-using Microsoft.AspNetCore.Http;
 
 namespace Messenger.IntegrationTests.Helpers;
 
 public static class CommandHelper
 {
-	//registraion
-	public static RegistrationCommand Registration21thCommand()
+	//registration
+	public static RegistrationCommand Registration21ThCommand()
 	{
-		return new RegistrationCommand("21th", "ketteiteki", "1234567890");
+		return new RegistrationCommand(
+			DisplayName: "21th",
+			Nickname: "ketteiteki",
+			Password: "1234567890",
+			UserAgent: "Mozilla",
+			Ip: "314.423.215.764");
 	}
 	
 	public static RegistrationCommand RegistrationAliceCommand()
 	{
-		return new RegistrationCommand("alice", "alice123", "3254321f");
+		return new RegistrationCommand(
+			DisplayName: "alice", 
+			Nickname: "alice123", 
+			Password: "3254321f",
+			UserAgent: "Mozilla",
+			Ip: "332.223.242.732");
 	}
 	
 	public static RegistrationCommand RegistrationBobCommand()
 	{
-		return new RegistrationCommand("bob", "bob123", "gbv43rf");
+		return new RegistrationCommand(
+			DisplayName: "bob",
+			Nickname: "bob123",
+			Password: "gbv43rf",
+			UserAgent: "Mozilla",
+			Ip: "534.123.32.53");
 	}
 	
 	public static RegistrationCommand RegistrationAlexCommand()
 	{
-		return new RegistrationCommand("alex", "alex123", "765cs3131");
+		return new RegistrationCommand(
+			DisplayName: "alex", 
+			Nickname: "alex123",
+			Password: "765cs3131",
+			UserAgent: "Mozilla",
+			Ip: "324.768.543.211");
 	}
-	//conversation
-	public static CreateConversationCommand CreateConversationCommand(Guid requesterId, string title, string name,
-		IFormFile? avatarFile)
-	{
-		return new CreateConversationCommand(requesterId, name, title, avatarFile);
-	}
-	
 }
