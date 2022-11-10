@@ -46,7 +46,8 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<Authoriz
 		}
 		
 		var accessToken = _tokenService.CreateAccessToken(
-			requester, _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey]);
+			requester, _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey],
+			int.Parse(_configuration[AppSettingConstants.MessengerAccessTokenLifetimeMinutes]));
 
 		var session = new Session(
 			accessToken: accessToken,

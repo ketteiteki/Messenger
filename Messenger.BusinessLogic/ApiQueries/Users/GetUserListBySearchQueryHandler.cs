@@ -18,6 +18,16 @@ public class GetUserListBySearchQueryHandler : IRequestHandler<GetUserListBySear
 	
 	public async Task<Result<List<UserDto>>> Handle(GetUserListBySearchQuery request, CancellationToken cancellationToken)
 	{
+		if (request.Page < 1 || request.Limit < 1)
+		{
+			return new Result<List<UserDto>>(new BadRequestError("Page and Limit must be greater than 0"));
+		}
+
+		if (request.Limit > 40)
+		{
+			return new Result<List<UserDto>>(new BadRequestError("limit must not be higher than 40"));
+		}
+		
 		var users = await _context.Users
 			.AsNoTracking()
 			.Where(u => u.Id != request.RequesterId)

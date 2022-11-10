@@ -1,6 +1,7 @@
 using MediatR;
 using Messenger.BusinessLogic.ApiQueries.Users;
 using Messenger.BusinessLogic.Models;
+using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,8 @@ public class UsersController : ApiControllerBase
 {
 	public UsersController(IMediator mediator) : base(mediator) {}
 	
-	[ProducesResponseType(typeof(List<UserDto>), 200)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
 	[HttpGet]
 	public async Task<IActionResult> GetUserListBySearch(
 		[FromQuery] string search,
@@ -33,9 +35,10 @@ public class UsersController : ApiControllerBase
 		return await RequestAsync(query, cancellationToken);
 	}
 	
-	[ProducesResponseType(typeof(ErrorModel), 404)]
-	[ProducesResponseType(typeof(UserDto), 200)]
-	[HttpGet("{userId}")]
+	[ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status404NotFound)]
+	[ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
+	[HttpGet("{userId:guid}")]
 	public async Task<IActionResult> GetUser(
 		Guid userId,
 		CancellationToken cancellationToken)

@@ -2,6 +2,7 @@ using MediatR;
 using Messenger.BusinessLogic.ApiCommands.Dialogs;
 using Messenger.BusinessLogic.ApiQueries.Dialogs;
 using Messenger.BusinessLogic.Models;
+using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,9 +16,10 @@ public class DialogsController : ApiControllerBase
 {
     public DialogsController(IMediator mediator) : base(mediator) { }
     
-    [ProducesResponseType(typeof(ErrorModel), 404)]
-    [ProducesResponseType(typeof(ChatDto), 200)]
-    [HttpGet("{userId}")]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
+    [HttpGet("{userId:guid}")]
     public async Task<IActionResult> GetDialog(
         Guid userId,
         CancellationToken cancellationToken)
@@ -31,9 +33,10 @@ public class DialogsController : ApiControllerBase
         return await RequestAsync(query, cancellationToken);
     }
     
-    [ProducesResponseType(typeof(ErrorModel), 409)]
-    [ProducesResponseType(typeof(ErrorModel), 404)]
-    [ProducesResponseType(typeof(ChatDto), 200)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
     [HttpPost("createDialog")]
     public async Task<IActionResult> CreateDialog(
         [FromQuery] Guid userId,
@@ -48,8 +51,9 @@ public class DialogsController : ApiControllerBase
         return await RequestAsync(command, cancellationToken);
     }
     
-    [ProducesResponseType(typeof(ErrorModel), 404)]
-    [ProducesResponseType(typeof(ChatDto), 200)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
     [HttpDelete("deleteDialog")]
     public async Task<IActionResult> DeleteDialog(
         [FromQuery] Guid dialogId, 

@@ -10,7 +10,7 @@ namespace Messenger.Application.Services;
 
 public class TokenService : ITokenService
 {
-    public string CreateAccessToken(User user, string signKey)
+    public string CreateAccessToken(User user, string signKey, int accessTokenLifetimeMinutes)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.Default.GetBytes(signKey);

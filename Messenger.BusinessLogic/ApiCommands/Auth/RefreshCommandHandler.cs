@@ -40,7 +40,8 @@ public class RefreshCommandHandler : IRequestHandler<RefreshCommand, Result<Auth
         }
 
         var accessToken = _tokenService.CreateAccessToken(session.User, 
-            _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey]);
+            _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey],
+            int.Parse(_configuration[AppSettingConstants.MessengerAccessTokenLifetimeMinutes]));
 
         var newSession = new Session(
             accessToken: accessToken,

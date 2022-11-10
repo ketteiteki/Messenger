@@ -2,6 +2,7 @@ using MediatR;
 using Messenger.BusinessLogic.ApiCommands.Profiles;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Models.Requests;
+using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,8 +16,9 @@ public class ProfileController : ApiControllerBase
 {
 	public ProfileController(IMediator mediator) : base(mediator) {}
 	
-	[ProducesResponseType(typeof(ErrorModel), 409)]
-	[ProducesResponseType(typeof(UserDto), 200)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
 	[HttpPut("update")]
 	public async Task<IActionResult> UpdateProfileData(
 		[FromBody] UpdateProfileData request,
@@ -33,7 +35,9 @@ public class ProfileController : ApiControllerBase
 		return await RequestAsync(command, cancellationToken);
 	}
 
-	[ProducesResponseType(typeof(UserDto), 200)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
 	[HttpPut("updateAvatar")]
 	public async Task<IActionResult> UpdateProfileAvatar(
 		[FromForm] UpdateProfileAvatar request,
@@ -48,26 +52,13 @@ public class ProfileController : ApiControllerBase
 		return await RequestAsync(command, cancellationToken);
 	}
 
-	[ProducesResponseType(typeof(UserDto), 200)]
+	[ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
 	[HttpDelete("deleteProfile")]
 	public async Task<IActionResult> DeleteProfile(CancellationToken cancellationToken)
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
 		var command = new DeleteProfileCommand(
-			RequesterId: requesterId);
-			
-		return await RequestAsync(command, cancellationToken);
-	}
-	
-	[ProducesResponseType(typeof(UserDto), 403)]
-	[ProducesResponseType(typeof(UserDto), 200)]
-	[HttpDelete("deleteProfileAvatar")]
-	public async Task<IActionResult> DeleteProfileAvatar(CancellationToken cancellationToken)
-	{
-		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
-
-		var command = new DeleteProfileAvatarCommand(
 			RequesterId: requesterId);
 			
 		return await RequestAsync(command, cancellationToken);

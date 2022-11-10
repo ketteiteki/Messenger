@@ -45,7 +45,8 @@ public class AuthorizationCommandHandler : IRequestHandler<AuthorizationCommand,
 		}
 		
 		var accessToken = _tokenService.CreateAccessToken(requester,
-			_configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey]);
+			_configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey],
+			int.Parse(_configuration[AppSettingConstants.MessengerAccessTokenLifetimeMinutes]));
 
 		session.AccessToken = accessToken;
 

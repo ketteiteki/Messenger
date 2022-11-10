@@ -3,6 +3,7 @@ using Messenger.BusinessLogic.ApiCommands.Messages;
 using Messenger.BusinessLogic.ApiQueries.Messages;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Models.Requests;
+using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,9 +17,9 @@ public class MessagesController : ApiControllerBase
 {
 	public MessagesController(IMediator mediator) : base(mediator) {}
 	
-	[ProducesResponseType(typeof(ErrorModel), 403)]
-	[ProducesResponseType(typeof(ErrorModel), 400)]
-	[ProducesResponseType(typeof(List<MessageDto>), 200)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(List<MessageDto>), StatusCodes.Status200OK)]
 	[HttpGet]
 	public async Task<IActionResult> GetMessageList(
 		[FromQuery] Guid chatId, 
@@ -37,9 +38,9 @@ public class MessagesController : ApiControllerBase
 		return await RequestAsync(query, cancellationToken);
 	}
 	
-	[ProducesResponseType(typeof(ErrorModel), 403)]
-	[ProducesResponseType(typeof(ErrorModel), 400)]
-	[ProducesResponseType(typeof(List<MessageDto>), 200)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(List<MessageDto>), StatusCodes.Status200OK)]
 	[HttpGet("search")]
 	public async Task<IActionResult> GetMessageListBySearch(
 		[FromQuery] Guid chatId, 
@@ -59,10 +60,12 @@ public class MessagesController : ApiControllerBase
 		return await RequestAsync(query, cancellationToken);
 	}
 	
-	[ProducesResponseType(typeof(ErrorModel), 403)]
-	[ProducesResponseType(typeof(MessageDto), 200)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(MessageDto), StatusCodes.Status200OK)]
 	[HttpPost("createMessage")]
-	public async Task<IActionResult> CreateMessage([FromForm] CreateMessageRequest request,
+	public async Task<IActionResult> CreateMessage(
+		[FromForm] CreateMessageRequest request,
 		CancellationToken cancellationToken)
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
@@ -77,9 +80,10 @@ public class MessagesController : ApiControllerBase
 		return await RequestAsync(command, cancellationToken);
 	}
 	
-	[ProducesResponseType(typeof(ErrorModel), 404)]
-	[ProducesResponseType(typeof(ErrorModel), 403)]
-	[ProducesResponseType(typeof(MessageDto), 200)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(MessageDto), StatusCodes.Status200OK)]
 	[HttpPut("updateMessage")]
 	public async Task<IActionResult> UpdateMessage(
 		[FromBody] UpdateMessageRequest request, 
@@ -95,10 +99,11 @@ public class MessagesController : ApiControllerBase
 		return await RequestAsync(command, cancellationToken);
 	}
 	
-	[ProducesResponseType(typeof(ErrorModel), 404)]
-	[ProducesResponseType(typeof(ErrorModel), 403)]
-	[ProducesResponseType(typeof(MessageDto), 200)]
-	[HttpDelete("{messageId}")]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(MessageDto), StatusCodes.Status200OK)]
+	[HttpDelete("{messageId:guid}")]
 	public async Task<IActionResult> DeleteMessage(
 		Guid messageId,
 		[FromQuery] bool isDeleteForAll,

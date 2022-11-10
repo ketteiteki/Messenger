@@ -8,7 +8,6 @@ public class UpdateProfileAvatarCommandValidator : AbstractValidator<UpdateProfi
     public UpdateProfileAvatarCommandValidator()
     {
         RuleFor(x => x.AvatarFile)
-            .NotNull()
             .SetValidator(new ImageValidator());
     }
 }
