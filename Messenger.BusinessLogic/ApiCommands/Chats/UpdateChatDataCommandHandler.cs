@@ -1,26 +1,29 @@
 using MediatR;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
+using Messenger.Domain.Enum;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace Messenger.BusinessLogic.ApiCommands.Conversations;
+namespace Messenger.BusinessLogic.ApiCommands.Chats;
 
-public class UpdateConversationCommandHandler : IRequestHandler<UpdateConversationCommand, Result<ChatDto>>
+public class UpdateChatDataCommandHandler : IRequestHandler<UpdateChatDataCommand, Result<ChatDto>>
 {
 	private readonly DatabaseContext _context;
 
-	public UpdateConversationCommandHandler(DatabaseContext context)
+	public UpdateChatDataCommandHandler(DatabaseContext context)
 	{
 		_context = context;
 	}
 	
-	public async Task<Result<ChatDto>> Handle(UpdateConversationCommand request, CancellationToken cancellationToken)
+	public async Task<Result<ChatDto>> Handle(UpdateChatDataCommand request, CancellationToken cancellationToken)
 	{
 		var chatUserByRequester = await _context.ChatUsers
 			.Include(c => c.Chat)
 			.Include(c => c.Role)
-			.FirstOrDefaultAsync(r => r.UserId == request.RequesterId && r.ChatId == request.ChatId, cancellationToken);
+			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId &&
+			                          c.ChatId == request.ChatId && 
+			                          c.Chat.Type != ChatType.Dialog, cancellationToken);
 
 		if (chatUserByRequester == null)
 		{
@@ -37,7 +40,7 @@ public class UpdateConversationCommandHandler : IRequestHandler<UpdateConversati
 
 				if (conversationByName != null && conversationByName.Id != chatUserByRequester.Chat.Id)
 				{
-					return new Result<ChatDto>(new DbEntityExistsError("Conversation with that name already exists"));
+					return new Result<ChatDto>(new DbEntityExistsError("Chat with that name already exists"));
 				}
 			
 				chatUserByRequester.Chat.Name = request.Name;
@@ -66,6 +69,6 @@ public class UpdateConversationCommandHandler : IRequestHandler<UpdateConversati
 				});
 		}
 		
-		return new Result<ChatDto>(new ForbiddenError("It is forbidden to update someone else's conversation"));
+		return new Result<ChatDto>(new ForbiddenError("It is forbidden to update someone else's chat"));
 	}
 }

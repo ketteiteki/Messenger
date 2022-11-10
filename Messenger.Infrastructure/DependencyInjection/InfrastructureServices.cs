@@ -14,6 +14,8 @@ public static class InfrastructureServices
 		
 		serviceCollection.AddMediator();
 
+		serviceCollection.AddSignalR();
+		
 		return serviceCollection;
 	}
 }

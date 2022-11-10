@@ -6,7 +6,7 @@ using Messenger.IntegrationTests.Helpers;
 using Microsoft.AspNetCore.Http;
 using Xunit;
 
-namespace Messenger.IntegrationTests.ApiCommands.DeleteProfileAvatarCommandHandlerTests;
+namespace Messenger.IntegrationTests.ApiCommands.UpdateProfileAvatarCommandHandlerTests;
 
 public class DeleteProfileAvatarTestSuccess : IntegrationTestBase, IIntegrationTest
 {
@@ -18,7 +18,7 @@ public class DeleteProfileAvatarTestSuccess : IntegrationTestBase, IIntegrationT
         await using var fileStream = new FileStream(
             Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
 
-        var updateProfileAvatarResult = await MessengerModule.RequestAsync(new UpdateProfileAvatarCommand(
+        var firstUpdateProfileAvatarResult = await MessengerModule.RequestAsync(new UpdateProfileAvatarCommand(
             RequesterId: user21Th.Value.Id,
             AvatarFile: new FormFile(
                 baseStream: fileStream,
@@ -27,13 +27,14 @@ public class DeleteProfileAvatarTestSuccess : IntegrationTestBase, IIntegrationT
                 name: "qwerty",
                 fileName: "qwerty.jpg")), CancellationToken.None);
 
-        var deleteProfileAvatarResult = await MessengerModule.RequestAsync(new DeleteProfileAvatarCommand(
-            RequesterId: user21Th.Value.Id), CancellationToken.None);
+        var secondUpdateProfileAvatarResult = await MessengerModule.RequestAsync(new UpdateProfileAvatarCommand(
+            RequesterId: user21Th.Value.Id,
+            AvatarFile: null), CancellationToken.None);
 
-        deleteProfileAvatarResult.IsSuccess.Should().BeTrue();
+        secondUpdateProfileAvatarResult.IsSuccess.Should().BeTrue();
 
         File.Exists(Path.Combine(
-            BaseDirService.GetPathWwwRoot(), updateProfileAvatarResult.Value.AvatarLink.Split("/")[^1]))
+            BaseDirService.GetPathWwwRoot(), firstUpdateProfileAvatarResult.Value.AvatarLink.Split("/")[^1]))
             .Should().BeFalse();
     }
 }

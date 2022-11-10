@@ -43,13 +43,13 @@ public class UpdateConversationDataTestSuccess : IntegrationTestBase, IIntegrati
 
 		await MessengerModule.RequestAsync(createRoleAliceCommand, CancellationToken.None);
 		
-		var updateConversationBy21ThCommand = new UpdateConversationCommand(
+		var updateConversationBy21ThCommand = new UpdateChatDataCommand(
 			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			Name: "21thName",
 			Title: "21thTitle");
 		
-		var updateConversationByAliceCommand =new UpdateConversationCommand(
+		var updateConversationByAliceCommand =new UpdateChatDataCommand(
 			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id,
 			Name: "AliceName",

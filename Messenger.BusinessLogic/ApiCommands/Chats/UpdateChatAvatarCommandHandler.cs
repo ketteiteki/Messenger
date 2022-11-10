@@ -4,31 +4,34 @@ using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Constants;
+using Messenger.Domain.Enum;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace Messenger.BusinessLogic.ApiCommands.Conversations;
+namespace Messenger.BusinessLogic.ApiCommands.Chats;
 
-public class UpdateConversationAvatarCommandHandler : IRequestHandler<UpdateConversationAvatarCommand, Result<ChatDto>>
+public class UpdateChatAvatarCommandHandler : IRequestHandler<UpdateChatAvatarCommand, Result<ChatDto>>
 {
 	private readonly DatabaseContext _context;
 	private readonly IFileService _fileService;
 	private readonly IConfiguration _configuration;
 	
-	public UpdateConversationAvatarCommandHandler(DatabaseContext context, IFileService fileService, IConfiguration configuration)
+	public UpdateChatAvatarCommandHandler(DatabaseContext context, IFileService fileService, IConfiguration configuration)
 	{
 		_context = context;
 		_fileService = fileService;
 		_configuration = configuration;
 	}
 	
-	public async Task<Result<ChatDto>> Handle(UpdateConversationAvatarCommand request, CancellationToken cancellationToken)
+	public async Task<Result<ChatDto>> Handle(UpdateChatAvatarCommand request, CancellationToken cancellationToken)
 	{
 		var chatUserByRequester = await _context.ChatUsers
 			.Include(c => c.Chat)
 			.Include(c => c.Role)
-			.FirstOrDefaultAsync(r => r.UserId == request.RequesterId && r.ChatId == request.ChatId, cancellationToken);
+			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && 
+			                          c.ChatId == request.ChatId &&
+			                          c.Chat.Type != ChatType.Dialog, cancellationToken);
 
 		if (chatUserByRequester == null)
 		{
@@ -73,6 +76,6 @@ public class UpdateConversationAvatarCommandHandler : IRequestHandler<UpdateConv
 				});
 		}
 		
-		return new Result<ChatDto>(new ForbiddenError("It is forbidden to update someone else's conversation"));
+		return new Result<ChatDto>(new ForbiddenError("It is forbidden to update someone else's chat"));
 	}
 }

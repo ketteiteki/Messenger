@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace Messenger.BusinessLogic.Models.Requests;
 
-public class UpdateConversationAvatarRequest
+public class UpdateChatAvatarRequest
 {
     public Guid ChatId { get; set; }
 
-    public IFormFile Avatar { get; set; }
+    public IFormFile AvatarFile { get; set; }
 }

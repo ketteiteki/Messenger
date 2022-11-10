@@ -47,7 +47,7 @@ public class UpdateConversationAvatarTestSuccess : IntegrationTestBase, IIntegra
 
 		await using var fileStream = new FileStream(Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
 		
-		var updateAvatarConversationBy21ThCommand = new UpdateConversationAvatarCommand(
+		var updateAvatarConversationBy21ThCommand = new UpdateChatAvatarCommand(
 			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			AvatarFile: new FormFile(
@@ -57,7 +57,7 @@ public class UpdateConversationAvatarTestSuccess : IntegrationTestBase, IIntegra
 				name: "qwerty",
 				fileName: "qwerty.jpg"));
 		
-		var updateAvatarConversationByAliceCommand =new UpdateConversationAvatarCommand(
+		var updateAvatarConversationByAliceCommand =new UpdateChatAvatarCommand(
 			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id,
 			AvatarFile: new FormFile(

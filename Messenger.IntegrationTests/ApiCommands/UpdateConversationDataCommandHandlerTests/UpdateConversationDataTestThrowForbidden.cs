@@ -31,7 +31,7 @@ public class UpdateConversationDataTestThrowForbidden : IntegrationTestBase, IIn
 			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id), CancellationToken.None);
 		
-		var updateConversationByAliceCommand =new UpdateConversationCommand(
+		var updateConversationByAliceCommand =new UpdateChatDataCommand(
 			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id,
 			Name: "AliceName",

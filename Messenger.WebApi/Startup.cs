@@ -1,3 +1,4 @@
+using Messenger.BusinessLogic.Hubs;
 using Messenger.Domain.Constants;
 using Messenger.Infrastructure.DependencyInjection;
 using Messenger.Infrastructure.Middlewares;
@@ -57,7 +58,11 @@ public class Startup
         applicationBuilder.UseAuthorization();
         
         applicationBuilder.UseMiddleware<ValidationMiddleware>();
-
-        applicationBuilder.UseEndpoints(options => { options.MapControllers(); });
+        
+        applicationBuilder.UseEndpoints(options =>
+        {
+            options.MapHub<ChatHub>("/chatHub");
+            options.MapControllers();
+        });
     }
 }

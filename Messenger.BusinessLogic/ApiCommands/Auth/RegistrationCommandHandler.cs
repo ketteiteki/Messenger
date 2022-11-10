@@ -45,7 +45,8 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 			avatarLink: null);
 
 		var accessToken = _tokenService.CreateAccessToken(newUser,
-			_configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey]);
+			_configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey],
+			int.Parse(_configuration[AppSettingConstants.MessengerAccessTokenLifetimeMinutes]));
 		
 		var session = new Session(
 			accessToken: accessToken,

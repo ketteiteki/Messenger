@@ -3,9 +3,9 @@ using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Microsoft.AspNetCore.Http;
 
-namespace Messenger.BusinessLogic.ApiCommands.Conversations;
+namespace Messenger.BusinessLogic.ApiCommands.Chats;
 
-public record UpdateConversationAvatarCommand(
+public record UpdateChatAvatarCommand(
 		Guid RequesterId, 
 		Guid ChatId, 
 		IFormFile AvatarFile) 

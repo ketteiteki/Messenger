@@ -34,7 +34,7 @@ public class UpdateConversationAvatarTestThrowForbidden : IntegrationTestBase, I
 		
 		await using var fileStream = new FileStream(Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
 		
-		var updateAvatarConversationByAliceCommand =new UpdateConversationAvatarCommand(
+		var updateAvatarConversationByAliceCommand =new UpdateChatAvatarCommand(
 			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id,
 			AvatarFile: new FormFile(
