@@ -17,7 +17,7 @@ public class UsersController : ApiControllerBase
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
-	[HttpGet]
+	[HttpGet("search")]
 	public async Task<IActionResult> GetUserListBySearch(
 		[FromQuery] string search,
 		CancellationToken cancellationToken, 
@@ -29,6 +29,27 @@ public class UsersController : ApiControllerBase
 		var query = new GetUserListBySearchQuery(
 			RequesterId: requesterId,
 			SearchText: search,
+			Limit: limit,
+			Page: page);
+		
+		return await RequestAsync(query, cancellationToken);
+	}
+	
+	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
+	[HttpGet("chat/{chatId:guid}")]
+	public async Task<IActionResult> GetUserListByChat(
+		Guid chatId,
+		CancellationToken cancellationToken, 
+		[FromQuery] int limit = 10, 
+		[FromQuery] int page = 1)
+	{
+		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
+		
+		var query = new GetUserListByChatQuery(
+			RequesterId: requesterId,
+			ChatId: chatId,
 			Limit: limit,
 			Page: page);
 		

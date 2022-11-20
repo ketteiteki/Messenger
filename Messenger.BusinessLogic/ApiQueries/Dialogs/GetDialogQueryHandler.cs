@@ -32,6 +32,11 @@ public class GetDialogQueryHandler : IRequestHandler<GetDialogQuery, Result<Chat
 				Title = chatUser2.Chat.Title,
 				Type = chatUser2.Chat.Type,
 				AvatarLink = chatUser2.User.AvatarLink,
+				LastMessageId = chatUser2.Chat.LastMessageId,
+				LastMessageText = chatUser2.Chat.LastMessage != null ? chatUser2.Chat.LastMessage.Text : null,
+				LastMessageAuthorDisplayName = chatUser2.Chat.LastMessage != null && chatUser2.Chat.LastMessage.Owner != null ? 
+					chatUser2.Chat.LastMessage.Owner.DisplayName : null,
+				LastMessageDateOfCreate = chatUser2.Chat.LastMessage != null ? chatUser2.Chat.LastMessage.DateOfCreate : null,
 				MembersCount = 2,
 				IsMember = true,
 				CanSendMedia = true,

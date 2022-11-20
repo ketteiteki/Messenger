@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Messenger.WebApi.Controllers;
 
-[Route("[controller]")]
+[Route("api/[controller]")]
 [Authorize]
 [ApiController]
 public class DialogsController : ApiControllerBase

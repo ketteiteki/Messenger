@@ -1,3 +1,4 @@
+using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -27,5 +28,50 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
 		
 		builder.Property(x => x.ChatId).IsRequired();
 		builder.Property(x => x.OwnerId).IsRequired();
+
+		var dotnetChatMessageByBob = new Message(
+			ownerId: SeedDataConstants.BobUserId,
+			chatId: SeedDataConstants.DotnetChatId,
+			text: "привет, какие книжки почитать?",
+			replyToMessageId: null)
+		{
+			Id = Guid.NewGuid()
+		};;
+		
+		var dotnetChatMessageByKaminome1 = new Message(
+			ownerId: SeedDataConstants.KaminomeUserId,
+			chatId: SeedDataConstants.DotnetChatId,
+			text: "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться...",
+			replyToMessageId: dotnetChatMessageByBob.Id)
+		{
+			Id = Guid.NewGuid()
+		};
+		
+		var dotnetChatMessageByAlice = new Message(
+			ownerId: SeedDataConstants.AliceUserId,
+			chatId: SeedDataConstants.DotnetChatId,
+			text: "ладно",
+			replyToMessageId: dotnetChatMessageByKaminome1.Id);
+
+		var dotnetChatMessageByKaminome2 = new Message(
+			ownerId: SeedDataConstants.KaminomeUserId,
+			chatId: SeedDataConstants.DotnetChatId,
+			text: "ага",
+			replyToMessageId: null);
+
+		var dialogKaminomeAliceMessageByKaminome = new Message(
+			ownerId: SeedDataConstants.KaminomeUserId,
+			chatId: SeedDataConstants.DialogKaminomeAliceChatId,
+			replyToMessageId: null,
+			text: "привет");
+		
+		var dialogKaminomeAliceMessageByAlice = new Message(
+			ownerId: SeedDataConstants.KaminomeUserId,
+			chatId: SeedDataConstants.DialogKaminomeAliceChatId,
+			replyToMessageId: null,
+			text: "привет, как дела?");
+
+		builder.HasData(dotnetChatMessageByBob, dotnetChatMessageByKaminome1, dotnetChatMessageByAlice,
+			dotnetChatMessageByKaminome2, dialogKaminomeAliceMessageByKaminome, dialogKaminomeAliceMessageByAlice);
 	}
 }

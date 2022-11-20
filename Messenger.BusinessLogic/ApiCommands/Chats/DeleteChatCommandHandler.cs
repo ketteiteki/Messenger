@@ -22,7 +22,9 @@ public class DeleteChatCommandHandler : IRequestHandler<DeleteChatCommand, Resul
 	
     public async Task<Result<ChatDto>> Handle(DeleteChatCommand request, CancellationToken cancellationToken)
     {
-        var chat = await _context.Chats.FirstOrDefaultAsync(c => c.Id == request.ChatId, CancellationToken.None);
+        var chat = await _context.Chats
+            .Include(c => c.LastMessage)
+            .FirstOrDefaultAsync(c => c.Id == request.ChatId, CancellationToken.None);
 
         if (chat == null)
         {
@@ -53,7 +55,12 @@ public class DeleteChatCommandHandler : IRequestHandler<DeleteChatCommand, Resul
                 Id = chat.Id,
                 Name = chat.Name,
                 Title = chat.Title,
-                Type = chat.Type
+                Type = chat.Type,
+                LastMessageId = chat.LastMessageId,
+                LastMessageText = chat.LastMessage?.Text,
+                LastMessageAuthorDisplayName = chat.LastMessage is { Owner: { } } ? 
+                    chat.LastMessage.Owner.DisplayName : null,
+                LastMessageDateOfCreate = chat.LastMessage?.DateOfCreate,
             });
     }
 }

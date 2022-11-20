@@ -215,6 +215,12 @@ namespace Messenger.Services.Migrations
                         principalTable: "ChatUsers",
                         principalColumns: new[] { "ChatId", "UserId" },
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RoleUserByChats_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -240,6 +246,83 @@ namespace Messenger.Services.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Chats",
+                columns: new[] { "Id", "AvatarLink", "LastMessageId", "Name", "OwnerId", "Title", "Type" },
+                values: new object[] { new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), null, null, null, null, null, 0 });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "AvatarLink", "Bio", "DisplayName", "Nickname", "PasswordHash", "PasswordSalt" },
+                values: new object[,]
+                {
+                    { new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "the best account", "kami no me", "kaminome", "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==", "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI=" },
+                    { new Guid("9f40e295-8b43-4329-b37e-d267deee6c4a"), null, "why alex?", "alex", "alex123", "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==", "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI=" },
+                    { new Guid("a85825ba-f99b-4177-a858-96384303ea14"), null, "I'm Bob", "bob", "bob123", "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==", "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI=" },
+                    { new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), null, "cool status", "alice", "alice123", "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==", "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI=" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ChatUsers",
+                columns: new[] { "ChatId", "UserId", "CanSendMedia", "MuteDateOfExpire" },
+                values: new object[,]
+                {
+                    { new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), true, null },
+                    { new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), true, null }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Chats",
+                columns: new[] { "Id", "AvatarLink", "LastMessageId", "Name", "OwnerId", "Title", "Type" },
+                values: new object[,]
+                {
+                    { new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), null, null, "DotNetRuChat", new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), "DotNetRuChat", 1 },
+                    { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), null, null, ".NET Talks", new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), "dotnettalks", 1 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Messages",
+                columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
+                values: new object[,]
+                {
+                    { new Guid("0a388196-a5f7-4543-8bce-0ebf43e7f121"), new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(1640), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "привет, как дела?" },
+                    { new Guid("29cac846-6a85-42e0-a6a5-bc65deac5d30"), new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(1396), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "привет" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ChatUsers",
+                columns: new[] { "ChatId", "UserId", "CanSendMedia", "MuteDateOfExpire" },
+                values: new object[,]
+                {
+                    { new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), true, null },
+                    { new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new Guid("9f40e295-8b43-4329-b37e-d267deee6c4a"), true, null },
+                    { new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new Guid("a85825ba-f99b-4177-a858-96384303ea14"), true, null },
+                    { new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), true, null },
+                    { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), true, null },
+                    { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), new Guid("9f40e295-8b43-4329-b37e-d267deee6c4a"), true, null },
+                    { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), new Guid("a85825ba-f99b-4177-a858-96384303ea14"), true, null },
+                    { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), true, null }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Messages",
+                columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
+                values: new object[,]
+                {
+                    { new Guid("68c46e0b-0154-452f-a734-c41478e1ce8e"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(1098), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "ага" },
+                    { new Guid("a3238371-f947-4868-83d2-46d5e3c236e8"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2022, 11, 20, 7, 15, 21, 67, DateTimeKind.Utc).AddTicks(9787), false, new Guid("a85825ba-f99b-4177-a858-96384303ea14"), null, "привет, какие книжки почитать?" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Messages",
+                columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
+                values: new object[] { new Guid("40870318-f26f-4834-98af-389ed8ddcfa4"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(413), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), new Guid("a3238371-f947-4868-83d2-46d5e3c236e8"), "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться..." });
+
+            migrationBuilder.InsertData(
+                table: "Messages",
+                columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
+                values: new object[] { new Guid("03c48c52-42ed-405d-b3ee-7e22ba25c0aa"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(662), false, new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), new Guid("40870318-f26f-4834-98af-389ed8ddcfa4"), "ладно" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attachments_MessageId",
@@ -292,6 +375,11 @@ namespace Messenger.Services.Migrations
                 table: "Messages",
                 column: "ReplyToMessageId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoleUserByChats_UserId",
+                table: "RoleUserByChats",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sessions_UserId",

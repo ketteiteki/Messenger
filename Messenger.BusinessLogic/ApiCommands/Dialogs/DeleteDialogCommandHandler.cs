@@ -21,6 +21,7 @@ public class DeleteDialogCommandHandler : IRequestHandler<DeleteDialogCommand, R
 	{
 		var chatUser = await _context.ChatUsers
 			.Include(c => c.Chat)
+			.ThenInclude(c => c.Owner)
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUser == null)
@@ -55,6 +56,12 @@ public class DeleteDialogCommandHandler : IRequestHandler<DeleteDialogCommand, R
 					Title = chatUser.Chat.Title,
 					Type = chatUser.Chat.Type,
 					AvatarLink = null,
+					LastMessageId = chatUser.Chat.LastMessageId,
+					LastMessageText = chatUser.Chat.LastMessage?.Text,
+					LastMessageAuthorDisplayName = chatUser.Chat.LastMessage != null && 
+					                               chatUser.Chat.LastMessage.Owner != null ?
+						chatUser.Chat.LastMessage.Owner.DisplayName : null,
+					LastMessageDateOfCreate = chatUser.Chat.LastMessage?.DateOfCreate,
 					MembersCount = 2,
 					CanSendMedia = false,
 					IsMember = false
@@ -78,6 +85,12 @@ public class DeleteDialogCommandHandler : IRequestHandler<DeleteDialogCommand, R
 				Title = chatUser.Chat.Title,
 				Type = chatUser.Chat.Type,
 				AvatarLink = null,
+				LastMessageId = chatUser.Chat.LastMessageId,
+				LastMessageText = chatUser.Chat.LastMessage?.Text,
+				LastMessageAuthorDisplayName = chatUser.Chat.LastMessage != null && 
+				                               chatUser.Chat.LastMessage.Owner != null ?
+					chatUser.Chat.LastMessage.Owner.DisplayName : null,
+				LastMessageDateOfCreate = chatUser.Chat.LastMessage?.DateOfCreate,
 				MembersCount = 2,
 				CanSendMedia = false,
 				IsMember = false

@@ -19,11 +19,11 @@ public class JoinToChatCommandHandler : IRequestHandler<JoinToChatCommand, Resul
 
 	public async Task<Result<ChatDto>> Handle(JoinToChatCommand request, CancellationToken cancellationToken)
 	{
-		var conversation = await _context.Chats
+		var chat = await _context.Chats
 			.Where(c => c.Type != ChatType.Dialog)
 			.FirstOrDefaultAsync(c => c.Id == request.ChatId, cancellationToken);
 
-		if (conversation == null) return new Result<ChatDto>(new DbEntityNotFoundError("Chat not found"));
+		if (chat == null) return new Result<ChatDto>(new DbEntityNotFoundError("Chat not found"));
 		
 		var chatUser = await _context.ChatUsers
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
@@ -47,17 +47,20 @@ public class JoinToChatCommandHandler : IRequestHandler<JoinToChatCommand, Resul
 		_context.ChatUsers.Add(newChatUser);
 		await _context.SaveChangesAsync(cancellationToken);
 
-		await _context.Entry(newChatUser).Reference(c => c.Chat).LoadAsync(cancellationToken);
-		
 		return new Result<ChatDto>(
 			new ChatDto
 			{
-				Id = newChatUser.ChatId,
-				Name = newChatUser.Chat.Name,
-				Title = newChatUser.Chat.Title,
-				Type = newChatUser.Chat.Type,
-				AvatarLink = newChatUser.Chat.AvatarLink,
-				IsOwner = newChatUser.Chat.OwnerId == request.RequesterId,
+				Id = chat.Id,
+				Name = chat.Name,
+				Title = chat.Title,
+				Type = chat.Type,
+				AvatarLink = chat.AvatarLink,
+				LastMessageId = chat.LastMessageId,
+				LastMessageText = chat.LastMessage?.Text,
+				LastMessageAuthorDisplayName = chat.LastMessage != null && chat.LastMessage.Owner != null ?
+					chat.LastMessage.Owner.DisplayName : null,
+				LastMessageDateOfCreate = chat.LastMessage?.DateOfCreate,
+				IsOwner = chat.OwnerId == request.RequesterId,
 				IsMember = true,
 				MuteDateOfExpire = newChatUser.MuteDateOfExpire,
 				BanDateOfExpire = null,

@@ -8,5 +8,5 @@ public record BanUserInConversationCommand(
 		Guid RequesterId,
 		Guid ChatId,
 		Guid UserId,
-		DateTime BanDateOfExpire)
+		int BanMinutes)
 	: IRequest<Result<UserDto>>;

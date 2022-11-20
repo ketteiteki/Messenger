@@ -36,7 +36,7 @@ public class JoinToChatTestThrowForbidden : IntegrationTestBase, IIntegrationTes
             RequesterId: user21Th.Value.Id,
             ChatId: conversation.Value.Id,
             UserId: alice.Value.Id,
-            DateTime.UtcNow.AddDays(2));
+            BanMinutes: 15);
 
         await MessengerModule.RequestAsync(banUserAliceInConversationBy21ThCommand, CancellationToken.None);
         

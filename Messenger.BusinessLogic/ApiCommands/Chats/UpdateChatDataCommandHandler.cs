@@ -20,6 +20,7 @@ public class UpdateChatDataCommandHandler : IRequestHandler<UpdateChatDataComman
 	{
 		var chatUserByRequester = await _context.ChatUsers
 			.Include(c => c.Chat)
+			.ThenInclude(c => c.Owner)
 			.Include(c => c.Role)
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId &&
 			                          c.ChatId == request.ChatId && 
@@ -59,6 +60,12 @@ public class UpdateChatDataCommandHandler : IRequestHandler<UpdateChatDataComman
 					Title =  chatUserByRequester.Chat.Title,
 					Type =  chatUserByRequester.Chat.Type,
 					AvatarLink =  chatUserByRequester.Chat.AvatarLink,
+					LastMessageId = chatUserByRequester.Chat.LastMessageId,
+					LastMessageText = chatUserByRequester.Chat.LastMessage?.Text,
+					LastMessageAuthorDisplayName = chatUserByRequester.Chat.LastMessage != null && 
+					                               chatUserByRequester.Chat.LastMessage.Owner != null ?
+						chatUserByRequester.Chat.LastMessage.Owner.DisplayName : null,
+					LastMessageDateOfCreate = chatUserByRequester.Chat.LastMessage?.DateOfCreate,
 					MembersCount =  chatUserByRequester.Chat.ChatUsers.Count,
 					CanSendMedia = chatUserByRequester.CanSendMedia,
 					IsOwner =  chatUserByRequester.Chat.OwnerId == request.RequesterId,

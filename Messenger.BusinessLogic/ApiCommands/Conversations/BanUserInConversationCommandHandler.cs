@@ -18,9 +18,9 @@ public class BanUserInConversationCommandHandler : IRequestHandler<BanUserInConv
 	
 	public async Task<Result<UserDto>> Handle(BanUserInConversationCommand request, CancellationToken cancellationToken)
 	{
-		if (DateTime.UtcNow > request.BanDateOfExpire)
+		if (request.BanMinutes <= 0)
 		{
-			return new Result<UserDto>(new BadRequestError("The ban time must be longer than the current time"));
+			return new Result<UserDto>(new BadRequestError("The ban minutes must be greater than 0"));
 		}
 
 		var chatUserByRequester = await _context.ChatUsers
@@ -48,7 +48,7 @@ public class BanUserInConversationCommandHandler : IRequestHandler<BanUserInConv
 			{
 				UserId = request.UserId, 
 				ChatId = request.ChatId, 
-				BanDateOfExpire = request.BanDateOfExpire
+				BanDateOfExpire = DateTime.UtcNow.AddMinutes(request.BanMinutes)
 			});
 			
 			_context.ChatUsers.Remove(chatUser);
