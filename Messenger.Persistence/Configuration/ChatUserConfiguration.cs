@@ -69,12 +69,6 @@ public class ChatUserConfiguration : IEntityTypeConfiguration<ChatUser>
 			ChatId = SeedDataConstants.DotnetFloodChatId
 		};
 		
-		var dotnetFloodChatAlex = new ChatUser()
-		{
-			UserId = SeedDataConstants.AlexUserId,
-			ChatId = SeedDataConstants.DotnetFloodChatId
-		};
-		
 		var dialogKamimomeAliceForKaminome = new ChatUser()
 		{
 			UserId = SeedDataConstants.KaminomeUserId,
@@ -88,7 +82,7 @@ public class ChatUserConfiguration : IEntityTypeConfiguration<ChatUser>
 		};
 
 		builder.HasData(dotnetChatKaminome, dotnetChatAlice, dotnetChatBob, dotnetChatAlex,
-			dotnetFloodChatKaminome, dotnetFloodChatAlice, dotnetFloodChatBob, dotnetFloodChatAlex,
+			dotnetFloodChatKaminome, dotnetFloodChatAlice, dotnetFloodChatBob,
 			dialogKamimomeAliceForAlice, dialogKamimomeAliceForKaminome);
 	}
 }

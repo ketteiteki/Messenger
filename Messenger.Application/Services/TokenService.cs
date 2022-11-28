@@ -23,7 +23,7 @@ public class TokenService : ITokenService
         };
 
         var jwtToken = new JwtSecurityToken(
-            expires: DateTime.UtcNow.AddMinutes(15),
+            expires: DateTime.UtcNow.AddMinutes(accessTokenLifetimeMinutes),
             claims: claims,
             signingCredentials: new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256));

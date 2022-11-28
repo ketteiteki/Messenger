@@ -1,23 +1,27 @@
 using MediatR;
 using Messenger.Application.Interfaces;
+using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Entities;
 using Messenger.Services;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.BusinessLogic.ApiCommands.Messages;
 
 public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand, Result<MessageDto>>
 {
+	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 	private readonly DatabaseContext _context;
 	private readonly IFileService _fileService;
 
-	public DeleteMessageCommandHandler(DatabaseContext context, IFileService fileService)
+	public DeleteMessageCommandHandler(DatabaseContext context, IFileService fileService, IHubContext<ChatHub, IChatHub> hubContext)
 	{
 		_context = context;
 		_fileService = fileService;
+		_hubContext = hubContext;
 	}
 	
 	public async Task<Result<MessageDto>> Handle(DeleteMessageCommand request, CancellationToken cancellationToken)
@@ -68,9 +72,26 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 				MessageId = message.Id,
 				UserId = request.RequesterId
 			};
+
+			var lastMessageNow = await _context.Messages
+				.Include(m => m.Owner)
+				.Where(m => m.ChatId == message.ChatId && m.Id != message.Id)
+				.OrderBy(m => m.DateOfCreate)
+				.LastAsync(cancellationToken);
 			
 			_context.DeletedMessageByUsers.Add(deletedMessageByUser);
 			await _context.SaveChangesAsync(cancellationToken);
+
+			var messageDeleteNotification = new MessageDeleteNotificationDto()
+			{
+				MessageId = message.Id,
+				NewLastMessageId = lastMessageNow.Id,
+				NewLastMessageText = lastMessageNow.Text,
+				NewLastMessageAuthorDisplayName = lastMessageNow.Owner?.DisplayName,
+				NewLastMessageDateOfCreate = lastMessageNow.DateOfCreate
+			};
+			
+			await _hubContext.Clients.Group(message.ChatId.ToString()).DeleteMessageAsync(messageDeleteNotification);
 			
 			return new Result<MessageDto>(
 				new MessageDto

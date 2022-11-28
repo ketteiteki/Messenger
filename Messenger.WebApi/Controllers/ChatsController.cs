@@ -118,7 +118,7 @@ public class ChatsController : ApiControllerBase
 	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
 	[HttpPut("updateChatData")]
-	public async Task<IActionResult> UpdateChatData([FromForm] UpdateChatDataRequest request, CancellationToken cancellationToken)
+	public async Task<IActionResult> UpdateChatData([FromBody] UpdateChatDataRequest request, CancellationToken cancellationToken)
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		

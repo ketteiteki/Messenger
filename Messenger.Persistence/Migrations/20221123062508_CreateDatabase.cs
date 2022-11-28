@@ -258,9 +258,9 @@ namespace Messenger.Services.Migrations
                 values: new object[,]
                 {
                     { new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "the best account", "kami no me", "kaminome", "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==", "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI=" },
-                    { new Guid("9f40e295-8b43-4329-b37e-d267deee6c4a"), null, "why alex?", "alex", "alex123", "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==", "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI=" },
-                    { new Guid("a85825ba-f99b-4177-a858-96384303ea14"), null, "I'm Bob", "bob", "bob123", "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==", "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI=" },
-                    { new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), null, "cool status", "alice", "alice123", "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==", "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI=" }
+                    { new Guid("9f40e295-8b43-4329-b37e-d267deee6c4a"), null, "why alex?", "alex1", "alex1234", "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==", "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI=" },
+                    { new Guid("a85825ba-f99b-4177-a858-96384303ea14"), null, "I'm Bob", "bob1", "bob1234", "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==", "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI=" },
+                    { new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), null, "cool status", "alice1", "alice1234", "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==", "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI=" }
                 });
 
             migrationBuilder.InsertData(
@@ -278,7 +278,7 @@ namespace Messenger.Services.Migrations
                 values: new object[,]
                 {
                     { new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), null, null, "DotNetRuChat", new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), "DotNetRuChat", 1 },
-                    { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), null, null, ".NET Talks", new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), "dotnettalks", 1 }
+                    { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), null, null, "dotnettalks", new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), ".NET Talks", 1 }
                 });
 
             migrationBuilder.InsertData(
@@ -286,8 +286,8 @@ namespace Messenger.Services.Migrations
                 columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
                 values: new object[,]
                 {
-                    { new Guid("0a388196-a5f7-4543-8bce-0ebf43e7f121"), new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(1640), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "привет, как дела?" },
-                    { new Guid("29cac846-6a85-42e0-a6a5-bc65deac5d30"), new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(1396), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "привет" }
+                    { new Guid("31b01199-5ea9-45cb-86c6-212c480e9469"), new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new DateTime(2022, 11, 23, 6, 25, 7, 599, DateTimeKind.Utc).AddTicks(7371), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "привет, как дела?" },
+                    { new Guid("d5eb923d-51e6-4be9-8ec5-0235255d27e2"), new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new DateTime(2022, 11, 23, 6, 25, 7, 599, DateTimeKind.Utc).AddTicks(7107), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "привет" }
                 });
 
             migrationBuilder.InsertData(
@@ -300,7 +300,6 @@ namespace Messenger.Services.Migrations
                     { new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new Guid("a85825ba-f99b-4177-a858-96384303ea14"), true, null },
                     { new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), true, null },
                     { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), true, null },
-                    { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), new Guid("9f40e295-8b43-4329-b37e-d267deee6c4a"), true, null },
                     { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), new Guid("a85825ba-f99b-4177-a858-96384303ea14"), true, null },
                     { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), true, null }
                 });
@@ -310,19 +309,19 @@ namespace Messenger.Services.Migrations
                 columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
                 values: new object[,]
                 {
-                    { new Guid("68c46e0b-0154-452f-a734-c41478e1ce8e"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(1098), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "ага" },
-                    { new Guid("a3238371-f947-4868-83d2-46d5e3c236e8"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2022, 11, 20, 7, 15, 21, 67, DateTimeKind.Utc).AddTicks(9787), false, new Guid("a85825ba-f99b-4177-a858-96384303ea14"), null, "привет, какие книжки почитать?" }
+                    { new Guid("5e122151-dc4c-422e-aceb-0d7bc4945918"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2022, 11, 23, 6, 25, 7, 599, DateTimeKind.Utc).AddTicks(6848), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "ага" },
+                    { new Guid("775a5028-c45a-4a96-9a6e-c0e98b5f42cd"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2022, 11, 23, 6, 25, 7, 599, DateTimeKind.Utc).AddTicks(5777), false, new Guid("a85825ba-f99b-4177-a858-96384303ea14"), null, "привет, какие книжки почитать?" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Messages",
                 columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
-                values: new object[] { new Guid("40870318-f26f-4834-98af-389ed8ddcfa4"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(413), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), new Guid("a3238371-f947-4868-83d2-46d5e3c236e8"), "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться..." });
+                values: new object[] { new Guid("c1e3c16e-4c5b-40bd-9150-e5c56cc05793"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2022, 11, 23, 6, 25, 7, 599, DateTimeKind.Utc).AddTicks(6334), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), new Guid("775a5028-c45a-4a96-9a6e-c0e98b5f42cd"), "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться..." });
 
             migrationBuilder.InsertData(
                 table: "Messages",
                 columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
-                values: new object[] { new Guid("03c48c52-42ed-405d-b3ee-7e22ba25c0aa"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(662), false, new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), new Guid("40870318-f26f-4834-98af-389ed8ddcfa4"), "ладно" });
+                values: new object[] { new Guid("bbb690f6-08c4-466c-8234-a7db54c6d957"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2022, 11, 23, 6, 25, 7, 599, DateTimeKind.Utc).AddTicks(6603), false, new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), new Guid("c1e3c16e-4c5b-40bd-9150-e5c56cc05793"), "ладно" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attachments_MessageId",

@@ -1,23 +1,28 @@
 using MediatR;
+using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Services;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.BusinessLogic.ApiCommands.Messages;
 
 public class UpdateMessageCommandHandler : IRequestHandler<UpdateMessageCommand, Result<MessageDto>>
 {
+	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 	private readonly DatabaseContext _context;
 
-	public UpdateMessageCommandHandler(DatabaseContext context)
+	public UpdateMessageCommandHandler(DatabaseContext context, IHubContext<ChatHub, IChatHub> hubContext)
 	{
 		_context = context;
+		_hubContext = hubContext;
 	}
 	
 	public async Task<Result<MessageDto>> Handle(UpdateMessageCommand request, CancellationToken cancellationToken)
 	{
 		var message = await _context.Messages
+			.Include(m => m.Chat)
 			.Include(m => m.Owner)
 			.Include(m => m.ReplyToMessage)
 			.ThenInclude(r => r.Owner)
@@ -39,6 +44,15 @@ public class UpdateMessageCommandHandler : IRequestHandler<UpdateMessageCommand,
 
 		_context.Messages.Update(message);
 		await _context.SaveChangesAsync(cancellationToken);
+
+		var messageUpdateNotification = new MessageUpdateNotificationDto
+		{
+			MessageId = message.Id,
+			UpdatedText = message.Text,
+			IsLastMessage = message.Chat.LastMessageId == message.Id
+		};
+		
+		await _hubContext.Clients.Group(message.ChatId.ToString()).UpdateMessageAsync(messageUpdateNotification);
 		
 		return new Result<MessageDto>(
 			new MessageDto

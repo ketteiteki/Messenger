@@ -112,9 +112,9 @@ namespace Messenger.Services.Migrations
                         new
                         {
                             Id = new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"),
-                            Name = ".NET Talks",
+                            Name = "dotnettalks",
                             OwnerId = new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"),
-                            Title = "dotnettalks",
+                            Title = ".NET Talks",
                             Type = 1
                         },
                         new
@@ -185,12 +185,6 @@ namespace Messenger.Services.Migrations
                         {
                             ChatId = new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"),
                             UserId = new Guid("a85825ba-f99b-4177-a858-96384303ea14"),
-                            CanSendMedia = true
-                        },
-                        new
-                        {
-                            ChatId = new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"),
-                            UserId = new Guid("9f40e295-8b43-4329-b37e-d267deee6c4a"),
                             CanSendMedia = true
                         },
                         new
@@ -277,56 +271,56 @@ namespace Messenger.Services.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a3238371-f947-4868-83d2-46d5e3c236e8"),
+                            Id = new Guid("775a5028-c45a-4a96-9a6e-c0e98b5f42cd"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2022, 11, 20, 7, 15, 21, 67, DateTimeKind.Utc).AddTicks(9787),
+                            DateOfCreate = new DateTime(2022, 11, 23, 6, 25, 7, 599, DateTimeKind.Utc).AddTicks(5777),
                             IsEdit = false,
                             OwnerId = new Guid("a85825ba-f99b-4177-a858-96384303ea14"),
                             Text = "привет, какие книжки почитать?"
                         },
                         new
                         {
-                            Id = new Guid("40870318-f26f-4834-98af-389ed8ddcfa4"),
+                            Id = new Guid("c1e3c16e-4c5b-40bd-9150-e5c56cc05793"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(413),
+                            DateOfCreate = new DateTime(2022, 11, 23, 6, 25, 7, 599, DateTimeKind.Utc).AddTicks(6334),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
-                            ReplyToMessageId = new Guid("a3238371-f947-4868-83d2-46d5e3c236e8"),
+                            ReplyToMessageId = new Guid("775a5028-c45a-4a96-9a6e-c0e98b5f42cd"),
                             Text = "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться..."
                         },
                         new
                         {
-                            Id = new Guid("03c48c52-42ed-405d-b3ee-7e22ba25c0aa"),
+                            Id = new Guid("bbb690f6-08c4-466c-8234-a7db54c6d957"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(662),
+                            DateOfCreate = new DateTime(2022, 11, 23, 6, 25, 7, 599, DateTimeKind.Utc).AddTicks(6603),
                             IsEdit = false,
                             OwnerId = new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"),
-                            ReplyToMessageId = new Guid("40870318-f26f-4834-98af-389ed8ddcfa4"),
+                            ReplyToMessageId = new Guid("c1e3c16e-4c5b-40bd-9150-e5c56cc05793"),
                             Text = "ладно"
                         },
                         new
                         {
-                            Id = new Guid("68c46e0b-0154-452f-a734-c41478e1ce8e"),
+                            Id = new Guid("5e122151-dc4c-422e-aceb-0d7bc4945918"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(1098),
+                            DateOfCreate = new DateTime(2022, 11, 23, 6, 25, 7, 599, DateTimeKind.Utc).AddTicks(6848),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "ага"
                         },
                         new
                         {
-                            Id = new Guid("29cac846-6a85-42e0-a6a5-bc65deac5d30"),
+                            Id = new Guid("d5eb923d-51e6-4be9-8ec5-0235255d27e2"),
                             ChatId = new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"),
-                            DateOfCreate = new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(1396),
+                            DateOfCreate = new DateTime(2022, 11, 23, 6, 25, 7, 599, DateTimeKind.Utc).AddTicks(7107),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "привет"
                         },
                         new
                         {
-                            Id = new Guid("0a388196-a5f7-4543-8bce-0ebf43e7f121"),
+                            Id = new Guid("31b01199-5ea9-45cb-86c6-212c480e9469"),
                             ChatId = new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"),
-                            DateOfCreate = new DateTime(2022, 11, 20, 7, 15, 21, 68, DateTimeKind.Utc).AddTicks(1640),
+                            DateOfCreate = new DateTime(2022, 11, 23, 6, 25, 7, 599, DateTimeKind.Utc).AddTicks(7371),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "привет, как дела?"
@@ -453,8 +447,8 @@ namespace Messenger.Services.Migrations
                         {
                             Id = new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"),
                             Bio = "cool status",
-                            DisplayName = "alice",
-                            Nickname = "alice123",
+                            DisplayName = "alice1",
+                            Nickname = "alice1234",
                             PasswordHash = "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==",
                             PasswordSalt = "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI="
                         },
@@ -462,8 +456,8 @@ namespace Messenger.Services.Migrations
                         {
                             Id = new Guid("a85825ba-f99b-4177-a858-96384303ea14"),
                             Bio = "I'm Bob",
-                            DisplayName = "bob",
-                            Nickname = "bob123",
+                            DisplayName = "bob1",
+                            Nickname = "bob1234",
                             PasswordHash = "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==",
                             PasswordSalt = "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI="
                         },
@@ -471,8 +465,8 @@ namespace Messenger.Services.Migrations
                         {
                             Id = new Guid("9f40e295-8b43-4329-b37e-d267deee6c4a"),
                             Bio = "why alex?",
-                            DisplayName = "alex",
-                            Nickname = "alex123",
+                            DisplayName = "alex1",
+                            Nickname = "alex1234",
                             PasswordHash = "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==",
                             PasswordSalt = "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI="
                         });

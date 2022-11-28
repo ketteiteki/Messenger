@@ -47,6 +47,8 @@ public class JoinToChatCommandHandler : IRequestHandler<JoinToChatCommand, Resul
 		_context.ChatUsers.Add(newChatUser);
 		await _context.SaveChangesAsync(cancellationToken);
 
+		var memberCount = await _context.ChatUsers.Where(c => c.ChatId == request.ChatId).CountAsync(cancellationToken);
+		
 		return new Result<ChatDto>(
 			new ChatDto
 			{
@@ -62,6 +64,7 @@ public class JoinToChatCommandHandler : IRequestHandler<JoinToChatCommand, Resul
 				LastMessageDateOfCreate = chat.LastMessage?.DateOfCreate,
 				IsOwner = chat.OwnerId == request.RequesterId,
 				IsMember = true,
+				MembersCount = memberCount,
 				MuteDateOfExpire = newChatUser.MuteDateOfExpire,
 				BanDateOfExpire = null,
 			});

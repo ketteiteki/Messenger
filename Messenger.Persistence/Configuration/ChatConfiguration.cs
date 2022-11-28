@@ -32,8 +32,8 @@ public class ChatConfiguration : IEntityTypeConfiguration<Chat>
 		builder.Property(x => x.Type).IsRequired();
 
 		var dotnetChat = new Chat(
-			name: "DotNetRuChat",
 			title: "DotNetRuChat",
+			name: "DotNetRuChat",
 			type: ChatType.Conversation,
 			ownerId: SeedDataConstants.KaminomeUserId,
 			avatarLink: null,
@@ -43,8 +43,8 @@ public class ChatConfiguration : IEntityTypeConfiguration<Chat>
 		};
 		
 		var dotnetFloodChat = new Chat(
-			name: ".NET Talks",
-			title: "dotnettalks",
+			title: ".NET Talks",
+			name: "dotnettalks",
 			type: ChatType.Conversation,
 			ownerId: SeedDataConstants.AliceUserId,
 			avatarLink: null,

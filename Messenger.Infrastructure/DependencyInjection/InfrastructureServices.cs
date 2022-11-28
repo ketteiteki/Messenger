@@ -1,3 +1,4 @@
+using Messenger.BusinessLogic.Hubs;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Messenger.Infrastructure.DependencyInjection;
@@ -14,8 +15,11 @@ public static class InfrastructureServices
 		
 		serviceCollection.AddMediator();
 
-		serviceCollection.AddSignalR();
-		
+		serviceCollection.AddSignalR().AddHubOptions<ChatHub>(options =>
+		{
+			options.EnableDetailedErrors = true;
+		});
+
 		return serviceCollection;
 	}
 }
