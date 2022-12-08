@@ -20,6 +20,7 @@ public class LeaveFromChatCommandHandler : IRequestHandler<LeaveFromChatCommand,
     {
         var chatUser = await _context.ChatUsers
             .Include(c => c.Chat)
+            .ThenInclude(c => c.Owner)
             .FirstOrDefaultAsync(c => 
                 c.ChatId == request.ChatId &&
                 c.UserId == request.RequesterId &&
@@ -41,6 +42,11 @@ public class LeaveFromChatCommandHandler : IRequestHandler<LeaveFromChatCommand,
                 Title = chatUser.Chat.Title,
                 Type = chatUser.Chat.Type,
                 AvatarLink = chatUser.Chat.AvatarLink,
+                LastMessageId = chatUser.Chat.LastMessageId,
+                LastMessageText = chatUser.Chat.LastMessage?.Text,
+                LastMessageAuthorDisplayName = chatUser.Chat.LastMessage != null && chatUser.Chat.LastMessage.Owner != null ?
+                    chatUser.Chat.LastMessage.Owner.DisplayName : null,
+                LastMessageDateOfCreate = chatUser.Chat.LastMessage?.DateOfCreate,
                 CanSendMedia = chatUser.CanSendMedia,
                 IsOwner = chatUser.Chat.OwnerId == request.RequesterId,
                 IsMember = false,

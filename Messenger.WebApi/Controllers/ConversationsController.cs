@@ -1,8 +1,6 @@
 using MediatR;
-using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.BusinessLogic.Models;
-using Messenger.BusinessLogic.Models.Requests;
 using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
@@ -45,7 +43,7 @@ public class ConversationsController : ApiControllerBase
 	[ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
 	[HttpPost("banUser")]
 	public async Task<IActionResult> BanUser([FromQuery] Guid chatId, [FromQuery] Guid userId, 
-		[FromQuery] DateTime banDateOfExpire, CancellationToken cancellationToken)
+		[FromQuery] int banMinutes, CancellationToken cancellationToken)
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
@@ -53,7 +51,7 @@ public class ConversationsController : ApiControllerBase
 			RequesterId: requesterId,
 			ChatId: chatId,
 			UserId: userId,
-			BanDateOfExpire: banDateOfExpire);
+			BanMinutes: banMinutes);
 
 		return await RequestAsync(command, cancellationToken);
 	}

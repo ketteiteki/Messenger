@@ -39,7 +39,7 @@ public class GetMessageListQueryHandler : IRequestHandler<GetMessageListQuery, R
 							equals new { x1 = deletedMessageByUsers.UserId, x2 = deletedMessageByUsers.MessageId }
 							into deletedMessageByUsersEnumerable
 						from deletedMessageByUsersItem in deletedMessageByUsersEnumerable.DefaultIfEmpty()
-						orderby message.DateOfCreate
+						orderby message.DateOfCreate descending
 						where deletedMessageByUsersItem == null
 						where message.ChatId == request.ChatId
 						where message.DateOfCreate < request.FromMessageDateTime
@@ -72,7 +72,7 @@ public class GetMessageListQueryHandler : IRequestHandler<GetMessageListQuery, R
 						equals new { x1 = deletedMessageByUsers.UserId, x2 = deletedMessageByUsers.MessageId }
 						into deletedMessageByUsersEnumerable
 					from deletedMessageByUsersItem in deletedMessageByUsersEnumerable.DefaultIfEmpty()
-					orderby message.DateOfCreate
+					orderby message.DateOfCreate descending
 					where deletedMessageByUsersItem == null
 					where message.ChatId == request.ChatId
 					select new MessageDto

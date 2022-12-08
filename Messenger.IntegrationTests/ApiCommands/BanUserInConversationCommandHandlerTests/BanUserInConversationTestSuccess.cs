@@ -57,13 +57,13 @@ public class BanUserInConversationTestSuccess : IntegrationTestBase, IIntegratio
 			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alice.Value.Id,
-			BanDateOfExpire: DateTime.UtcNow.AddDays(2));
+			BanMinutes: 15);
 
 		var banUserAlexInConversationCommandByBobCommand = new BanUserInConversationCommand(
 			RequesterId: bob.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alex.Value.Id,
-			BanDateOfExpire: DateTime.UtcNow.AddDays(2));
+			BanMinutes: 15);
 
 		await MessengerModule.RequestAsync(banUserAliceInConversationBy21ThCommand, CancellationToken.None);
 		await MessengerModule.RequestAsync(banUserAlexInConversationCommandByBobCommand, CancellationToken.None);

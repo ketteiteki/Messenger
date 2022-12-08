@@ -34,7 +34,7 @@ public class GetMessageListBySearchTestForbidden : IntegrationTestBase, IIntegra
             RequesterId: user21Th.Value.Id,
             ChatId: conversation.Value.Id,
             UserId: alice.Value.Id,
-            BanDateOfExpire: DateTime.UtcNow.AddDays(2)), CancellationToken.None);
+            BanMinutes: 15), CancellationToken.None);
         
         var createMessageForSearchCheckCommand = new CreateMessageCommand(
             RequesterId: user21Th.Value.Id,

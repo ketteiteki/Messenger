@@ -42,7 +42,7 @@ public class BanUserInConversationTestThrowForbidden : IntegrationTestBase, IInt
             RequesterId: bob.Value.Id,
             ChatId: conversation.Value.Id,
             UserId: alice.Value.Id,
-            BanDateOfExpire: DateTime.UtcNow.AddDays(2));
+            BanMinutes: 15);
 
         var banUserAliceInConversationByBobResult =
             await MessengerModule.RequestAsync(banUserAliceInConversationByBobCommand, CancellationToken.None);
@@ -51,7 +51,7 @@ public class BanUserInConversationTestThrowForbidden : IntegrationTestBase, IInt
             RequesterId: bob.Value.Id,
             ChatId: conversation.Value.Id,
             UserId: alice.Value.Id,
-            BanDateOfExpire: DateTime.UtcNow.AddDays(2));
+            BanMinutes: 15);
 
         var banUserAlexInConversationByAliceResult =
             await MessengerModule.RequestAsync(banUserAlexInConversationByAliceCommand, CancellationToken.None);

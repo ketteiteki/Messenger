@@ -1,5 +1,6 @@
 using MediatR;
 using Messenger.Application.Interfaces;
+using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.BusinessLogic.Services;
@@ -7,6 +8,7 @@ using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
 using Messenger.Domain.Enum;
 using Messenger.Services;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -14,15 +16,18 @@ namespace Messenger.BusinessLogic.ApiCommands.Messages;
 
 public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand, Result<MessageDto>>
 {
+	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 	private readonly DatabaseContext _context;
 	private readonly IFileService _fileService;
 	private readonly IConfiguration _configuration;
 
-	public CreateMessageCommandHandler(DatabaseContext context, IFileService fileService, IConfiguration configuration)
+	public CreateMessageCommandHandler(DatabaseContext context, IFileService fileService, IConfiguration configuration, 
+		IHubContext<ChatHub, IChatHub> hubContext)
 	{
 		_context = context;
 		_fileService = fileService;
 		_configuration = configuration;
+		_hubContext = hubContext;
 	}
 	
 	public async Task<Result<MessageDto>> Handle(CreateMessageCommand request, CancellationToken cancellationToken)
@@ -117,22 +122,25 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 				await _context.Entry(newMessage.ReplyToMessage).Reference(r => r.Owner).LoadAsync(cancellationToken);
 			}
 
-			return new Result<MessageDto>(
-				new MessageDto
-				{
-					Id = newMessage.Id,
-					Text = newMessage.Text,
-					IsEdit = false,
-					OwnerId = newMessage.OwnerId,
-					OwnerDisplayName = newMessage.Owner?.DisplayName,
-					OwnerAvatarLink = newMessage.Owner?.AvatarLink,
-					ReplyToMessageId = newMessage.ReplyToMessageId,
-					ReplyToMessageText = newMessage.ReplyToMessage?.Text,
-					ReplyToMessageAuthorDisplayName = newMessage.ReplyToMessage?.Owner?.DisplayName,
-					ChatId = newMessage.ChatId,
-					DateOfCreate = newMessage.DateOfCreate,
-					Attachments = newMessage.Attachments.Select(a => new AttachmentDto(a)).ToList()
-				});
+			var messageDto = new MessageDto
+			{
+				Id = newMessage.Id,
+				Text = newMessage.Text,
+				IsEdit = false,
+				OwnerId = newMessage.OwnerId,
+				OwnerDisplayName = newMessage.Owner?.DisplayName,
+				OwnerAvatarLink = newMessage.Owner?.AvatarLink,
+				ReplyToMessageId = newMessage.ReplyToMessageId,
+				ReplyToMessageText = newMessage.ReplyToMessage?.Text,
+				ReplyToMessageAuthorDisplayName = newMessage.ReplyToMessage?.Owner?.DisplayName,
+				ChatId = newMessage.ChatId,
+				DateOfCreate = newMessage.DateOfCreate,
+				Attachments = newMessage.Attachments.Select(a => new AttachmentDto(a)).ToList()
+			};
+			
+			await _hubContext.Clients.Group(request.ChatId.ToString()).BroadcastMessageAsync(messageDto);
+			
+			return new Result<MessageDto>(messageDto);
 		}
 
 		return new Result<MessageDto>(new ForbiddenError("It is forbidden to send messages to the chat"));

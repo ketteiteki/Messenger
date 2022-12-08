@@ -1,6 +1,5 @@
 using FluentValidation;
 using Messenger.BusinessLogic.ApiCommands.Chats;
-using Messenger.BusinessLogic.ApiCommands.Conversations;
 
 namespace Messenger.BusinessLogic.Pipelines;
 

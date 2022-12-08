@@ -40,7 +40,7 @@ public class UnbanUserInConversationTestThrowForbidden : IntegrationTestBase, II
 			RequesterId: user21Th.Value.Id,
 			ChatId: conversation.Value.Id,
 			UserId: alice.Value.Id,
-			BanDateOfExpire: DateTime.UtcNow.AddDays(2));
+			BanMinutes: 15);
 		
 		await MessengerModule.RequestAsync(banForAliceCommand, CancellationToken.None);
 		

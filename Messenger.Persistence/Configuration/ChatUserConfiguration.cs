@@ -1,3 +1,4 @@
+using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -25,5 +26,63 @@ public class ChatUserConfiguration : IEntityTypeConfiguration<ChatUser>
 		
 		builder.Property(x => x.ChatId).IsRequired();
 		builder.Property(x => x.UserId).IsRequired();
+
+		var dotnetChatKaminome = new ChatUser()
+		{
+			UserId = SeedDataConstants.KaminomeUserId,
+			ChatId = SeedDataConstants.DotnetChatId
+		};
+		
+		var dotnetChatAlice = new ChatUser()
+		{
+			UserId = SeedDataConstants.AliceUserId,
+			ChatId = SeedDataConstants.DotnetChatId
+		};
+		
+		var dotnetChatBob = new ChatUser()
+		{
+			UserId = SeedDataConstants.BobUserId,
+			ChatId = SeedDataConstants.DotnetChatId
+		};
+		
+		var dotnetChatAlex = new ChatUser()
+		{
+			UserId = SeedDataConstants.AlexUserId,
+			ChatId = SeedDataConstants.DotnetChatId
+		};
+		
+		var dotnetFloodChatKaminome = new ChatUser()
+		{
+			UserId = SeedDataConstants.KaminomeUserId,
+			ChatId = SeedDataConstants.DotnetFloodChatId
+		};
+		
+		var dotnetFloodChatAlice = new ChatUser()
+		{
+			UserId = SeedDataConstants.AliceUserId,
+			ChatId = SeedDataConstants.DotnetFloodChatId
+		};
+		
+		var dotnetFloodChatBob = new ChatUser()
+		{
+			UserId = SeedDataConstants.BobUserId,
+			ChatId = SeedDataConstants.DotnetFloodChatId
+		};
+		
+		var dialogKamimomeAliceForKaminome = new ChatUser()
+		{
+			UserId = SeedDataConstants.KaminomeUserId,
+			ChatId = SeedDataConstants.DialogKaminomeAliceChatId
+		};
+		
+		var dialogKamimomeAliceForAlice = new ChatUser()
+		{
+			UserId = SeedDataConstants.AliceUserId,
+			ChatId = SeedDataConstants.DialogKaminomeAliceChatId
+		};
+
+		builder.HasData(dotnetChatKaminome, dotnetChatAlice, dotnetChatBob, dotnetChatAlex,
+			dotnetFloodChatKaminome, dotnetFloodChatAlice, dotnetFloodChatBob,
+			dialogKamimomeAliceForAlice, dialogKamimomeAliceForKaminome);
 	}
 }

@@ -28,6 +28,7 @@ public class UpdateChatAvatarCommandHandler : IRequestHandler<UpdateChatAvatarCo
 	{
 		var chatUserByRequester = await _context.ChatUsers
 			.Include(c => c.Chat)
+			.ThenInclude(c => c.Owner)
 			.Include(c => c.Role)
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && 
 			                          c.ChatId == request.ChatId &&
@@ -68,6 +69,12 @@ public class UpdateChatAvatarCommandHandler : IRequestHandler<UpdateChatAvatarCo
 					Title = chatUserByRequester.Chat.Title,
 					Type = chatUserByRequester.Chat.Type,
 					AvatarLink = chatUserByRequester.Chat.AvatarLink,
+					LastMessageId = chatUserByRequester.Chat.LastMessageId,
+					LastMessageText = chatUserByRequester.Chat.LastMessage?.Text,
+					LastMessageAuthorDisplayName = chatUserByRequester.Chat.LastMessage != null && 
+					                               chatUserByRequester.Chat.LastMessage.Owner != null ?
+						chatUserByRequester.Chat.LastMessage.Owner.DisplayName : null,
+					LastMessageDateOfCreate = chatUserByRequester.Chat.LastMessage?.DateOfCreate,
 					IsOwner = chatUserByRequester.Chat.OwnerId == request.RequesterId,
 					IsMember = true,
 					MuteDateOfExpire = chatUserByRequester.MuteDateOfExpire,

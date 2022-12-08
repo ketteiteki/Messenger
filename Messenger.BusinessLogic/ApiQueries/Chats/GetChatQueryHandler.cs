@@ -40,6 +40,11 @@ public class GetChatQueryHandler : IRequestHandler<GetChatQuery, Result<ChatDto>
 						Title = chat.Title,
 						Type = chat.Type,
 						AvatarLink = chat.Type != ChatType.Dialog ? chat.AvatarLink : null,
+						LastMessageId = chat.LastMessageId,
+						LastMessageText = chat.LastMessage != null ? chat.LastMessage.Text : null,
+						LastMessageAuthorDisplayName = chat.LastMessage != null && chat.LastMessage.Owner != null ? 
+							chat.LastMessage.Owner.DisplayName : null,
+						LastMessageDateOfCreate = chat.LastMessage != null ? chat.LastMessage.DateOfCreate : null,
 						MembersCount = chat.ChatUsers.Count,
 						CanSendMedia = chatUsersItem != null && chatUsersItem.CanSendMedia,
 						IsOwner = chat.OwnerId == request.RequesterId,

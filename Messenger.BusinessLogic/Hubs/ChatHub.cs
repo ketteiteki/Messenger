@@ -1,16 +1,19 @@
+using Messenger.Domain.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Messenger.BusinessLogic.Hubs;
 
-public class ChatHub : Hub
+[Authorize]
+public class ChatHub : Hub<IChatHub>
 {
-    public void BroadcastMessage(string name, string message)
+    public Task JoinChat(Guid chatId)
     {
-        Clients.All.SendAsync("broadcastMessage", name, message);
+        return Groups.AddToGroupAsync(Context.ConnectionId, chatId.ToString());
     }
-
-    public void Echo(string name, string message)
+    
+    public Task LeaveChat(Guid chatId)
     {
-        Clients.Client(Context.ConnectionId).SendAsync("echo", name, message + " (echo from server)");
+        return Groups.RemoveFromGroupAsync(Context.ConnectionId, chatId.ToString());
     }
 }

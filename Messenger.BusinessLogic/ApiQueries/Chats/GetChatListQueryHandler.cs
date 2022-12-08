@@ -44,6 +44,11 @@ public class GetChatListQueryHandler : IRequestHandler<GetChatListQuery, Result<
 						Title = chat.Title,
 						Type = chat.Type,
 						AvatarLink = chat.Type != ChatType.Dialog ? chat.AvatarLink : null,
+						LastMessageId = chat.LastMessageId,
+						LastMessageText = chat.LastMessage != null ? chat.LastMessage.Text : null,
+						LastMessageAuthorDisplayName = chat.LastMessage != null && chat.LastMessage.Owner != null ? 
+							chat.LastMessage.Owner.DisplayName : null,
+						LastMessageDateOfCreate = chat.LastMessage != null ? chat.LastMessage.DateOfCreate : null,
 						MembersCount = chat.ChatUsers.Count,
 						CanSendMedia = chatUsersItem.CanSendMedia,
 						IsOwner = chat.OwnerId == request.RequesterId,
@@ -52,7 +57,7 @@ public class GetChatListQueryHandler : IRequestHandler<GetChatListQuery, Result<
 						BanDateOfExpire = banUserByChatItem != null ? banUserByChatItem.BanDateOfExpire : null,
 						RoleUser = chatUsersItem.Role != null ? new RoleUserByChatDto(chatUsersItem.Role) : null,
 						Members = chat.Type == ChatType.Dialog ?
-							chat.ChatUsers.Select(c => new UserDto(c.User)).ToList() : new List<UserDto>()
+							chat.ChatUsers.Select(c => new UserDto(c.User)).ToList() : new List<UserDto>(),
 					})
 				.ToListAsync(cancellationToken);
 

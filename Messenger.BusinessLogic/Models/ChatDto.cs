@@ -14,6 +14,14 @@ public class ChatDto
 	
 	public string AvatarLink { get; init; }
 	
+	public Guid? LastMessageId { get; init; }
+	
+	public string LastMessageText { get; init; }
+	
+	public string LastMessageAuthorDisplayName { get; init; }
+
+	public DateTime? LastMessageDateOfCreate { get; init; }
+	
 	public int MembersCount { get; init; }
 	
 	public bool CanSendMedia { get; init; }
