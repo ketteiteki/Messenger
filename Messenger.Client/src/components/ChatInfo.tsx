@@ -14,18 +14,6 @@ export const ChatInfo = () => {
   const currentChatState = useAppSelector(selectCurrentChat);
   const dispatch = useAppDispatch();
 
-  // const definedChatTitle =
-  //   currentChatState.data?.title ||
-  //   currentChatState.data?.members?.find(
-  //     (m) => m.id !== authorizationState.data?.id
-  //   )?.displayName;
-
-  // const definedChatName =
-  //   currentChatState.data?.name ||
-  //   currentChatState.data?.members?.find(
-  //     (m) => m.id !== authorizationState.data?.id
-  //   )?.nickname;
-
   const [chatTitle, setChatTitle] = useState<string>(currentChatState.data?.title || "");
   const [chatName, setChatName] = useState<string>(currentChatState.data?.name || "");
 
@@ -40,14 +28,6 @@ export const ChatInfo = () => {
       );
     }
   };
-
-  // const onClickLeaveFromChat = async () => {
-  //   if (currentChatState.data) {
-  //     await dispatch(postLeaveFromChatAsync(currentChatState.data.id));
-  //     setShowChatInfo(false);
-  //     setShowBlackBackground(false);
-  //   }
-  // };
 
   const onClickDeleteDialog = async () => {};
 

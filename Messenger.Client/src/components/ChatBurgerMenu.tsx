@@ -2,7 +2,7 @@ import React from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   selectCurrentChat,
-  setCurrentChatData,
+  currentChatSliceActions,
 } from "../app/slices/currentChatSlice";
 import {
   setShowBlackBackground,
@@ -36,13 +36,13 @@ export const ChatBurgerMenu = ({
     if (!currentChatState.data) return;
 
     dispatch(delDeleteChatAsync(currentChatState.data.id));
-    dispatch(setCurrentChatData(null));
+    dispatch(currentChatSliceActions.setCurrentChatData(null));
   };
 
   const onClickLeaveFromChat = () => {
     if (currentChatState.data) {
       dispatch(postLeaveFromChatAsync(currentChatState.data.id));
-      dispatch(setCurrentChatData(null));
+      dispatch(currentChatSliceActions.setCurrentChatData(null));
     }
   };
 

@@ -9,8 +9,13 @@ import {
 } from "../app/thunks/chatsThuck";
 import DateService from "../services/messenger/DateService";
 import { ReactComponent as ProfileSVG } from "../assets/svg/profile.svg";
-import { setCurrentChatData } from "../app/slices/currentChatSlice";
-import { selectLayoutComponent, setShowBlackBackground, setShowChatCreater, setShowProfile } from "../app/slices/layoutComponentSlice";
+import { currentChatSliceActions } from "../app/slices/currentChatSlice";
+import {
+  selectLayoutComponent,
+  setShowBlackBackground,
+  setShowChatCreater,
+  setShowProfile,
+} from "../app/slices/layoutComponentSlice";
 
 export const ChatBar = () => {
   const authorizationState = useAppSelector(selectAuthorization);
@@ -18,10 +23,6 @@ export const ChatBar = () => {
   const dispatch = useAppDispatch();
 
   const [searchChatsValue, setSearchChatsValue] = useState<string>("");
-
-  useEffect(() => {
-    dispatch(getChatListAsync());
-  }, []);
 
   const shortLastMessage = (text: string): string => {
     if (text.length > 15) return `${text.slice(0, 15)}...`;
@@ -60,37 +61,40 @@ export const ChatBar = () => {
         />
       </div>
       <div className="chatsbar__chatlist">
-        {chatListState.data.map((chat) => (
+        {chatListState.data.map((item) => (
           <div
             className="chatsbar__chatlist-item"
-            key={chat.id}
-            onClick={() => dispatch(setCurrentChatData(chat))}
+            key={item.chat.id}
+            onClick={() => {
+              dispatch(currentChatSliceActions.setCurrentChatData(item));
+            }}
           >
             <img
               className="chatsbar__chatlist-item__avatar"
               src={
-                chat.avatarLink
-                  ? chat.avatarLink
+                item.chat.avatarLink
+                  ? item.chat.avatarLink
                   : "https://i.pinimg.com/564x/55/76/29/5576291b493260f343e96dabf11f41d4.jpg"
               }
               alt=""
             />
             <div className="chatsbar__chatlist-item__data">
               <p className="chatsbar__chatlist-item__data__chat-name">
-                {chat.title ??
-                  chat.members?.find((m) => m.id != authorizationState?.data?.id)
-                    ?.displayName}
+                {item.chat.title ??
+                  item.chat.members?.find(
+                    (m) => m.id != authorizationState?.data?.id
+                  )?.displayName}
               </p>
               <p className="chatsbar__chatlist-item__data__last-message">
-                {chat.lastMessageId && chat.lastMessageText
-                  ? `${chat.lastMessageAuthorDisplayName}: ${shortLastMessage(
-                      chat.lastMessageText
-                    )}`
+                {item.chat.lastMessageId && item.chat.lastMessageText
+                  ? `${
+                      item.chat.lastMessageAuthorDisplayName
+                    }: ${shortLastMessage(item.chat.lastMessageText || "")}`
                   : ""}
               </p>
               <p className="chatsbar__chatlist-item__data__last-message-date-time">
-                {chat.lastMessageDateOfCreate
-                  ? DateService.getTime(chat.lastMessageDateOfCreate)
+                {item.chat.lastMessageDateOfCreate
+                  ? DateService.getTime(item.chat.lastMessageDateOfCreate)
                   : ""}
               </p>
             </div>

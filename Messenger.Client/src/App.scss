@@ -465,6 +465,33 @@ $green-hover: #018353;
     overflow-y: scroll;
     scrollbar-width: none;
 
+    &__loading {
+      position: relative;
+      margin-top: 10px;
+      left: calc(50% - 20px);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: inline-block;
+      border-top: 3px solid #fff;
+      border-right: 3px solid transparent;
+      box-sizing: border-box;
+      animation: rotation 1s linear infinite;
+
+      @keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    }
+
+    &__bottom {
+      margin-bottom: 10px;
+    }
+
     &__banned {
       position: absolute;
       top: 50%;
@@ -637,10 +664,10 @@ $green-hover: #018353;
     outline: none;
     margin-bottom: 5px;
     font-size: 18px;
-    transition: .2s;
+    transition: 0.2s;
 
     &:focus {
-      background-color: #00000031; 
+      background-color: #00000031;
     }
   }
 
@@ -653,9 +680,9 @@ $green-hover: #018353;
     text-align: center;
     border: none;
     outline: none;
-    
+
     &:focus {
-      background-color: #00000030; 
+      background-color: #00000030;
     }
   }
 
@@ -670,8 +697,8 @@ $green-hover: #018353;
     outline: none;
     margin-bottom: 10px;
 
-     &:focus {
-      background-color: #00000030; 
+    &:focus {
+      background-color: #00000030;
     }
   }
 
@@ -1053,7 +1080,7 @@ $green-hover: #018353;
     cursor: pointer;
 
     &:hover {
-      background-color: rgb(41, 42, 51)
+      background-color: rgb(41, 42, 51);
     }
   }
 
@@ -1062,10 +1089,10 @@ $green-hover: #018353;
   }
 
   &__delete-button {
-    color: red
+    color: red;
   }
 
   &__leave-button {
-    color: red
+    color: red;
   }
 }

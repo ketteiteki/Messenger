@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { selectCurrentChat, setCurrentChatData } from "../app/slices/currentChatSlice";
+import { selectCurrentChat, currentChatSliceActions } from "../app/slices/currentChatSlice";
 import { setShowBlackBackground, setShowConfirmDeleteDialog } from "../app/slices/layoutComponentSlice";
 import { delDeleteDialogAsync } from "../app/thunks/dialogsThuck";
 
@@ -20,7 +20,7 @@ export const ConfirmDeleteDialog = ({
     if (!currentChatState.data) return;
 
     dispatch(delDeleteDialogAsync({dialogId: currentChatState.data.id, isDeleteForAll: deleteForAll}));
-    dispatch(setCurrentChatData(null));
+    dispatch(currentChatSliceActions.setCurrentChatData(null));
 
     dispatch(setShowBlackBackground(false));
     dispatch(setShowConfirmDeleteDialog(false));

@@ -18,6 +18,7 @@ public static class InfrastructureServices
 		serviceCollection.AddSignalR().AddHubOptions<ChatHub>(options =>
 		{
 			options.EnableDetailedErrors = true;
+			options.ClientTimeoutInterval = TimeSpan.FromDays(1);
 		});
 
 		return serviceCollection;

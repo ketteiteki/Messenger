@@ -3,8 +3,15 @@ import MessagesAPI from "../../services/api/MessagesAPI";
 
 interface IGetMessageListAsyncThunkAction {
   chatId: string;
-  fromMessageTime: Date | null;
+  fromMessageTime: string | null;
   limit: number;
+}
+
+interface IPostCreateMessageAsync {
+  text: string;
+  chatId: string;
+  replyToId: string | null;
+  files: File[];
 }
 
 export const getMessageListAsync = createAsyncThunk(
@@ -18,6 +25,19 @@ export const getMessageListAsync = createAsyncThunk(
       chatId,
       fromMessageTime,
       limit
+    );
+    return response.data;
+  }
+);
+
+export const postCreateMessageAsync = createAsyncThunk(
+  "messages/postCreateMessageAsync",
+  async ({ text, chatId, replyToId, files }: IPostCreateMessageAsync) => {
+    const response = await MessagesAPI.postCreateMessageAsync(
+      text,
+      chatId,
+      replyToId,
+      files
     );
     return response.data;
   }

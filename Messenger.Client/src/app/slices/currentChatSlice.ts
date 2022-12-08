@@ -1,3 +1,4 @@
+import { IMessage } from './../../models/interfaces/IMessage';
 import {
   putUpdateChatDataAsync,
   postJoinToChatAsync,
@@ -6,8 +7,12 @@ import { IChat } from "../../models/interfaces/IChat";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RequestStatusEnum } from "../../models/enums/RequestStatusEnum";
 import { RootState } from "../store";
-import { IMessage } from "../../models/interfaces/IMessage";
-import { getMessageListAsync } from "../thunks/MessageThunks";
+import {
+  getMessageListAsync,
+  postCreateMessageAsync,
+} from "../thunks/messageThunks";
+import MessageEntity from "../../models/MessageEntity";
+import { IChatListDataItem } from "./chatListSlice";
 
 export interface IСurrentChatState {
   data: IChat | null;
@@ -25,11 +30,37 @@ export const currentChatSlice = createSlice({
   name: "currentChat",
   initialState,
   reducers: {
-    setCurrentChatData: (state, action: PayloadAction<IChat | null>) => {
-      state.data = action.payload;
+    setCurrentChatData: (
+      state,
+      action: PayloadAction<IChatListDataItem | null>
+    ) => {
+      if (action.payload === null) {
+        state.data = null;
+        state.messages = [];
+
+        return;
+      }
+
+      state.data = action.payload.chat;
+      state.messages = action.payload.messages;
     },
     setNullMessageData: (state) => {
       state.messages = [];
+    },
+    addMessageCurrentChat: (state, action: PayloadAction<MessageEntity | IMessage>) => {
+      state.messages.push(action.payload);
+    },
+    updateMessageIdAfterCreateMessage: (
+      state,
+      action: PayloadAction<{ lastMessageId: string; message: IMessage }>
+    ) => {
+      const indexMessageById = state.messages.findIndex(
+        (m) => m.id === action.payload.lastMessageId
+      );
+
+      if (indexMessageById) {
+        state.messages[indexMessageById] = action.payload.message;
+      }
     },
   },
   extraReducers(builder) {
@@ -41,22 +72,21 @@ export const currentChatSlice = createSlice({
           state.status = RequestStatusEnum.success;
         }
       })
-      .addCase(putUpdateChatDataAsync.rejected, (state, action) => {
+      .addCase(putUpdateChatDataAsync.rejected, (state) => {
         state.status = RequestStatusEnum.fail;
       });
 
     builder.addCase(getMessageListAsync.fulfilled, (state, action) => {
-      state.messages.push(...action.payload);
+      state.messages.unshift(...action.payload);
     });
 
     builder.addCase(postJoinToChatAsync.fulfilled, (state, action) => {
       state.data = action.payload;
-      // state.data.membersCount++;
     });
   },
 });
 
-export const { setCurrentChatData, setNullMessageData } =
+export const currentChatSliceActions =
   currentChatSlice.actions;
 
 export const selectCurrentChat = (state: RootState) => state.currentChat;

@@ -4,7 +4,7 @@ import api from "./baseAPI";
 export default class MessagesAPI {
   public static async getMessageListAsync(
     chatId: string,
-    fromMessageDateTime: Date | null,
+    fromMessageDateTime: string | null,
     limit: number
   ) {
     const params = {
@@ -38,17 +38,20 @@ export default class MessagesAPI {
     replyToId: string | null,
     files: File[]
   ) {
-    const formDate = new FormData();
+    const data = {
+      text,
+      chatId,
+      replyToId,
+      files,
+    };
 
-    formDate.append("Text", text);
-    formDate.append("ChatId", chatId);
-    formDate.append("ReplyToId", replyToId ?? "");
+    const headers = {
+      "Content-Type": "multipart/form-data",
+    };
 
-    files.forEach((file) => {
-      formDate.append("Files", file);
+    return await api.post<IMessage>(`/Messages/createMessage`, data, {
+      headers,
     });
-
-    return await api.post<IMessage>(`/Messages/createMessage`, formDate);
   }
 
   public static async putUpdateMessageAsync(id: string, text: string) {

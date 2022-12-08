@@ -3,9 +3,10 @@ import TextArea from "rc-textarea";
 import { ReactComponent as SendMessageSVG } from "../assets/svg/send-message.svg";
 import { Message } from "./Message";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { v4 as uuidv4 } from "uuid";
 import {
   selectCurrentChat,
-  setNullMessageData,
+  currentChatSliceActions,
 } from "../app/slices/currentChatSlice";
 import { selectAuthorization } from "../app/slices/authorizationSlice";
 import { ChatBurgerMenu } from "./ChatBurgerMenu";
@@ -16,16 +17,28 @@ import {
   setShowProfile,
 } from "../app/slices/layoutComponentSlice";
 import DateService from "../services/messenger/DateService";
-import { getMessageListAsync } from "../app/thunks/MessageThunks";
+import { getMessageListAsync } from "../app/thunks/messageThunks";
 import { getUserAsync } from "../app/thunks/usersThucks";
 import { postJoinToChatAsync } from "../app/thunks/chatsThuck";
+import MessageEntity from "../models/MessageEntity";
+import MessagesAPI from "../services/api/MessagesAPI";
+import {
+  chatListSliceActions,
+  selectChatList,
+} from "../app/slices/chatListSlice";
 
 export const Chat = () => {
   const authorizationState = useAppSelector(selectAuthorization);
   const currentChatState = useAppSelector(selectCurrentChat);
+  const chatListState = useAppSelector(selectChatList);
   const dispatch = useAppDispatch();
 
   const [showBurgerMenu, setShowBurgerMenu] = useState<boolean>(false);
+  const [textareaForSendMessageText, setTextareaForSendMessageText] =
+    useState<string>("");
+  const [loadingGetMessage, setLoadingGetMessage] = useState<boolean>(false);
+
+  const refChatMessages = React.createRef<HTMLDivElement>();
 
   const openChatInfo = async () => {
     if (currentChatState.data?.type === ChatTypeEnum.dialog) {
@@ -46,25 +59,112 @@ export const Chat = () => {
     dispatch(setShowBlackBackground(true));
   };
 
-  const onClickJoinChat = () => {
+  const onClickJoinChat = async () => {
+    setLoadingGetMessage(true);
     if (currentChatState.data) {
-      dispatch(postJoinToChatAsync(currentChatState.data?.id));
+      await dispatch(postJoinToChatAsync(currentChatState.data?.id));
+    }
+    setLoadingGetMessage(false)
+  };
+
+  const onScrollGetMessages = () => {
+    if (refChatMessages.current?.scrollTop === 0 && currentChatState.data) {
+      dispatch(
+        getMessageListAsync({
+          chatId: currentChatState.data.id,
+          limit: 15,
+          fromMessageTime: currentChatState.messages[0].dateOfCreate,
+        })
+      );
+    }
+  }
+
+  const SendMessage = async () => {
+    if (authorizationState.data && currentChatState.data) {
+      const messageId = uuidv4();
+
+      const message = new MessageEntity(
+        messageId,
+        textareaForSendMessageText,
+        false,
+        authorizationState.data.id || "",
+        authorizationState.data.displayName || "",
+        authorizationState.data.avatarLink || null,
+        null,
+        null,
+        null,
+        [],
+        currentChatState.data.id,
+        `${new Date()}`
+      );
+
+      await dispatch(currentChatSliceActions.addMessageCurrentChat(message));
+      await dispatch(chatListSliceActions.addMessageInChatOfChatList(message));
+
+      const createMessageResult = await MessagesAPI.postCreateMessageAsync(
+        textareaForSendMessageText,
+        currentChatState.data.id,
+        null,
+        []
+      );
+
+      await dispatch(
+        currentChatSliceActions.updateMessageIdAfterCreateMessage({
+          lastMessageId: messageId,
+          message: createMessageResult.data,
+        })
+      );
+      await dispatch(
+        chatListSliceActions.updateMessageIdAfterCreateMessage({
+          lastMessageId: messageId,
+          message: createMessageResult.data,
+        })
+      );
+      await dispatch(chatListSliceActions.setLastMessage(createMessageResult.data));
+
+      setTextareaForSendMessageText("");
+      refChatMessagesScrollBottom();
+    }
+  };
+
+  const onClickSendMessage = () => SendMessage();
+
+  const onEnterSendMessage = (e: React.KeyboardEvent) => {
+    e.preventDefault();
+    if (e.key === "Enter") {
+      return SendMessage();
+    }
+  };
+
+  const refChatMessagesScrollBottom = () => {
+    if (refChatMessages.current) {
+      refChatMessages.current.scrollTop = refChatMessages.current.scrollHeight;
     }
   };
 
   useEffect(() => {
-    dispatch(setNullMessageData());
-
-    if (currentChatState.data !== null) {
-      dispatch(
-        getMessageListAsync({
-          chatId: currentChatState.data.id,
-          limit: 30,
-          fromMessageTime: null,
-        })
-      );
-    }
+    refChatMessagesScrollBottom();
   }, [currentChatState.data]);
+
+  useEffect(() => {
+    const fun = async () => {
+      if (
+        currentChatState.data !== null &&
+        chatListState.data.find((c) => c.chat.id === currentChatState.data?.id)
+          ?.messages.length === 0
+      ) {
+        await dispatch(
+          getMessageListAsync({
+            chatId: currentChatState.data.id,
+            limit: 15,
+            fromMessageTime: null,
+          })
+        );
+      }
+    };
+
+    fun()
+  }, [currentChatState.data?.id]);
 
   return (
     <div className="chat">
@@ -109,7 +209,8 @@ export const Chat = () => {
               <div className="chat__header__button-menu__dot3" />
             </div>
           </div>
-          <div className="chat__messages">
+          <div className="chat__messages" ref={refChatMessages} onScroll={onScrollGetMessages}>
+            {loadingGetMessage && <div className="chat__messages__loading"/>}
             {currentChatState.data?.banDateOfExpire ? (
               <p className="chat__messages__banned">You are banned</p>
             ) : (
@@ -139,10 +240,16 @@ export const Chat = () => {
                   className="chat__footer__textarea"
                   placeholder="Message"
                   autoSize={{ maxRows: 3 }}
+                  value={textareaForSendMessageText}
+                  onChange={(e) =>
+                    setTextareaForSendMessageText(e.currentTarget.value)
+                  }
+                  onPressEnter={onEnterSendMessage}
                 />
                 <SendMessageSVG
                   className="chat__footer__send-message-svg"
                   fill="white"
+                  onClick={onClickSendMessage}
                 />
               </>
             ) : (

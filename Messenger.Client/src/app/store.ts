@@ -8,6 +8,9 @@ import layoutComponentReducer from './slices/layoutComponentSlice';
 import sessionReducer from './slices/sessionSlice';
 
 export const store = configureStore({
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    serializableCheck: false
+  }),
   reducer: {
     counter: counterReducer,
     authorization: authorizationReducer,
