@@ -20,7 +20,7 @@ public class GetChatListBySearchQueryHandler : IRequestHandler<GetChatListBySear
     public async Task<Result<List<ChatDto>>> Handle(GetChatListBySearchQuery request, CancellationToken cancellationToken)
     {
         var chatList = 
-            await (from chat in _context.Chats.AsNoTracking()
+            await (from chat in _context.Chats.AsNoTracking().Include(c => c.ChatUsers).ThenInclude(cu => cu.Role)
                     join chatUsers in _context.ChatUsers.AsNoTracking()
                         on new {x1 = request.RequesterId, x2 = chat.Id} 
                         equals new {x1 = chatUsers.UserId, x2 = chatUsers.ChatId }
@@ -53,7 +53,9 @@ public class GetChatListBySearchQueryHandler : IRequestHandler<GetChatListBySear
                         MuteDateOfExpire = chatUsersItem != null ? chatUsersItem.MuteDateOfExpire : null,
                         BanDateOfExpire = banUserByChatItem != null ? banUserByChatItem.BanDateOfExpire : null,
                         RoleUser = chatUsersItem.Role != null ? new RoleUserByChatDto(chatUsersItem.Role) : null,
-                        Members = new List<UserDto>()
+                        Members = new List<UserDto>(),
+                        UsersWithRole = chat.ChatUsers.Where(c => c.Role != null)
+                            .Select(cu => new RoleUserByChatDto(cu.Role)).ToList()
                     })
                 .ToListAsync(cancellationToken);
 
