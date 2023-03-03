@@ -84,6 +84,8 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 
 			var messageDeleteNotification = new MessageDeleteNotificationDto()
 			{
+				OwnerId = message.OwnerId,
+				ChatId = message.ChatId,
 				MessageId = message.Id,
 				NewLastMessageId = lastMessageNow.Id,
 				NewLastMessageText = lastMessageNow.Text,

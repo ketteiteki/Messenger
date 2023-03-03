@@ -1,0 +1,194 @@
+@import "../../App.scss";
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: $light-grey;
+  border-radius: 0 20px 0 0;
+}
+
+.header {
+  position: relative;
+  width: 100%;
+  height: 71px;
+  background-color: white;
+  border-radius: 0 20px 0 0;
+}
+
+.chatAvatar {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  right: 15px;
+  top: 7px;
+  border-radius: 100%;
+}
+
+.chatName {
+  padding-top: 14px;
+  text-align: center;
+}
+
+.additionalData {
+  text-align: center;
+  color: $light-grey-font-page;
+  font-size: 14px;
+}
+
+.messageList {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.banned {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.bannedPage {
+  margin: auto;
+  color: $grey-font-page;
+}
+
+.chooseChat {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.chooseChatPage {
+  margin: auto;
+  color: $grey-font-page;
+}
+
+.footer {
+  position: relative;
+  display: flex;
+  width: 100%;
+  background-color: white;
+}
+
+.textarea {
+  width: 100%;
+  padding: 17px;
+  margin: 0 auto;
+  outline: none;
+  resize: none;
+  background-color: white;
+  border: none;
+  font-size: 16px;
+}
+
+.sendMessageSvg {
+  margin-right: 10px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.attachment {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.JoinChatButton {
+  width: 100%;
+  height: 45px;
+  background-color: $purple;
+  color: $light-grey;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: .1s;
+
+  &:hover {
+    background-color: $purpleHover;
+  }
+}
+
+.muted {
+  display: flex;
+  width: 100%;
+  height: 45px;
+}
+
+.mutedPage {
+  margin: auto;
+  color: $grey-font-page;
+  font-size: 14px;
+}
+
+.reply {
+  display: flex;
+  position: absolute;
+  top: -100%;
+  width: 100%;
+  height: 52px;
+  background-color: white;
+}
+
+.replySvg {
+  margin-left: 20px;
+}
+
+.replyConstainer {
+  margin-top: 7px;
+  margin-left: 20px;
+}
+
+.replyDisplayName {
+
+}
+
+.replyMessageText {
+  color: $grey-font-page;
+}
+
+.closeReplyButton {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: inherit;
+  border: none;
+  cursor: pointer;
+}
+
+//edit message
+.editMessage {
+  display: flex;
+  position: absolute;
+  top: -100%;
+  width: 100%;
+  height: 52px;
+  background-color: white;
+}
+
+.editMessageSvg {
+  margin-left: 20px;
+}
+
+.editMessageConstainer {
+  margin-top: 7px;
+  margin-left: 20px;
+}
+
+.editMessagePage {
+
+}
+
+.editMessageText {
+  color: $grey-font-page;
+}
+
+.closeEditMessageButton {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: inherit;
+  border: none;
+  cursor: pointer;
+}

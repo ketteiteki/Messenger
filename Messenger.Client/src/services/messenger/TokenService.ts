@@ -1,6 +1,5 @@
 
 
-
 export default class TokenService {
     public static getLocalAccessToken(): string | null {
         return localStorage.getItem("AuthorizationToken");

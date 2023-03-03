@@ -47,6 +47,8 @@ public class UpdateMessageCommandHandler : IRequestHandler<UpdateMessageCommand,
 
 		var messageUpdateNotification = new MessageUpdateNotificationDto
 		{
+			OwnerId = message.OwnerId,
+			ChatId = message.ChatId,
 			MessageId = message.Id,
 			UpdatedText = message.Text,
 			IsLastMessage = message.Chat.LastMessageId == message.Id

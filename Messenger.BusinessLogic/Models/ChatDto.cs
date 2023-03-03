@@ -1,4 +1,3 @@
-using Messenger.Domain.Entities;
 using Messenger.Domain.Enum;
 
 namespace Messenger.BusinessLogic.Models;
@@ -36,8 +35,8 @@ public class ChatDto
 	public DateTime? BanDateOfExpire { get; init; }
 	
 	public RoleUserByChatDto RoleUser { get; init; }
-	
-	public List<UserDto> Members { get; set; }
 
-	public List<RoleUserByChatDto> UsersWithRole { get; set; }
+	public List<UserDto> Members { get; set; } = new();
+
+	public List<RoleUserByChatDto> UsersWithRole { get; set; } = new();
 }

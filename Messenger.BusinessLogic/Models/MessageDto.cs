@@ -20,8 +20,8 @@ public class MessageDto
 	public string ReplyToMessageText { get; init; }
 	
 	public string ReplyToMessageAuthorDisplayName { get; init; }
-	
-	public List<AttachmentDto> Attachments { get; init; } 
+
+	public List<AttachmentDto> Attachments { get; init; } = new();
 	
 	public Guid ChatId { get; init; }
 

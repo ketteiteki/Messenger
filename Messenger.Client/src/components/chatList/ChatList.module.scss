@@ -1,0 +1,57 @@
+@import "../../App.scss";
+
+.chatList {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  width: 330px;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.header {
+  display: flex;
+  padding: 15px;
+  border-bottom: 1px solid $light-grey-border;
+
+  p {
+    line-height: 30px;
+    margin-left: 10px;
+  }
+}
+
+.search {
+  display: flex;
+  height: 50px;
+  padding: 15px;
+  border-bottom: 1px solid $light-grey-border;
+  border-right: 2px solid $light-grey;
+
+  input {
+    width: 100%;
+    margin-left: 5px;
+    outline: none;
+    border: none;
+    font-size: 18px;
+  }
+}
+
+.items {
+  border-radius: 0 0 0 20px;
+  flex-grow: 1;
+  border-right: 2px solid $light-grey;
+  overflow-y: auto;
+}
+
+.penSvg {
+  
+}
+
+.createChatButton {
+  position: absolute;
+  top: 18px;
+  right: 15px;
+  cursor: pointer;
+  border: none;
+  background-color: inherit;
+}

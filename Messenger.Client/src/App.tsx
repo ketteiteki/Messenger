@@ -1,22 +1,30 @@
 import React from "react";
-import { Routes, Route, BrowserRouter } from "react-router-dom";
-import { Login } from "./pages/Login";
-import { Registration } from "./pages/Registration";
 import "./App.scss";
-import { Layout } from "./pages/Layout";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { observer } from "mobx-react-lite";
+import Layout from "./pages/layout/Layout";
+import Login from "./pages/login/Login";
+import Registration from "./pages/registration/Registration";
+import ChatInfo from "./components/chatInfo/ChatInfo";
+import ProfileInfo from "./components/profileInfo/ProfileInfo";
+import CreateChat from "./components/createChat/CreateChat";
 
-const App = () => {
+const App = observer(() => {
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route path="" element={<ProfileInfo />} />
+            <Route path="chatInfo" element={<ChatInfo />} />
+            <Route path="createChat" element={<CreateChat />} />
+          </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/registration" element={<Registration />} />
-          <Route path="/" element={<Layout />} />
         </Routes>
       </BrowserRouter>
     </div>
   );
-};
+});
 
 export default App;

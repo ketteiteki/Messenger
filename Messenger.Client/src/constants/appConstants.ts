@@ -1,5 +1,5 @@
 
 
-export class AppConstants {
-    static serverDomain: string = "https://localhost:7400"
+export default class AppConstants {
+    public static serverDomain: string = "https://localhost:7400";
 }

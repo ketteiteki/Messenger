@@ -1,0 +1,206 @@
+@import "../../App.scss";
+
+.chatInfo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.avatarContainer {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 100%;
+  margin: 0 auto;
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+
+.avatarBlackCover {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 100%;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $blackTransparent;
+  }
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 100%;
+}
+
+.title {
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.name {
+  font-size: 14px;
+  text-align: center;
+  color: $light-grey-font-page;
+  margin-bottom: 6px;
+}
+
+.inputTitle {
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 5px;
+  outline: none;
+  border: none;
+  border-bottom: 1px solid $grey;
+}
+
+.inputName {
+  font-size: 14px;
+  text-align: center;
+  color: $light-grey-font-page;
+  margin-bottom: 5px;
+  outline: none;
+  border: none;
+  border-bottom: 1px solid $grey;
+}
+
+.joinChattingButton {
+  border: none;
+  background-color: inherit;
+  font-size: 17px;
+  color: $blue;
+  margin-bottom: 10px;
+
+  &:hover {
+    transition: 0.2;
+    color: $blueHover;
+    cursor: pointer;
+  }
+}
+
+.leaveChattingButton {
+  border: none;
+  background-color: inherit;
+  font-size: 17px;
+  color: $red;
+  margin-bottom: 10px;
+
+  &:hover {
+    transition: 0.2;
+    color: $redHover;
+    cursor: pointer;
+  }
+}
+
+.settingsButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border: none;
+  background-color: inherit;
+  cursor: pointer;
+  transition: .1s;
+  border-radius: 5px;
+  padding: 5px 7px;
+
+  &:hover {
+    background-color: $light-grey;
+  }
+}
+
+.showMembersButton {
+  border: none;
+  width: 100%;
+  height: 30px;
+  cursor: pointer;
+  background-color: $grey;
+  color: $grey-font-page;
+  flex-shrink: 0;
+  transition: .2s;
+
+  &:hover {
+    background-color: $greyHover;
+  }
+}
+
+.memberList {
+  display: block;
+  overflow-y: scroll;
+  width: 100%;
+  height: 100%;
+  border-radius: 0 0 20px 0;
+}
+
+.memberItem {
+  display: flex;
+  border-bottom: 2px solid $grey;
+  transition: 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $light-grey
+  }
+}
+
+.memberItemAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  margin: 5px;
+  flex-shrink: 0;
+}
+
+.memberItemContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin-left: 5px;
+}
+
+.memberItemDisplayName {
+  font-size: 15px;
+  margin-top: 5px;
+}
+
+.memberItemBio {
+  font-size: 12px;
+  margin-top: 5px;
+  color: $light-grey-font-page;
+}
+
+.memberItemRole {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  font-size: 12px;
+  color: $grey-font-page;
+}
+
+.okButton {
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  border: none;
+  background-color: $green;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: .1s;
+  
+  &:hover {
+    background-color: $greenHover;
+  }
+}
+
+.avatarInput {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}

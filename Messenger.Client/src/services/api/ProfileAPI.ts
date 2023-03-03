@@ -1,7 +1,7 @@
-import { IUser } from "../../models/interfaces/IUser";
-import api from "./baseAPI";
+import IUserDto from "../../models/interfaces/IUserDto";
+import api from "./baseApi";
 
-export default class ProfileAPI {
+export default class ProfileApi {
   public static async putUpdateProfileAsync(
     displayName: string,
     nickName: string,
@@ -13,18 +13,22 @@ export default class ProfileAPI {
       bio,
     };
 
-    return await api.put<IUser>(`/Profile/update`, data);
+    return await api.put<IUserDto>(`/Profile/update`, data);
   }
 
-  public static async putUpdateProfileAvatarAsync(avatarFile: File) {
-    const formData = new FormData();
+  public static async putUpdateProfileAvatarAsync(avatar: File) {
+    const data = {
+      avatar,
+    };
 
-    formData.append("Avatar", avatarFile);
-
-    return await api.put<IUser>(`/Profile/updateAvatar`, formData);
+    return await api.put<IUserDto>(`/Profile/updateAvatar`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   }
 
   public static async delDeleteProfileAsync() {
-    return await api.delete<IUser>(`/Profile/deleteProfile`);
+    return await api.delete<IUserDto>(`/Profile/deleteProfile`);
   }
 }

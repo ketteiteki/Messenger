@@ -1,0 +1,72 @@
+@import "../../App.scss"; 
+
+.createChat {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.createChatContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 400px;
+  margin: auto;
+}
+
+.inputTitle {
+  width: 98%;
+  height: 35px;
+  border: none;
+  outline: none;
+  font-size: 22px;
+  color: $grey-font-page;
+  text-align: center;
+  margin: 0 auto;
+  border-bottom: 1px solid $light-grey-border;
+  margin-bottom: 15px;
+}
+
+.inputName {
+  width: 98%;
+  height: 35px;
+  border: none;
+  outline: none;
+  font-size: 22px;
+  color: $grey-font-page;
+  text-align: center;
+  margin: 0 auto;
+  border-bottom: 1px solid $light-grey-border;
+  margin-bottom: 15px;
+}
+
+.chooseChatTypeSelect {
+  width: 98%;
+  height: 35px;
+  border: none;
+  outline: none;
+  font-size: 22px;
+  color: $grey-font-page;
+  text-align: center;
+  margin: 0 auto;
+  background-color: inherit;
+  border-bottom: 1px solid $light-grey-border;
+  margin-bottom: 15px;
+}
+
+.CreateChatButton {
+  border: none;
+  outline: none;
+  font-size: 20px;
+  text-align: center;
+  margin: 0 auto;
+  background-color: inherit;
+  color: $blue;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: .1s;
+
+  &:hover {
+    color: $blueHover;
+  }
+}

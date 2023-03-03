@@ -1,5 +1,6 @@
-import { AppConstants } from "./../../constants/appConstants";
+import { authorizationState } from "./../../state/AuthorizationState";
 import axios from "axios";
+import AppConstants from "../../constants/AppConstants";
 import TokenService from "../messenger/TokenService";
 
 const api = axios.create({
@@ -39,7 +40,8 @@ api.interceptors.response.use(
     ) {
       if (err.response.status === 401 && !originalConfig._retry) {
         originalConfig._retry = true;
-
+        console.log(3);
+        authorizationState.incrementCountFailRefresh();
         try {
           const refreshToken = TokenService.getLocalRefreshToken();
 
@@ -54,7 +56,6 @@ api.interceptors.response.use(
         }
       }
     }
-
     return Promise.reject(err);
   }
 );

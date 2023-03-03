@@ -1,4 +1,3 @@
-using Messenger.BusinessLogic.Hubs;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Messenger.Infrastructure.DependencyInjection;
