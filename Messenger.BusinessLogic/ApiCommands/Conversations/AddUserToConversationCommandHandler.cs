@@ -1,8 +1,10 @@
 using MediatR;
+using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Entities;
 using Messenger.Services;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.BusinessLogic.ApiCommands.Conversations;
@@ -10,10 +12,12 @@ namespace Messenger.BusinessLogic.ApiCommands.Conversations;
 public class AddUserToConversationCommandHandler : IRequestHandler<AddUserToConversationCommand, Result<UserDto>>
 {
 	private readonly DatabaseContext _context;
+	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 
-	public AddUserToConversationCommandHandler(DatabaseContext context)
+	public AddUserToConversationCommandHandler(DatabaseContext context, IHubContext<ChatHub, IChatHub> hubContext)
 	{
 		_context = context;
+		_hubContext = hubContext;
 	}
 	
 	public async Task<Result<UserDto>> Handle(AddUserToConversationCommand request, CancellationToken cancellationToken)
@@ -21,6 +25,8 @@ public class AddUserToConversationCommandHandler : IRequestHandler<AddUserToConv
 		var chatUserByRequester = await _context.ChatUsers
 			.Include(c => c.Role)
 			.Include(c => c.Chat)
+			.ThenInclude(c => c.LastMessage)
+			.ThenInclude(m => m.Owner)
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
 
 		if (chatUserByRequester == null)
@@ -56,6 +62,34 @@ public class AddUserToConversationCommandHandler : IRequestHandler<AddUserToConv
 			
 			_context.ChatUsers.Add(new ChatUser {UserId = request.UserId, ChatId = request.ChatId});
 			await _context.SaveChangesAsync(cancellationToken);
+
+			var usersWithRole = await _context.ChatUsers
+				.Include(c => c.Role)
+				.Where(c => c.ChatId == request.ChatId && c.Role != null)
+				.Select(c => new RoleUserByChatDto(c.Role))
+				.ToListAsync(cancellationToken);
+
+			var memberCountChat = await _context.ChatUsers.Where(c => c.ChatId == request.ChatId).CountAsync(cancellationToken);
+			
+			var chatDto = new ChatDto
+			{
+				Id = chatUserByRequester.Chat.Id,
+				Name = chatUserByRequester.Chat.Name,
+				Title = chatUserByRequester.Chat.Title,
+				Type = chatUserByRequester.Chat.Type,
+				AvatarLink = chatUserByRequester.Chat.AvatarLink,
+				LastMessageId = chatUserByRequester.Chat.LastMessage?.Id,
+				LastMessageText = chatUserByRequester.Chat.LastMessage?.Text,
+				LastMessageAuthorDisplayName = chatUserByRequester.Chat.LastMessage?.Owner?.DisplayName,
+				LastMessageDateOfCreate = chatUserByRequester.Chat.LastMessage?.DateOfCreate,
+				MembersCount = memberCountChat,
+				CanSendMedia = true,
+				IsOwner = chatUserByRequester.Chat.OwnerId == request.UserId,
+				IsMember = true,
+				UsersWithRole = usersWithRole
+			};
+			
+			await _hubContext.Clients.User(request.UserId.ToString()).CreateChatForUserAfterAddUserInChat(chatDto);
 			
 			return new Result<UserDto>(new UserDto(user));
 		}

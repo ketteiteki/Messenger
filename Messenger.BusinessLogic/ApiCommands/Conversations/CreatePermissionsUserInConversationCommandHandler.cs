@@ -1,7 +1,9 @@
 using MediatR;
+using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Services;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.BusinessLogic.ApiCommands.Conversations;
@@ -10,10 +12,12 @@ public class CreatePermissionsUserInConversationCommandHandler
 	: IRequestHandler<CreatePermissionsUserInConversationCommand, Result<PermissionDto>>
 {
 	private readonly DatabaseContext _context;
+	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 
-	public CreatePermissionsUserInConversationCommandHandler(DatabaseContext context)
+	public CreatePermissionsUserInConversationCommandHandler(DatabaseContext context, IHubContext<ChatHub, IChatHub> hubContext)
 	{
 		_context = context;
+		_hubContext = hubContext;
 	}
 
 	public async Task<Result<PermissionDto>> Handle(CreatePermissionsUserInConversationCommand request
@@ -41,12 +45,29 @@ public class CreatePermissionsUserInConversationCommandHandler
 			{
 				return new Result<PermissionDto>(new DbEntityNotFoundError("No user found in chat"));
 			}
+
+			var notifyPermissionForUserDto = new NotifyPermissionForUserDto(
+				chatId: request.ChatId,
+				canSendMedia: request.CanSendMedia,
+				muteDateOfExpire: null
+			); 
+			
+			if (request.MuteMinutes != null && request.MuteMinutes >= 1)
+			{
+				var muteDateOfExpire = DateTime.UtcNow.AddMinutes((int) request.MuteMinutes);
+
+				chatUserByUser.MuteDateOfExpire = muteDateOfExpire;
+				
+				notifyPermissionForUserDto.MuteDateOfExpire = muteDateOfExpire;
+			}
 			
 			chatUserByUser.CanSendMedia = request.CanSendMedia;
 
 			_context.ChatUsers.Update(chatUserByUser);
 			await _context.SaveChangesAsync(cancellationToken);
-				
+
+			await _hubContext.Clients.User(request.UserId.ToString()).NotifyPermissionForUser(notifyPermissionForUserDto);
+			
 			return new Result<PermissionDto>(new PermissionDto(chatUserByUser));
 		}
 		

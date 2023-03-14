@@ -8,5 +8,6 @@ public record CreatePermissionsUserInConversationCommand(
 	Guid RequesterId,
 	Guid ChatId,
 	Guid UserId,
-	bool CanSendMedia)
+	bool CanSendMedia,
+	int? MuteMinutes)
 	: IRequest<Result<PermissionDto>>;

@@ -45,7 +45,8 @@ public class CreatePermissionsUserInConversationTestThrowForbidden : Integration
             RequesterId: bob.Value.Id,
             ChatId: conversation.Value.Id,
             UserId: alice.Value.Id,
-            CanSendMedia: false);
+            CanSendMedia: false,
+            MuteMinutes: null);
         
         var createPermissionUserAliceInConversationByBobResult = 
             await MessengerModule.RequestAsync(createPermissionUserAliceInConversationByBobCommand, CancellationToken.None);
@@ -54,7 +55,8 @@ public class CreatePermissionsUserInConversationTestThrowForbidden : Integration
             RequesterId: alice.Value.Id,
             ChatId: conversation.Value.Id,
             UserId: alex.Value.Id,
-            CanSendMedia: false);
+            CanSendMedia: false,
+            MuteMinutes: null);
         
         var createPermissionUserAlexInConversationByAliceResult = 
             await MessengerModule.RequestAsync(createPermissionUserAlexInConversationByAliceCommand, CancellationToken.None);

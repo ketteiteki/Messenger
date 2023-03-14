@@ -36,7 +36,8 @@ public class GetChannelTestSuccess : IntegrationTestBase, IIntegrationTest
 			RequesterId: user21Th.Value.Id,
 			UserId: bob.Value.Id,
 			ChatId: channel.Value.Id,
-			CanSendMedia: false);
+			CanSendMedia: false,
+			MuteMinutes: null);
 
 		await MessengerModule.RequestAsync(createPermissionsUserBobBy21ThCommand, CancellationToken.None);
 
