@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
+using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
@@ -63,21 +64,33 @@ public class CreatePermissionsUserInConversationTestSuccess : IntegrationTestBas
 			RequesterId: user21Th.Value.Id,
 			UserId: bob.Value.Id,
 			ChatId: conversation.Value.Id,
-			CanSendMedia: false);
+			CanSendMedia: false,
+			MuteMinutes: 5);
 
 		var createPermissionsUserInConversationByAliceCommand = new CreatePermissionsUserInConversationCommand(
 			RequesterId: alice.Value.Id,
 			UserId: alex.Value.Id,
 			ChatId: conversation.Value.Id,
-			CanSendMedia: false
-		);
+			CanSendMedia: false,
+			MuteMinutes: null);
+		
+		var createPermissionsUserBobInConversationByAlexCommand = new CreatePermissionsUserInConversationCommand(
+			RequesterId: alex.Value.Id,
+			UserId: bob.Value.Id,
+			ChatId: conversation.Value.Id,
+			CanSendMedia: false,
+			MuteMinutes: 10);
 		
 		var createPermissionsUserInConversationBy21ThResult =
 			await MessengerModule.RequestAsync(createPermissionsUserInConversationBy21ThCommand, CancellationToken.None);
 		var createPermissionsUserInConversationByAliceResult = 
 			await MessengerModule.RequestAsync(createPermissionsUserInConversationByAliceCommand, CancellationToken.None);
+		var createPermissionsUserBobInConversationByAlexResult = 
+			await MessengerModule.RequestAsync(createPermissionsUserBobInConversationByAlexCommand, CancellationToken.None);
 
 		createPermissionsUserInConversationBy21ThResult.Value.CanSendMedia.Should().BeFalse();
+		createPermissionsUserInConversationBy21ThResult.Value.MuteDateOfExpire.Should().NotBeNull();
 		createPermissionsUserInConversationByAliceResult.Value.CanSendMedia.Should().BeFalse();
+		createPermissionsUserBobInConversationByAlexResult.Error.Should().BeOfType<ForbiddenError>();
 	}
 }

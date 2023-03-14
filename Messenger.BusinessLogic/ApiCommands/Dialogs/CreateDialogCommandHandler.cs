@@ -1,9 +1,11 @@
 using MediatR;
+using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Entities;
 using Messenger.Domain.Enum;
 using Messenger.Services;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.BusinessLogic.ApiCommands.Dialogs;
@@ -11,10 +13,12 @@ namespace Messenger.BusinessLogic.ApiCommands.Dialogs;
 public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, Result<ChatDto>>
 {
 	private readonly DatabaseContext _context;
+	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 
-	public CreateDialogCommandHandler(DatabaseContext context)
+	public CreateDialogCommandHandler(DatabaseContext context, IHubContext<ChatHub, IChatHub> hubContext)
 	{
 		_context = context;
+		_hubContext = hubContext;
 	}
 	
 	public async Task<Result<ChatDto>> Handle(CreateDialogCommand request, CancellationToken cancellationToken)
@@ -59,17 +63,20 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 			await _context.Entry(chatUser).Reference(c => c.User).LoadAsync(cancellationToken);
 		}
 		
-		return new Result<ChatDto>(
-			new ChatDto
-			{
-				Id = newDialog.Id,
-				Name = newDialog.Name,
-				Title = newDialog.Title,
-				Type = newDialog.Type,
-				AvatarLink = user.AvatarLink,
-				MembersCount = 2,
-				IsMember = true,
-				Members = newDialog.ChatUsers.Select(c => new UserDto(c.User)).ToList()
-			});
+		var chatDto = new ChatDto
+		{
+			Id = newDialog.Id,
+			Name = newDialog.Name,
+			Title = newDialog.Title,
+			Type = newDialog.Type,
+			AvatarLink = user.AvatarLink,
+			MembersCount = 2,
+			IsMember = true,
+			Members = newDialog.ChatUsers.Select(c => new UserDto(c.User)).ToList()
+		};
+		
+		await _hubContext.Clients.User(request.UserId.ToString()).CreateDialogForInterlocutor(chatDto);
+		
+		return new Result<ChatDto>(chatDto);
 	}
 }

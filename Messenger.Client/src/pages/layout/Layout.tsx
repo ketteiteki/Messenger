@@ -68,9 +68,13 @@ const Layout = observer(() => {
         chatListWithMessagesState.deleteMessageInData(message);
       });
 
+      signalRConfiguration.connection.on("CreateDialogForInterlocutor", (message: string) => {
+        console.log(message);
+      });
+
       signalRConfiguration.connection
         .start()
-        .then(function () {
+        .then(function () {  
           response.data.forEach(async (c) => {
             await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, c.id);
           });
