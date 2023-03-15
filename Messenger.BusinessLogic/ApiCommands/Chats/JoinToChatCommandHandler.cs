@@ -10,7 +10,7 @@ namespace Messenger.BusinessLogic.ApiCommands.Chats;
 
 public class JoinToChatCommandHandler : IRequestHandler<JoinToChatCommand, Result<ChatDto>>
 {
-	private DatabaseContext _context;
+	private readonly DatabaseContext _context;
 
 	public JoinToChatCommandHandler(DatabaseContext context)
 	{
@@ -23,12 +23,15 @@ public class JoinToChatCommandHandler : IRequestHandler<JoinToChatCommand, Resul
 			.Where(c => c.Type != ChatType.Dialog)
 			.FirstOrDefaultAsync(c => c.Id == request.ChatId, cancellationToken);
 
-		if (chat == null) return new Result<ChatDto>(new DbEntityNotFoundError("Chat not found"));
+		if (chat == null)
+		{
+			return new Result<ChatDto>(new DbEntityNotFoundError("Chat not found"));
+		}
 		
-		var chatUser = await _context.ChatUsers
-			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
+		var isChatUserExists = await _context.ChatUsers.AnyAsync(c => 
+			c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
 
-		if (chatUser != null)
+		if (isChatUserExists)
 		{
 			return new Result<ChatDto>(new DbEntityExistsError("User already exists in the chat"));
 		}
@@ -48,25 +51,28 @@ public class JoinToChatCommandHandler : IRequestHandler<JoinToChatCommand, Resul
 		await _context.SaveChangesAsync(cancellationToken);
 
 		var memberCount = await _context.ChatUsers.Where(c => c.ChatId == request.ChatId).CountAsync(cancellationToken);
+
+		var chatDto = new ChatDto
+		{
+			Id = chat.Id,
+			Name = chat.Name,
+			Title = chat.Title,
+			Type = chat.Type,
+			AvatarLink = chat.AvatarLink,
+			LastMessageId = chat.LastMessageId,
+			LastMessageText = chat.LastMessage?.Text,
+			LastMessageAuthorDisplayName = 
+				chat.LastMessage is { Owner: { } }
+				? chat.LastMessage.Owner.DisplayName
+				: null,
+			LastMessageDateOfCreate = chat.LastMessage?.DateOfCreate,
+			IsOwner = chat.OwnerId == request.RequesterId,
+			IsMember = true,
+			MembersCount = memberCount,
+			MuteDateOfExpire = newChatUser.MuteDateOfExpire,
+			BanDateOfExpire = null,
+		};
 		
-		return new Result<ChatDto>(
-			new ChatDto
-			{
-				Id = chat.Id,
-				Name = chat.Name,
-				Title = chat.Title,
-				Type = chat.Type,
-				AvatarLink = chat.AvatarLink,
-				LastMessageId = chat.LastMessageId,
-				LastMessageText = chat.LastMessage?.Text,
-				LastMessageAuthorDisplayName = chat.LastMessage != null && chat.LastMessage.Owner != null ?
-					chat.LastMessage.Owner.DisplayName : null,
-				LastMessageDateOfCreate = chat.LastMessage?.DateOfCreate,
-				IsOwner = chat.OwnerId == request.RequesterId,
-				IsMember = true,
-				MembersCount = memberCount,
-				MuteDateOfExpire = newChatUser.MuteDateOfExpire,
-				BanDateOfExpire = null,
-			});
+		return new Result<ChatDto>(chatDto);
 	}
 }

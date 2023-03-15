@@ -18,6 +18,7 @@ public class GetSessionListQueryHandler : IRequestHandler<GetSessionListQuery, R
     public async Task<Result<List<SessionDto>>> Handle(GetSessionListQuery request, CancellationToken cancellationToken)
     {
         var sessionList = await _context.Sessions
+            .AsNoTracking()
             .Where(s => s.UserId == request.RequesterId)
             .Select(s => new SessionDto(s))
             .ToListAsync(cancellationToken);

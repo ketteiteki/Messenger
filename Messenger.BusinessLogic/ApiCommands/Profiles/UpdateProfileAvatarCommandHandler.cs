@@ -25,30 +25,40 @@ public class UpdateProfileAvatarCommandHandler : IRequestHandler<UpdateProfileAv
 	
 	public async Task<Result<UserDto>> Handle(UpdateProfileAvatarCommand request, CancellationToken cancellationToken)
 	{
-		var requester = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, CancellationToken.None);
+		var messengerDomainName = _configuration[AppSettingConstants.MessengerDomainName];
+		
+		var requester = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, cancellationToken);
 
 		if (requester.AvatarLink == null && request.AvatarFile == null)
 		{
 			return new Result<UserDto>(new ConflictError("Avatar not exists"));
 		}
-		
+
+		var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+
 		if (requester.AvatarLink != null && request.AvatarFile == null)
 		{
-			_fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), requester.AvatarLink.Split("/")[^1]));
+			var avatarFileName = requester.AvatarLink.Split("/")[^1];
+
+			var avatarFilePath = Path.Combine(pathWwwRoot, avatarFileName);
+			
+			_fileService.DeleteFile(avatarFilePath);
+			
 			requester.AvatarLink = null;
 			
 			_context.Users.Update(requester);
+			
 			await _context.SaveChangesAsync(cancellationToken);
 
 			return new Result<UserDto>(new UserDto(requester));
 		}
 
-		var avatarLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), request.AvatarFile,
-			_configuration[AppSettingConstants.MessengerDomainName]);
+		var avatarLink = await _fileService.CreateFileAsync(pathWwwRoot, request.AvatarFile, messengerDomainName);
 
 		requester.AvatarLink = avatarLink;
 			
 		_context.Users.Update(requester);
+		
 		await _context.SaveChangesAsync(cancellationToken);
 
 		return new Result<UserDto>(new UserDto(requester));

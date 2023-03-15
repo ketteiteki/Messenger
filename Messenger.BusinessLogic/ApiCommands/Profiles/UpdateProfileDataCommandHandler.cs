@@ -17,19 +17,22 @@ public class UpdateProfileDataCommandHandler : IRequestHandler<UpdateProfileData
 	
 	public async Task<Result<UserDto>> Handle(UpdateProfileDataCommand request, CancellationToken cancellationToken)
 	{
-		if (request.Nickname == null && request.DisplayName == null && request.Bio == null)
+		var isDataNotChanged = request.Nickname == null && request.DisplayName == null && request.Bio == null;
+		
+		if (isDataNotChanged)
 		{
 			return new Result<UserDto>(new BadRequestError("Data cannot all be null"));
 		}
 		
 		var requester = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, cancellationToken);
 
-		if (request.Nickname != null && requester.Nickname != request.Nickname )
+		var isNicknameChanged = request.Nickname != null && requester.Nickname != request.Nickname;
+		
+		if (isNicknameChanged)
 		{
-			var userByNickname =  await _context.Users
-				.FirstOrDefaultAsync(u => u.Nickname == request.Nickname, cancellationToken);
+			var isUserByNicknameExists =  await _context.Users.AnyAsync(u => u.Nickname == request.Nickname, cancellationToken);
 
-			if (userByNickname != null)
+			if (isUserByNicknameExists)
 			{
 				return new Result<UserDto>(new DbEntityExistsError("User with this nickname already exists")); 
 			}
@@ -48,6 +51,7 @@ public class UpdateProfileDataCommandHandler : IRequestHandler<UpdateProfileData
 		}
 		
 		_context.Users.Update(requester);
+		
 		await _context.SaveChangesAsync(cancellationToken);
 
 		return new Result<UserDto>(new UserDto(requester));

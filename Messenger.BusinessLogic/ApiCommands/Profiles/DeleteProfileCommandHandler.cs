@@ -23,15 +23,22 @@ public class DeleteProfileCommandHandler : IRequestHandler<DeleteProfileCommand,
 	{
 		var requester = await _context.Users
 			.Include(u => u.ChatUsers)
-			.FirstAsync(u => u.Id == request.RequesterId, CancellationToken.None);
+			.FirstAsync(u => u.Id == request.RequesterId, cancellationToken);
 
 		if (requester.AvatarLink != null)
 		{
-			_fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), requester.AvatarLink.Split("/")[^1]));
+			var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+			var avatarFileName = requester.AvatarLink.Split("/")[^1];
+
+			var avatarFilePath = Path.Combine(pathWwwRoot, avatarFileName);
+			
+			_fileService.DeleteFile(avatarFilePath);
+			
 			requester.AvatarLink = null;
 		}
 		
 		_context.Users.Remove(requester);
+		
 		await _context.SaveChangesAsync(cancellationToken);
 
 		return new Result<UserDto>(new UserDto(requester));

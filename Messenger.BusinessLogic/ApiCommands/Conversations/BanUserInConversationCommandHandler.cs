@@ -37,36 +37,43 @@ public class BanUserInConversationCommandHandler : IRequestHandler<BanUserInConv
 			return new Result<UserDto>(new ForbiddenError("No requester in the chat"));
 		}
 		
-		if (chatUserByRequester.Role is { CanBanUser: true } || chatUserByRequester.Chat.OwnerId == request.RequesterId)
+		if ((chatUserByRequester.Role == null &&
+		     chatUserByRequester.Chat.OwnerId != request.RequesterId)  || 
+		    (chatUserByRequester.Role is { CanBanUser: false } &&
+		     chatUserByRequester.Chat.OwnerId != request.RequesterId))
 		{
-			var chatUser = await _context.ChatUsers
-				.Include(c => c.User)
-				.FirstOrDefaultAsync(b => b.UserId == request.UserId && b.ChatId == request.ChatId, cancellationToken);
+			return new Result<UserDto>(new ForbiddenError("No rights to ban a user in chat"));
+		}
+		
+		var chatUser = await _context.ChatUsers
+			.Include(c => c.User)
+			.FirstOrDefaultAsync(b => b.UserId == request.UserId && b.ChatId == request.ChatId, cancellationToken);
 
-			if (chatUser == null)
-			{
-				return new Result<UserDto>(new DbEntityNotFoundError("User is not in this chat"));
-			}
-
-			var banDateOfExpire = DateTime.UtcNow.AddMinutes(request.BanMinutes);
-			
-			_context.BanUserByChats.Add(new BanUserByChat
-			{
-				UserId = request.UserId, 
-				ChatId = request.ChatId, 
-				BanDateOfExpire = banDateOfExpire
-			});
-			
-			_context.ChatUsers.Remove(chatUser);
-			await _context.SaveChangesAsync(cancellationToken);
-
-			var notifyBanUserDto = new NotifyBanUserDto(chatId: request.ChatId, banDateOfExpire: banDateOfExpire);
-			
-			await _hubContext.Clients.User(request.UserId.ToString()).NotifyBanUser(notifyBanUserDto);
-			
-			return new Result<UserDto>(new UserDto(chatUser.User));
+		if (chatUser == null)
+		{
+			return new Result<UserDto>(new DbEntityNotFoundError("User is not in this chat"));
 		}
 
-		return new Result<UserDto>(new ForbiddenError("No rights to ban a user in chat"));
+		var banDateOfExpire = DateTime.UtcNow.AddMinutes(request.BanMinutes);
+
+		var banUserByChat = new BanUserByChat
+		{
+			UserId = request.UserId,
+			ChatId = request.ChatId,
+			BanDateOfExpire = banDateOfExpire
+		};
+
+		_context.BanUserByChats.Add(banUserByChat);
+		_context.ChatUsers.Remove(chatUser);
+		
+		await _context.SaveChangesAsync(cancellationToken);
+
+		var notifyBanUserDto = new NotifyBanUserDto(request.ChatId, banDateOfExpire);
+			
+		await _hubContext.Clients.User(request.UserId.ToString()).NotifyBanUser(notifyBanUserDto);
+			
+		return new Result<UserDto>(new UserDto(chatUser.User));
+
+		
 	}
 }

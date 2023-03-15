@@ -28,24 +28,28 @@ public class RemoveUserFromConversationCommandHandler : IRequestHandler<RemoveUs
 			return new Result<UserDto>(new DbEntityNotFoundError("No requester in the chat"));
 		}
 		
-		if (chatUserByRequester.Role is { CanAddAndRemoveUserToConversation: true } ||
-		    chatUserByRequester.Chat.OwnerId == request.RequesterId)
+		if ((chatUserByRequester.Role == null &&
+		     chatUserByRequester.Chat.OwnerId != request.RequesterId)  || 
+		    (chatUserByRequester.Role is { CanAddAndRemoveUserToConversation: false } &&
+		     chatUserByRequester.Chat.OwnerId != request.RequesterId))
 		{
-			var chatUserByUser = await _context.ChatUsers
-				.Include(c => c.User)
-				.FirstOrDefaultAsync(r => r.UserId == request.UserId && r.ChatId == request.ChatId, cancellationToken);
-
-			if (chatUserByUser == null)
-			{
-				return new Result<UserDto>(new DbEntityNotFoundError("No User in the chat"));
-			}
-			
-			_context.ChatUsers.Remove(chatUserByUser);
-			await _context.SaveChangesAsync(cancellationToken);
-			
-			return new Result<UserDto>(new UserDto(chatUserByUser.User));
+			return new Result<UserDto>(new ForbiddenError("You cannot delete a user in someone else's conversation"));
 		}
 		
-		return new Result<UserDto>(new ForbiddenError("You cannot delete a user in someone else's conversation"));
+		var chatUserByUser = await _context.ChatUsers
+			.Include(c => c.User)
+			.FirstOrDefaultAsync(r => r.UserId == request.UserId && r.ChatId == request.ChatId, cancellationToken);
+
+		if (chatUserByUser == null)
+		{
+			return new Result<UserDto>(new DbEntityNotFoundError("No User in the chat"));
+		}
+			
+		_context.ChatUsers.Remove(chatUserByUser);
+		
+		await _context.SaveChangesAsync(cancellationToken);
+			
+		return new Result<UserDto>(new UserDto(chatUserByUser.User));
+		
 	}
 }

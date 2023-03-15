@@ -48,6 +48,7 @@ public class DeleteDialogCommandHandler : IRequestHandler<DeleteDialogCommand, R
 			
 			_context.DeletedDialogByUsers.RemoveRange(deletedDialogByUsers);
 			_context.ChatUsers.RemoveRange(chatUsers);
+			
 			foreach (var chatUserItem in chatUsers)
 			{
 				_context.Chats.Remove(chatUserItem.Chat);
@@ -59,8 +60,8 @@ public class DeleteDialogCommandHandler : IRequestHandler<DeleteDialogCommand, R
 			{
 				await _hubContext.Clients.User(interlocutorGuid.ToString()).DeleteDialogForInterlocutor(request.ChatId.ToString());
 			}
-			
-			return new Result<ChatDto>(new ChatDto
+
+			var chatDtoAfterDeleteFotAll = new ChatDto
 			{
 				Id = chatUser.Chat.Id,
 				Name = chatUser.Chat.Name,
@@ -69,15 +70,17 @@ public class DeleteDialogCommandHandler : IRequestHandler<DeleteDialogCommand, R
 				AvatarLink = null,
 				LastMessageId = chatUser.Chat.LastMessageId,
 				LastMessageText = chatUser.Chat.LastMessage?.Text,
-				LastMessageAuthorDisplayName = chatUser.Chat.LastMessage != null &&
-				                               chatUser.Chat.LastMessage.Owner != null
+				LastMessageAuthorDisplayName = 
+					chatUser.Chat.LastMessage is { Owner: { } }
 					? chatUser.Chat.LastMessage.Owner.DisplayName
 					: null,
 				LastMessageDateOfCreate = chatUser.Chat.LastMessage?.DateOfCreate,
-				MembersCount = 2,
+				MembersCount = 0,
 				CanSendMedia = false,
 				IsMember = false
-			});
+			};
+			
+			return new Result<ChatDto>(chatDtoAfterDeleteFotAll);
 		}
 
 		var deleteDialogByUser = new DeletedDialogByUser
@@ -88,24 +91,26 @@ public class DeleteDialogCommandHandler : IRequestHandler<DeleteDialogCommand, R
 
 		_context.DeletedDialogByUsers.Add(deleteDialogByUser);
 		await _context.SaveChangesAsync(cancellationToken);
+
+		var chatDto = new ChatDto
+		{
+			Id = chatUser.Chat.Id,
+			Name = chatUser.Chat.Name,
+			Title = chatUser.Chat.Title,
+			Type = chatUser.Chat.Type,
+			AvatarLink = null,
+			LastMessageId = chatUser.Chat.LastMessageId,
+			LastMessageText = chatUser.Chat.LastMessage?.Text,
+			LastMessageAuthorDisplayName = 
+				chatUser.Chat.LastMessage is { Owner: { } }
+				? chatUser.Chat.LastMessage.Owner.DisplayName
+				: null,
+			LastMessageDateOfCreate = chatUser.Chat.LastMessage?.DateOfCreate,
+			MembersCount = 1,
+			CanSendMedia = false,
+			IsMember = false
+		};
 		
-		return new Result<ChatDto>(
-			new ChatDto
-			{
-				Id = chatUser.Chat.Id,
-				Name = chatUser.Chat.Name,
-				Title = chatUser.Chat.Title,
-				Type = chatUser.Chat.Type,
-				AvatarLink = null,
-				LastMessageId = chatUser.Chat.LastMessageId,
-				LastMessageText = chatUser.Chat.LastMessage?.Text,
-				LastMessageAuthorDisplayName = chatUser.Chat.LastMessage != null && 
-				                               chatUser.Chat.LastMessage.Owner != null ?
-					chatUser.Chat.LastMessage.Owner.DisplayName : null,
-				LastMessageDateOfCreate = chatUser.Chat.LastMessage?.DateOfCreate,
-				MembersCount = 2,
-				CanSendMedia = false,
-				IsMember = false
-			});
+		return new Result<ChatDto>(chatDto);
 	}
 }

@@ -25,6 +25,10 @@ public class RefreshCommandHandler : IRequestHandler<RefreshCommand, Result<Auth
 
     public async Task<Result<AuthorizationResponse>> Handle(RefreshCommand request, CancellationToken cancellationToken)
     {
+        var accessTokenSignKey = _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
+        var accessTokenLifeTimeMinutes = _configuration[AppSettingConstants.MessengerAccessTokenLifetimeMinutes];
+        var refreshTokenLifetimeDays = _configuration[AppSettingConstants.MessengerRefreshTokenLifetimeDays];
+        
         var session = await _context.Sessions
             .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.RefreshToken == request.RefreshToken, cancellationToken);
@@ -39,16 +43,16 @@ public class RefreshCommandHandler : IRequestHandler<RefreshCommand, Result<Auth
             return new Result<AuthorizationResponse>(new AuthenticationError("Refresh token is expired"));
         }
 
-        var accessToken = _tokenService.CreateAccessToken(session.User, 
-            _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey],
-            int.Parse(_configuration[AppSettingConstants.MessengerAccessTokenLifetimeMinutes]));
+        var accessToken = _tokenService.CreateAccessToken(session.User, accessTokenSignKey, int.Parse(accessTokenLifeTimeMinutes));
 
+        var newSessionExpiresAt = DateTime.UtcNow.AddDays(int.Parse(refreshTokenLifetimeDays));
+        
         var newSession = new Session(
             accessToken: accessToken,
             userId: session.UserId,
             ip: request.Ip,
             userAgent: request.UserAgent,
-            expiresAt: DateTime.UtcNow.AddDays(int.Parse(_configuration[AppSettingConstants.MessengerRefreshTokenLifetimeDays])));
+            expiresAt: newSessionExpiresAt);
 
         _context.Sessions.Remove(session);
         _context.Sessions.Add(newSession);
@@ -56,9 +60,6 @@ public class RefreshCommandHandler : IRequestHandler<RefreshCommand, Result<Auth
 
         await _context.Entry(newSession).Reference(s => s.User).LoadAsync(cancellationToken);
         
-        return new Result<AuthorizationResponse>(new AuthorizationResponse(
-            user: newSession.User,
-            accessToken: accessToken,
-            refreshToken: newSession.RefreshToken));
+        return new Result<AuthorizationResponse>(new AuthorizationResponse(newSession.User, accessToken, newSession.RefreshToken));
     }
 }

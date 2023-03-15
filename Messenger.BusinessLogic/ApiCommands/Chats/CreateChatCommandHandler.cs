@@ -26,11 +26,13 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Resul
     
     public async Task<Result<ChatDto>> Handle(CreateChatCommand request, CancellationToken cancellationToken)
     {
+        var messengerDomainName = _configuration[AppSettingConstants.MessengerDomainName];
+        
         var requester = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, cancellationToken);
 
-        var chatByName = await _context.Chats.FirstOrDefaultAsync(c => c.Name == request.Name, cancellationToken);
+        var chatByName = await _context.Chats.AnyAsync(c => c.Name == request.Name, cancellationToken);
 
-        if (chatByName != null)
+        if (chatByName)
         {
             return new Result<ChatDto>(new DbEntityExistsError("A chat by that name already exists"));
         }
@@ -46,28 +48,33 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Resul
 
         if (request.AvatarFile != null)
         {
-            var avatarLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), request.AvatarFile,
-                _configuration[AppSettingConstants.MessengerDomainName]);
+            var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+            
+            var avatarLink = await _fileService.CreateFileAsync(pathWwwRoot, request.AvatarFile, messengerDomainName);
 
             newChat.AvatarLink = avatarLink;
         }
-		
-        _context.ChatUsers.Add(new ChatUser {UserId = requester.Id, ChatId = newChat.Id});
+
+        var newChatUser = new ChatUser { UserId = requester.Id, ChatId = newChat.Id };
+        
+        _context.ChatUsers.Add(newChatUser);
         _context.Chats.Add(newChat);
+        
         await _context.SaveChangesAsync(cancellationToken);
 
-        return new Result<ChatDto>(
-            new ChatDto
-            {
-                Id = newChat.Id,	
-                Name = newChat.Name,	
-                Title = newChat.Title,	
-                Type = newChat.Type,	
-                AvatarLink = newChat.AvatarLink,	
-                MembersCount = 1,	
-                CanSendMedia = true,	
-                IsOwner = true,
-                IsMember = true
-            });
+        var chatDto = new ChatDto
+        {
+            Id = newChat.Id,
+            Name = newChat.Name,
+            Title = newChat.Title,
+            Type = newChat.Type,
+            AvatarLink = newChat.AvatarLink,
+            MembersCount = 1,
+            CanSendMedia = true,
+            IsOwner = true,
+            IsMember = true
+        };
+        
+        return new Result<ChatDto>(chatDto);
     }
 }

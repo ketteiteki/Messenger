@@ -30,9 +30,14 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<Authoriz
 	
 	public async Task<Result<AuthorizationResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
 	{
+		var accessTokenSignKey = _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
+		var accessTokenLifeTimeMinutes = _configuration[AppSettingConstants.MessengerAccessTokenLifetimeMinutes];
+		var refreshTokenLifetimeDays = _configuration[AppSettingConstants.MessengerRefreshTokenLifetimeDays];
+		
 		var requester = await _context.Users
 			.Include(u => u.Sessions)
 			.FirstOrDefaultAsync(u => u.Nickname == request.Nickname, cancellationToken);
+		
 		if (requester == null)
 		{
 			return new Result<AuthorizationResponse>(new AuthenticationError("User does not exists"));
@@ -45,16 +50,16 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<Authoriz
 			return new Result<AuthorizationResponse>(new AuthenticationError("Password is wrong"));
 		}
 		
-		var accessToken = _tokenService.CreateAccessToken(
-			requester, _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey],
-			int.Parse(_configuration[AppSettingConstants.MessengerAccessTokenLifetimeMinutes]));
+		var accessToken = _tokenService.CreateAccessToken(requester, accessTokenSignKey, int.Parse(accessTokenLifeTimeMinutes));
 
+		var sessionExpiresAt = DateTime.UtcNow.AddDays(int.Parse(refreshTokenLifetimeDays));
+		
 		var session = new Session(
 			accessToken: accessToken,
 			userId: requester.Id,
 			ip: request.Ip,
 			userAgent: request.UserAgent,
-			expiresAt: DateTime.UtcNow.AddDays(int.Parse(_configuration[AppSettingConstants.MessengerRefreshTokenLifetimeDays])));
+			expiresAt: sessionExpiresAt);
 
 		if (requester.Sessions.Count >= 7)
 		{
@@ -66,9 +71,6 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<Authoriz
 		_context.Sessions.Add(session);
 		await _context.SaveChangesAsync(cancellationToken);
 		
-		return new Result<AuthorizationResponse>(new AuthorizationResponse(
-			user: requester, 
-			accessToken: accessToken,
-			refreshToken: session.RefreshToken));
+		return new Result<AuthorizationResponse>(new AuthorizationResponse(requester, accessToken, session.RefreshToken));
 	}
 }

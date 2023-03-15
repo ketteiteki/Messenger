@@ -26,63 +26,76 @@ public class UpdateChatAvatarCommandHandler : IRequestHandler<UpdateChatAvatarCo
 	
 	public async Task<Result<ChatDto>> Handle(UpdateChatAvatarCommand request, CancellationToken cancellationToken)
 	{
+		var messengerDomainName = _configuration[AppSettingConstants.MessengerDomainName];
+		
 		var chatUserByRequester = await _context.ChatUsers
 			.Include(c => c.Chat)
 			.ThenInclude(c => c.Owner)
 			.Include(c => c.Role)
-			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && 
-			                          c.ChatId == request.ChatId &&
-			                          c.Chat.Type != ChatType.Dialog, cancellationToken);
+			.FirstOrDefaultAsync(c => 
+				c.UserId == request.RequesterId && 
+				c.ChatId == request.ChatId &&
+				c.Chat.Type != ChatType.Dialog, cancellationToken);
 
 		if (chatUserByRequester == null)
 		{
 			return new Result<ChatDto>(new DbEntityNotFoundError("No requester in the chat"));
 		}
-		
-		if (chatUserByRequester.Role is { CanChangeChatData: true } || 
-		    chatUserByRequester.Chat.OwnerId == request.RequesterId)
+
+		if ((chatUserByRequester.Role == null &&
+		     chatUserByRequester.Chat.OwnerId != request.RequesterId)  || 
+		    (chatUserByRequester.Role is { CanChangeChatData: false } &&
+		     chatUserByRequester.Chat.OwnerId != request.RequesterId))
 		{
-			if (chatUserByRequester.Chat.AvatarLink != null)
-			{
-				_fileService.DeleteFile(Path.Combine(
-					BaseDirService.GetPathWwwRoot(),
-					chatUserByRequester.Chat.AvatarLink.Split("/")[^1]));
-				
-				chatUserByRequester.Chat.AvatarLink = null;
-			}
-			
-			if (request.AvatarFile != null)
-			{
-				var avatarLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), request.AvatarFile,
-					_configuration[AppSettingConstants.MessengerDomainName]);
-				chatUserByRequester.Chat.AvatarLink = avatarLink;
-			}
-			
-			_context.Chats.Update(chatUserByRequester.Chat);
-			await _context.SaveChangesAsync(cancellationToken);
-			
-			return new Result<ChatDto>(
-				new ChatDto
-				{
-					Id = chatUserByRequester.ChatId,
-					Name = chatUserByRequester.Chat.Name,
-					Title = chatUserByRequester.Chat.Title,
-					Type = chatUserByRequester.Chat.Type,
-					AvatarLink = chatUserByRequester.Chat.AvatarLink,
-					LastMessageId = chatUserByRequester.Chat.LastMessageId,
-					LastMessageText = chatUserByRequester.Chat.LastMessage?.Text,
-					LastMessageAuthorDisplayName = chatUserByRequester.Chat.LastMessage != null && 
-					                               chatUserByRequester.Chat.LastMessage.Owner != null ?
-						chatUserByRequester.Chat.LastMessage.Owner.DisplayName : null,
-					LastMessageDateOfCreate = chatUserByRequester.Chat.LastMessage?.DateOfCreate,
-					IsOwner = chatUserByRequester.Chat.OwnerId == request.RequesterId,
-					IsMember = true,
-					MuteDateOfExpire = chatUserByRequester.MuteDateOfExpire,
-					BanDateOfExpire = null,
-					RoleUser = chatUserByRequester.Role != null ? new RoleUserByChatDto(chatUserByRequester.Role) : null
-				});
+			return new Result<ChatDto>(new ForbiddenError("It is forbidden to update someone else's chat"));
 		}
-		
-		return new Result<ChatDto>(new ForbiddenError("It is forbidden to update someone else's chat"));
+
+		if (chatUserByRequester.Chat.AvatarLink != null)
+		{
+			var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+			var avatarFileName = chatUserByRequester.Chat.AvatarLink.Split("/")[^1];
+
+			var avatarFilePath = Path.Combine(pathWwwRoot, avatarFileName);
+				
+			_fileService.DeleteFile(avatarFilePath);
+				
+			chatUserByRequester.Chat.AvatarLink = null;
+		}
+			
+		if (request.AvatarFile != null)
+		{
+			var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+				
+			var avatarLink = await _fileService.CreateFileAsync(pathWwwRoot, request.AvatarFile, messengerDomainName);
+				
+			chatUserByRequester.Chat.AvatarLink = avatarLink;
+		}
+			
+		_context.Chats.Update(chatUserByRequester.Chat);
+			
+		await _context.SaveChangesAsync(cancellationToken);
+
+		var chatDto = new ChatDto
+		{
+			Id = chatUserByRequester.ChatId,
+			Name = chatUserByRequester.Chat.Name,
+			Title = chatUserByRequester.Chat.Title,
+			Type = chatUserByRequester.Chat.Type,
+			AvatarLink = chatUserByRequester.Chat.AvatarLink,
+			LastMessageId = chatUserByRequester.Chat.LastMessageId,
+			LastMessageText = chatUserByRequester.Chat.LastMessage?.Text,
+			LastMessageAuthorDisplayName =
+				chatUserByRequester.Chat.LastMessage is { Owner: { } }
+				? chatUserByRequester.Chat.LastMessage.Owner.DisplayName
+				: null,
+			LastMessageDateOfCreate = chatUserByRequester.Chat.LastMessage?.DateOfCreate,
+			IsOwner = chatUserByRequester.Chat.OwnerId == request.RequesterId,
+			IsMember = true,
+			MuteDateOfExpire = chatUserByRequester.MuteDateOfExpire,
+			BanDateOfExpire = null,
+			RoleUser = chatUserByRequester.Role != null ? new RoleUserByChatDto(chatUserByRequester.Role) : null
+		};
+			
+		return new Result<ChatDto>(chatDto);
 	}
 }
