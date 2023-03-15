@@ -14,7 +14,7 @@ public class UserDto
 
 	public string AvatarLink { get; init; }
 
-	public UserDto(User user)
+	public UserDto(UserEntity user)
 	{
 		Id = user.Id;
 		DisplayName = user.DisplayName;

@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class ChatUserConfiguration : IEntityTypeConfiguration<ChatUser>
+public class ChatUserConfiguration : IEntityTypeConfiguration<ChatUserEntity>
 {
-	public void Configure(EntityTypeBuilder<ChatUser> builder)
+	public void Configure(EntityTypeBuilder<ChatUserEntity> builder)
 	{
 		builder
 			.HasKey(c => new {c.ChatId, c.UserId});
@@ -27,60 +27,60 @@ public class ChatUserConfiguration : IEntityTypeConfiguration<ChatUser>
 		builder.Property(x => x.ChatId).IsRequired();
 		builder.Property(x => x.UserId).IsRequired();
 
-		var dotnetChatKaminome = new ChatUser()
-		{
-			UserId = SeedDataConstants.KaminomeUserId,
-			ChatId = SeedDataConstants.DotnetChatId
-		};
+		var dotnetChatKaminome = new ChatUserEntity(
+			SeedDataConstants.KaminomeUserId, 
+			SeedDataConstants.DotnetChatId, 
+			canSendMedia: true,
+			muteDateOfExpire: null);
 		
-		var dotnetChatAlice = new ChatUser()
-		{
-			UserId = SeedDataConstants.AliceUserId,
-			ChatId = SeedDataConstants.DotnetChatId
-		};
+		var dotnetChatAlice = new ChatUserEntity(
+			SeedDataConstants.AliceUserId, 
+			SeedDataConstants.DotnetChatId, 
+			canSendMedia: true,
+			muteDateOfExpire: null);
 		
-		var dotnetChatBob = new ChatUser()
-		{
-			UserId = SeedDataConstants.BobUserId,
-			ChatId = SeedDataConstants.DotnetChatId
-		};
+		var dotnetChatBob = new ChatUserEntity(
+			SeedDataConstants.BobUserId, 
+			SeedDataConstants.DotnetChatId, 
+			canSendMedia: true,
+			muteDateOfExpire: null);
 		
-		var dotnetChatAlex = new ChatUser()
-		{
-			UserId = SeedDataConstants.AlexUserId,
-			ChatId = SeedDataConstants.DotnetChatId
-		};
+		var dotnetChatAlex = new ChatUserEntity(
+			SeedDataConstants.AlexUserId, 
+			SeedDataConstants.DotnetChatId, 
+			canSendMedia: true,
+			muteDateOfExpire: null);
 		
-		var dotnetFloodChatKaminome = new ChatUser()
-		{
-			UserId = SeedDataConstants.KaminomeUserId,
-			ChatId = SeedDataConstants.DotnetFloodChatId
-		};
+		var dotnetFloodChatKaminome = new ChatUserEntity(
+			SeedDataConstants.AlexUserId, 
+			SeedDataConstants.DotnetFloodChatId, 
+			canSendMedia: true,
+			muteDateOfExpire: null);
 		
-		var dotnetFloodChatAlice = new ChatUser()
-		{
-			UserId = SeedDataConstants.AliceUserId,
-			ChatId = SeedDataConstants.DotnetFloodChatId
-		};
+		var dotnetFloodChatAlice = new ChatUserEntity(
+			SeedDataConstants.AliceUserId, 
+			SeedDataConstants.DotnetFloodChatId, 
+			canSendMedia: true,
+			muteDateOfExpire: null);
 		
-		var dotnetFloodChatBob = new ChatUser()
-		{
-			UserId = SeedDataConstants.BobUserId,
-			ChatId = SeedDataConstants.DotnetFloodChatId
-		};
-		
-		var dialogKamimomeAliceForKaminome = new ChatUser()
-		{
-			UserId = SeedDataConstants.KaminomeUserId,
-			ChatId = SeedDataConstants.DialogKaminomeAliceChatId
-		};
-		
-		var dialogKamimomeAliceForAlice = new ChatUser()
-		{
-			UserId = SeedDataConstants.AliceUserId,
-			ChatId = SeedDataConstants.DialogKaminomeAliceChatId
-		};
+		var dotnetFloodChatBob = new ChatUserEntity(
+			SeedDataConstants.BobUserId, 
+			SeedDataConstants.DotnetFloodChatId, 
+			canSendMedia: true,
+			muteDateOfExpire: null);
 
+		var dialogKamimomeAliceForKaminome = new ChatUserEntity(
+			SeedDataConstants.KaminomeUserId, 
+			SeedDataConstants.DialogKaminomeAliceChatId, 
+			canSendMedia: true,
+			muteDateOfExpire: null);
+		
+		var dialogKamimomeAliceForAlice = new ChatUserEntity(
+			SeedDataConstants.AliceUserId, 
+			SeedDataConstants.DialogKaminomeAliceChatId, 
+			canSendMedia: true,
+			muteDateOfExpire: null);
+		
 		builder.HasData(dotnetChatKaminome, dotnetChatAlice, dotnetChatBob, dotnetChatAlex,
 			dotnetFloodChatKaminome, dotnetFloodChatAlice, dotnetFloodChatBob,
 			dialogKamimomeAliceForAlice, dialogKamimomeAliceForKaminome);

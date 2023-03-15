@@ -82,7 +82,7 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 			_context.BanUserByChats.Remove(banUserByChat);
 		}
 
-		var newMessage = new Message(
+		var newMessage = new MessageEntity(
 				text: request.Text,
 				ownerId: request.RequesterId,
 				replyToMessageId: request.ReplyToId,
@@ -90,14 +90,14 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 		
 		if (request.Files != null)
 		{
-			var attachments = new List<Attachment>();
+			var attachments = new List<AttachmentEntity>();
         			
 			foreach (var file in request.Files)
 			{
 				var fileLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), file,
 					_configuration[AppSettingConstants.MessengerDomainName]);
         
-				var attachment = new Attachment(
+				var attachment = new AttachmentEntity(
 					name: file.FileName,
 					size: file.Length,
 					messageId: newMessage.Id,

@@ -47,7 +47,7 @@ public class RefreshCommandHandler : IRequestHandler<RefreshCommand, Result<Auth
 
         var newSessionExpiresAt = DateTime.UtcNow.AddDays(int.Parse(refreshTokenLifetimeDays));
         
-        var newSession = new Session(
+        var newSession = new SessionEntity(
             accessToken: accessToken,
             userId: session.UserId,
             ip: request.Ip,

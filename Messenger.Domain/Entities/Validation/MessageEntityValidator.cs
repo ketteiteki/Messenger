@@ -2,11 +2,12 @@ using FluentValidation;
 
 namespace Messenger.Domain.Entities.Validation;
 
-public class MessageValidator : AbstractValidator<Message>
+public class MessageEntityValidator : AbstractValidator<MessageEntity>
 {
-	public MessageValidator()
+	public MessageEntityValidator()
 	{
 		RuleFor(x => x.Text).NotEmpty();
 		RuleFor(x => x.OwnerId).NotNull();
+		RuleFor(x => x.ChatId).NotNull();
 	}
 }

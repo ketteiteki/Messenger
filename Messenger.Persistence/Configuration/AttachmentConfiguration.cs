@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class AttachmentConfiguration : IEntityTypeConfiguration<Attachment>
+public class AttachmentConfiguration : IEntityTypeConfiguration<AttachmentEntity>
 {
-    public void Configure(EntityTypeBuilder<Attachment> builder)
+    public void Configure(EntityTypeBuilder<AttachmentEntity> builder)
     {
         builder.Property(x => x.Id).IsRequired();
         builder.Property(x => x.Link).IsRequired();

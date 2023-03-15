@@ -6,14 +6,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class ChatConfiguration : IEntityTypeConfiguration<Chat>
+public class ChatConfiguration : IEntityTypeConfiguration<ChatEntity>
 {
-	public void Configure(EntityTypeBuilder<Chat> builder)
+	public void Configure(EntityTypeBuilder<ChatEntity> builder)
 	{
 		builder
 			.HasOne(c => c.LastMessage)
 			.WithOne(m => m.LastMessageByChat)
-			.HasForeignKey<Chat>(c => c.LastMessageId)
+			.HasForeignKey<ChatEntity>(c => c.LastMessageId)
 			.OnDelete(DeleteBehavior.SetNull);
 		
 		builder
@@ -31,7 +31,7 @@ public class ChatConfiguration : IEntityTypeConfiguration<Chat>
 		builder.Property(x => x.Id).IsRequired();
 		builder.Property(x => x.Type).IsRequired();
 
-		var dotnetChat = new Chat(
+		var dotnetChat = new ChatEntity(
 			title: "DotNetRuChat",
 			name: "DotNetRuChat",
 			type: ChatType.Conversation,
@@ -42,7 +42,7 @@ public class ChatConfiguration : IEntityTypeConfiguration<Chat>
 			Id = SeedDataConstants.DotnetChatId
 		};
 		
-		var dotnetFloodChat = new Chat(
+		var dotnetFloodChat = new ChatEntity(
 			title: ".NET Talks",
 			name: "dotnettalks",
 			type: ChatType.Conversation,
@@ -53,7 +53,7 @@ public class ChatConfiguration : IEntityTypeConfiguration<Chat>
 			Id = SeedDataConstants.DotnetFloodChatId
 		};
 		
-		var dialogKaminomeAliceChat = new Chat(
+		var dialogKaminomeAliceChat = new ChatEntity(
 			name: null,
 			title: null,
 			type: ChatType.Dialog,

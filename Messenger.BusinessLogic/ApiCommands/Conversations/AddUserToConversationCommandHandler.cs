@@ -67,7 +67,11 @@ public class AddUserToConversationCommandHandler : IRequestHandler<AddUserToConv
 			return new Result<UserDto>(new  DbEntityExistsError("User is already in the chat"));
 		}
 
-		var chatUser = new ChatUser { UserId = request.UserId, ChatId = request.ChatId };
+		var chatUser = new ChatUserEntity(
+			request.UserId,
+			request.ChatId,
+			canSendMedia: true, 
+			muteDateOfExpire: null);
 		
 		_context.ChatUsers.Add(chatUser);
 		

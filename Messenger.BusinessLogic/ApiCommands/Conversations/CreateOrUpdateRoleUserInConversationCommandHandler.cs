@@ -40,7 +40,7 @@ public class CreateOrUpdateRoleUserInConversationCommandHandler
 		{
 			var isOwner = chatUser.Chat.OwnerId == request.UserId;
 			
-			var role = new RoleUserByChat(
+			var role = new RoleUserByChatEntity(
 				chatUser.User.Id,
 				chatUser.Chat.Id,
 				request.RoleTitle,

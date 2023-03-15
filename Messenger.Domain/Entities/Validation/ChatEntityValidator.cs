@@ -2,11 +2,12 @@ using FluentValidation;
 
 namespace Messenger.Domain.Entities.Validation;
 
-public class ChatValidator : AbstractValidator<Chat>
+public class ChatEntityValidator : AbstractValidator<ChatEntity>
 {
-	public ChatValidator()
+	public ChatEntityValidator()
 	{
 		RuleFor(x => x.Name).MaximumLength(20);
 		RuleFor(x => x.Title).MaximumLength(20);
+		RuleFor(x => x.Type).NotNull();
 	}
 }

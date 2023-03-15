@@ -4,15 +4,15 @@ using Messenger.Domain.Enum;
 
 namespace Messenger.Domain.Entities;
 
-public class RoleUserByChat
+public class RoleUserByChatEntity
 {
 	public Guid UserId { get; set; }
 	
-	public User User { get; set; }
+	public UserEntity User { get; set; }
 
 	public Guid ChatId { get; set; }
 	
-	public ChatUser ChatUser { get; set; }
+	public ChatUserEntity ChatUser { get; set; }
 	
 	public string RoleTitle { get; set; }
 	
@@ -28,7 +28,7 @@ public class RoleUserByChat
 
 	public bool IsOwner { get; set; }
 
-	public RoleUserByChat(Guid userId, Guid chatId, string roleTitle, RoleColor roleColor,
+	public RoleUserByChatEntity(Guid userId, Guid chatId, string roleTitle, RoleColor roleColor,
 		bool canBanUser, bool canChangeChatData, bool canGivePermissionToUser,
 		bool canAddAndRemoveUserToConversation, bool isOwner)
 	{
@@ -42,6 +42,6 @@ public class RoleUserByChat
 		CanAddAndRemoveUserToConversation = canAddAndRemoveUserToConversation;
 		IsOwner = isOwner;
 		
-		new RoleUserByChatValidator().ValidateAndThrow(this);
+		new RoleUserByChatEntityValidator().ValidateAndThrow(this);
 	}
 }

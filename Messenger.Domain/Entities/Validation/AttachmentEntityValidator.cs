@@ -2,9 +2,9 @@ using FluentValidation;
 
 namespace Messenger.Domain.Entities.Validation;
 
-public class AttachmentValidator : AbstractValidator<Attachment>
+public class AttachmentEntityValidator : AbstractValidator<AttachmentEntity>
 {
-	public AttachmentValidator()
+	public AttachmentEntityValidator()
 	{
 		RuleFor(x => x.Link).NotEmpty();
 		RuleFor(x => x.Name).NotEmpty();

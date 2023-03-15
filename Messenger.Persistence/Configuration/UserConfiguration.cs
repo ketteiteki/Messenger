@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class UserConfiguration : IEntityTypeConfiguration<User>
+public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
 {
-    public void Configure(EntityTypeBuilder<User> builder)
+    public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
         builder
             .HasMany(u => u.Sessions)
@@ -19,7 +19,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.DisplayName).IsRequired();
         builder.Property(x => x.Nickname).IsRequired();
 
-        var kaminome = new User(
+        var kaminome = new UserEntity(
             displayName: "kami no me",
             nickname: "kaminome",
             bio: "the best account",
@@ -31,7 +31,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             Id = SeedDataConstants.KaminomeUserId
         };
         
-        var alice = new User(
+        var alice = new UserEntity(
             displayName: "alice1",
             nickname: "alice1234",
             bio: "cool status",
@@ -43,7 +43,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             Id = SeedDataConstants.AliceUserId
         };
         
-        var bob = new User(
+        var bob = new UserEntity(
             displayName: "bob1",
             nickname: "bob1234",
             bio: "I'm Bob",
@@ -55,7 +55,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             Id = SeedDataConstants.BobUserId
         };
         
-        var alex = new User(
+        var alex = new UserEntity(
             displayName: "alex1",
             nickname: "alex1234",
             bio: "why alex?",

@@ -40,7 +40,7 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 
 		var hmac512CryptoHash = _hashService.Hmacsha512CryptoHash(request.Password, out var salt);
 
-		var newUser = new User(
+		var newUser = new UserEntity(
 			displayName: request.DisplayName,
 			nickname: request.Nickname,
 			passwordHash: hmac512CryptoHash,
@@ -53,7 +53,7 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 		var sessionExpiresAt =
 			DateTime.UtcNow.AddDays(int.Parse(_configuration[AppSettingConstants.MessengerRefreshTokenLifetimeDays]));
 		
-		var session = new Session(
+		var session = new SessionEntity(
 			accessToken: accessToken,
 			userId: newUser.Id,
 			ip: request.Ip,

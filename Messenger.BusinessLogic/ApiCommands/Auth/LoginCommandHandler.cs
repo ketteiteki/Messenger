@@ -54,7 +54,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<Authoriz
 
 		var sessionExpiresAt = DateTime.UtcNow.AddDays(int.Parse(refreshTokenLifetimeDays));
 		
-		var session = new Session(
+		var session = new SessionEntity(
 			accessToken: accessToken,
 			userId: requester.Id,
 			ip: request.Ip,

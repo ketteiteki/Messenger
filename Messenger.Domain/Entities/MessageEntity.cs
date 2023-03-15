@@ -4,7 +4,7 @@ using Messenger.Domain.Entities.Validation;
 
 namespace Messenger.Domain.Entities;
 
-public class Message : IBaseEntity
+public class MessageEntity : IBaseEntity
 {
 	public Guid Id { get; set; } = Guid.NewGuid();
 
@@ -14,31 +14,31 @@ public class Message : IBaseEntity
 	
 	public Guid? OwnerId { get; set; }
 
-	public User? Owner { get; set; }
+	public UserEntity? Owner { get; set; }
 
 	public Guid? ReplyToMessageId { get; set; }
 	
-	public Message? ReplyToMessage { get; set; }
+	public MessageEntity? ReplyToMessage { get; set; }
 	
 	public Guid ChatId { get; set; }
 
-	public Chat Chat { get; set; }
+	public ChatEntity Chat { get; set; }
 
-	public List<Attachment> Attachments { get; set; } = new(); 
+	public List<AttachmentEntity> Attachments { get; set; } = new(); 
 
 	public DateTime DateOfCreate { get; set; } = DateTime.UtcNow;
 	
-	public Chat? LastMessageByChat { get; set; }
+	public ChatEntity? LastMessageByChat { get; set; }
 
-	public List<DeletedMessageByUser> DeletedMessageByUsers { get; set; }
+	public List<DeletedMessageByUserEntity> DeletedMessageByUsers { get; set; }
 
-	public Message(string text, Guid? ownerId, Guid? replyToMessageId, Guid chatId)
+	public MessageEntity(string text, Guid? ownerId, Guid? replyToMessageId, Guid chatId)
 	{
 		Text = text;
 		OwnerId = ownerId;
 		ReplyToMessageId = replyToMessageId;
 		ChatId = chatId;
 
-		new MessageValidator().ValidateAndThrow(this);
+		new MessageEntityValidator().ValidateAndThrow(this);
 	}
 }

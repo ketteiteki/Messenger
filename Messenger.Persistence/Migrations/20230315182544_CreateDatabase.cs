@@ -286,8 +286,8 @@ namespace Messenger.Services.Migrations
                 columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
                 values: new object[,]
                 {
-                    { new Guid("4cbeba37-a686-413c-9bd3-932bb24f3bd6"), new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new DateTime(2023, 2, 12, 5, 16, 53, 554, DateTimeKind.Utc).AddTicks(3400), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "привет" },
-                    { new Guid("da8dee89-831d-44c3-9e35-e70ade4e0f3f"), new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new DateTime(2023, 2, 12, 5, 16, 53, 554, DateTimeKind.Utc).AddTicks(3889), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "привет, как дела?" }
+                    { new Guid("64f156e3-a120-4525-a906-41fd170f1ad0"), new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new DateTime(2023, 3, 15, 18, 25, 43, 960, DateTimeKind.Utc).AddTicks(6151), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "привет, как дела?" },
+                    { new Guid("816e41f9-ba76-4b9c-9273-46db28d82917"), new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new DateTime(2023, 3, 15, 18, 25, 43, 960, DateTimeKind.Utc).AddTicks(5647), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "привет" }
                 });
 
             migrationBuilder.InsertData(
@@ -299,7 +299,7 @@ namespace Messenger.Services.Migrations
                     { new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new Guid("9f40e295-8b43-4329-b37e-d267deee6c4a"), true, null },
                     { new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new Guid("a85825ba-f99b-4177-a858-96384303ea14"), true, null },
                     { new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), true, null },
-                    { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), true, null },
+                    { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), new Guid("9f40e295-8b43-4329-b37e-d267deee6c4a"), true, null },
                     { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), new Guid("a85825ba-f99b-4177-a858-96384303ea14"), true, null },
                     { new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"), new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), true, null }
                 });
@@ -309,19 +309,19 @@ namespace Messenger.Services.Migrations
                 columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
                 values: new object[,]
                 {
-                    { new Guid("2a43fb8e-e1b3-4494-96ff-7bf7dac1aeb2"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 2, 12, 5, 16, 53, 554, DateTimeKind.Utc).AddTicks(975), false, new Guid("a85825ba-f99b-4177-a858-96384303ea14"), null, "привет, какие книжки почитать?" },
-                    { new Guid("acba511c-9151-47f3-b7c7-f6fa2504dc04"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 2, 12, 5, 16, 53, 554, DateTimeKind.Utc).AddTicks(2931), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "ага" }
+                    { new Guid("c5b500ad-9506-47cc-a52a-475621e3a10d"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 3, 15, 18, 25, 43, 960, DateTimeKind.Utc).AddTicks(5139), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "ага" },
+                    { new Guid("ef6ac908-b32a-4193-8f0c-33e5ee5348de"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 3, 15, 18, 25, 43, 960, DateTimeKind.Utc).AddTicks(3266), false, new Guid("a85825ba-f99b-4177-a858-96384303ea14"), null, "привет, какие книжки почитать?" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Messages",
                 columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
-                values: new object[] { new Guid("1e26b88e-4c7d-4dfd-a37f-9ac73e820ba1"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 2, 12, 5, 16, 53, 554, DateTimeKind.Utc).AddTicks(1909), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), new Guid("2a43fb8e-e1b3-4494-96ff-7bf7dac1aeb2"), "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться..." });
+                values: new object[] { new Guid("c0313c63-f159-4a00-9de1-8f14f04a3bae"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 3, 15, 18, 25, 43, 960, DateTimeKind.Utc).AddTicks(4078), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), new Guid("ef6ac908-b32a-4193-8f0c-33e5ee5348de"), "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться..." });
 
             migrationBuilder.InsertData(
                 table: "Messages",
                 columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
-                values: new object[] { new Guid("f05c7ada-dd39-4cfa-b2b3-7e0441e58056"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 2, 12, 5, 16, 53, 554, DateTimeKind.Utc).AddTicks(2432), false, new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), new Guid("1e26b88e-4c7d-4dfd-a37f-9ac73e820ba1"), "ладно" });
+                values: new object[] { new Guid("173936c3-9cf0-407a-9631-d04ebe8e1abc"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 3, 15, 18, 25, 43, 960, DateTimeKind.Utc).AddTicks(4625), false, new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), new Guid("c0313c63-f159-4a00-9de1-8f14f04a3bae"), "ладно" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attachments_MessageId",

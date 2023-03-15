@@ -6,16 +6,16 @@ namespace Messenger.Services;
 
 public class DatabaseContext : DbContext
 {
-	public DbSet<User> Users { get; set; } = null!;
-	public DbSet<Chat> Chats { get; set; } = null!;
-	public DbSet<Message> Messages { get; set; } = null!;
-	public DbSet<Attachment> Attachments { get; set; } = null!;
-	public DbSet<ChatUser> ChatUsers { get; set; } = null!;
-	public DbSet<RoleUserByChat> RoleUserByChats { get; set; } = null!;
-	public DbSet<DeletedMessageByUser> DeletedMessageByUsers { get; set; } = null!;
-	public DbSet<DeletedDialogByUser> DeletedDialogByUsers { get; set; } = null!;
-	public DbSet<BanUserByChat> BanUserByChats { get; set; } = null!;
-	public DbSet<Session> Sessions { get; set; } = null!;
+	public DbSet<UserEntity> Users { get; set; }
+	public DbSet<ChatEntity> Chats { get; set; }
+	public DbSet<MessageEntity> Messages { get; set; }
+	public DbSet<AttachmentEntity> Attachments { get; set; }
+	public DbSet<ChatUserEntity> ChatUsers { get; set; }
+	public DbSet<RoleUserByChatEntity> RoleUserByChats { get; set; }
+	public DbSet<DeletedMessageByUserEntity> DeletedMessageByUsers { get; set; }
+	public DbSet<DeletedDialogByUserEntity> DeletedDialogByUsers { get; set; }
+	public DbSet<BanUserByChatEntity> BanUserByChats { get; set; }
+	public DbSet<SessionEntity> Sessions { get; set; }
 
 	public DatabaseContext(DbContextOptions<DatabaseContext> dbContextOptions) : base(dbContextOptions)
 	{

@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class BanUserByChatConfiguration : IEntityTypeConfiguration<BanUserByChat>
+public class BanUserByChatConfiguration : IEntityTypeConfiguration<BanUserByChatEntity>
 {
-	public void Configure(EntityTypeBuilder<BanUserByChat> builder)
+	public void Configure(EntityTypeBuilder<BanUserByChatEntity> builder)
 	{
 		builder
 			.HasKey(b => new {b.ChatId, b.UserId});

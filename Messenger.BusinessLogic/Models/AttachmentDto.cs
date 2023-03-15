@@ -12,7 +12,7 @@ public class AttachmentDto
     	
 	public string Link { get; init; }
 
-	public AttachmentDto(Attachment attachment)
+	public AttachmentDto(AttachmentEntity attachment)
 	{
 		Id = attachment.Id;
 		Name = attachment.Name;

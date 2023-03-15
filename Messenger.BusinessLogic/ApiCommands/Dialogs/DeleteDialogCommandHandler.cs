@@ -83,11 +83,7 @@ public class DeleteDialogCommandHandler : IRequestHandler<DeleteDialogCommand, R
 			return new Result<ChatDto>(chatDtoAfterDeleteFotAll);
 		}
 
-		var deleteDialogByUser = new DeletedDialogByUser
-		{
-			ChatId = request.ChatId,
-			UserId = request.RequesterId
-		};
+		var deleteDialogByUser = new DeletedDialogByUserEntity(request.RequesterId, request.ChatId);
 
 		_context.DeletedDialogByUsers.Add(deleteDialogByUser);
 		await _context.SaveChangesAsync(cancellationToken);

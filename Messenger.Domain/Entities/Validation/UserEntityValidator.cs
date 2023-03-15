@@ -2,9 +2,9 @@ using FluentValidation;
 
 namespace Messenger.Domain.Entities.Validation;
 
-public class UserValidator : AbstractValidator<User>
+public class UserEntityValidator : AbstractValidator<UserEntity>
 {
-	public UserValidator()
+	public UserEntityValidator()
 	{
 		RuleFor(x => x.DisplayName).NotEmpty().Length(1, 20);
 		RuleFor(x => x.Nickname).NotEmpty().Length(4, 20);

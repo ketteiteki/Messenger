@@ -18,7 +18,7 @@ public class AuthorizationResponse
 
 	public string AvatarLink { get; set; }
 	
-	public AuthorizationResponse(User user, string accessToken, Guid refreshToken)
+	public AuthorizationResponse(UserEntity user, string accessToken, Guid refreshToken)
 	{
 		AccessToken = accessToken;
 		RefreshToken = refreshToken;

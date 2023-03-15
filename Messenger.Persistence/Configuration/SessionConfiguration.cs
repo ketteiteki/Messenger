@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class SessionConfiguration : IEntityTypeConfiguration<Session>
+public class SessionConfiguration : IEntityTypeConfiguration<SessionEntity>
 {
-    public void Configure(EntityTypeBuilder<Session> builder)
+    public void Configure(EntityTypeBuilder<SessionEntity> builder)
     {
         builder.Property(x => x.Id).IsRequired();
         builder.Property(x => x.Ip).IsRequired();
