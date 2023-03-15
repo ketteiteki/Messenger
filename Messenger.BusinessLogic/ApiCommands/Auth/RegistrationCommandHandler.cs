@@ -28,8 +28,12 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 	
 	public async Task<Result<AuthorizationResponse>> Handle(RegistrationCommand request, CancellationToken cancellationToken)
 	{
-		var userByNickname = await _context.Users.FirstOrDefaultAsync(u => u.Nickname == request.Nickname, cancellationToken);
-		if (userByNickname != null)
+		var accessTokenSignKey = _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
+		var accessTokenLifeTimeMinutes = _configuration[AppSettingConstants.MessengerAccessTokenLifetimeMinutes];
+		
+		var isUserByNicknameExists = await _context.Users.AnyAsync(u => u.Nickname == request.Nickname, cancellationToken);
+		
+		if (isUserByNicknameExists)
 		{
 			return new Result<AuthorizationResponse>(new AuthenticationError("User already exists"));
 		}
@@ -44,24 +48,22 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 			bio: null,
 			avatarLink: null);
 
-		var accessToken = _tokenService.CreateAccessToken(newUser,
-			_configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey],
-			int.Parse(_configuration[AppSettingConstants.MessengerAccessTokenLifetimeMinutes]));
+		var accessToken = _tokenService.CreateAccessToken(newUser, accessTokenSignKey, int.Parse(accessTokenLifeTimeMinutes));
+
+		var sessionExpiresAt =
+			DateTime.UtcNow.AddDays(int.Parse(_configuration[AppSettingConstants.MessengerRefreshTokenLifetimeDays]));
 		
 		var session = new Session(
 			accessToken: accessToken,
 			userId: newUser.Id,
 			ip: request.Ip,
 			userAgent: request.UserAgent,
-			expiresAt: DateTime.UtcNow.AddDays(int.Parse(_configuration[AppSettingConstants.MessengerRefreshTokenLifetimeDays])));
+			expiresAt: sessionExpiresAt);
 
 		_context.Users.Add(newUser);
 		_context.Sessions.Add(session);
 		await _context.SaveChangesAsync(cancellationToken);
 
-		return new Result<AuthorizationResponse>(new AuthorizationResponse(
-			user: newUser, 
-			accessToken: accessToken, 
-			refreshToken: session.RefreshToken));
+		return new Result<AuthorizationResponse>(new AuthorizationResponse(newUser, accessToken, session.RefreshToken));
 	}
 }

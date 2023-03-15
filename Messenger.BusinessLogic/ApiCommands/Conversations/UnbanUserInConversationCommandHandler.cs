@@ -27,23 +27,28 @@ public class UnbanUserInConversationCommandHandler : IRequestHandler<UnbanUserIn
 			return new Result<UserDto>(new DbEntityNotFoundError("No requester in the chat"));
 		}
 		
-		if (chatUserByRequester.Role is { CanBanUser: true } || chatUserByRequester.Chat.OwnerId == request.RequesterId)
+		if ((chatUserByRequester.Role == null &&
+		     chatUserByRequester.Chat.OwnerId != request.RequesterId)  || 
+		    (chatUserByRequester.Role is { CanBanUser: false } &&
+		     chatUserByRequester.Chat.OwnerId != request.RequesterId))
 		{
-			var banUserByChat = await _context.BanUserByChats
-				.Include(b => b.User)
-				.FirstOrDefaultAsync(r => r.UserId == request.UserId && r.ChatId == request.ChatId, cancellationToken);
-
-			if (banUserByChat == null)
-			{
-				return new Result<UserDto>(new DbEntityNotFoundError("User is not banned"));
-			}
-			
-			_context.BanUserByChats.Remove(banUserByChat);
-			await _context.SaveChangesAsync(cancellationToken);
-			
-			return new Result<UserDto>(new UserDto(banUserByChat.User));
+			return new Result<UserDto>(new ForbiddenError("No rights to unban a user in chat"));
 		}
 		
-		return new Result<UserDto>(new ForbiddenError("No rights to unban a user in chat"));
+		var banUserByChat = await _context.BanUserByChats
+			.Include(b => b.User)
+			.FirstOrDefaultAsync(r => r.UserId == request.UserId && r.ChatId == request.ChatId, cancellationToken);
+
+		if (banUserByChat == null)
+		{
+			return new Result<UserDto>(new DbEntityNotFoundError("User is not banned"));
+		}
+			
+		_context.BanUserByChats.Remove(banUserByChat);
+		
+		await _context.SaveChangesAsync(cancellationToken);
+			
+		return new Result<UserDto>(new UserDto(banUserByChat.User));
+		
 	}
 }

@@ -37,82 +37,91 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 			return new Result<MessageDto>(new DbEntityNotFoundError("Message not found"));
 		}
 
-		if (message.OwnerId == request.RequesterId || message.Chat.OwnerId == request.RequesterId)
+		if (message.OwnerId != request.RequesterId && message.Chat.OwnerId != request.RequesterId)
 		{
-			if (request.IsDeleteForAll)
+			return new Result<MessageDto>(new ForbiddenError("It is forbidden to delete someone else's message"));
+		}		
+
+		if (request.IsDeleteForAll)
+		{
+			foreach (var attachment in message.Attachments)
 			{
-				foreach (var attachment in message.Attachments)
-				{
-					_fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), attachment.Link.Split("/")[^1]));
-				}
-			
-				_context.Messages.Remove(message);
-				await _context.SaveChangesAsync(cancellationToken);
-			
-				return new Result<MessageDto>(
-					new MessageDto
-					{
-						Id = message.Id,
-						Text = message.Text,
-						IsEdit = message.IsEdit,
-						OwnerId = message.OwnerId,
-						OwnerDisplayName = message.Owner?.DisplayName,
-						OwnerAvatarLink = message.Owner?.AvatarLink,
-						ReplyToMessageId = message.ReplyToMessageId,
-						ReplyToMessageText = message.ReplyToMessage?.Text,
-						ReplyToMessageAuthorDisplayName = message.ReplyToMessage?.Owner?.DisplayName,
-						Attachments = message.Attachments.Select(a => new AttachmentDto(a)).ToList(),
-						ChatId = message.ChatId,
-						DateOfCreate = message.DateOfCreate
-					});
+				var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+				var attachmentFileName = attachment.Link.Split("/")[^1];
+
+				var attachmentPath = Path.Combine(pathWwwRoot, attachmentFileName);
+					
+				_fileService.DeleteFile(attachmentPath);
 			}
 			
-			var deletedMessageByUser = new DeletedMessageByUser
-			{
-				MessageId = message.Id,
-				UserId = request.RequesterId
-			};
+			_context.Messages.Remove(message);
+			_context.Attachments.RemoveRange(message.Attachments);
 
-			var lastMessageNow = await _context.Messages
-				.Include(m => m.Owner)
-				.Where(m => m.ChatId == message.ChatId && m.Id != message.Id)
-				.OrderBy(m => m.DateOfCreate)
-				.LastAsync(cancellationToken);
-			
-			_context.DeletedMessageByUsers.Add(deletedMessageByUser);
 			await _context.SaveChangesAsync(cancellationToken);
 
-			var messageDeleteNotification = new MessageDeleteNotificationDto()
+			var messageDtoDeleteForAll = new MessageDto
 			{
+				Id = message.Id,
+				Text = message.Text,
+				IsEdit = message.IsEdit,
 				OwnerId = message.OwnerId,
+				OwnerDisplayName = message.Owner?.DisplayName,
+				OwnerAvatarLink = message.Owner?.AvatarLink,
+				ReplyToMessageId = message.ReplyToMessageId,
+				ReplyToMessageText = message.ReplyToMessage?.Text,
+				ReplyToMessageAuthorDisplayName = message.ReplyToMessage?.Owner?.DisplayName,
+				Attachments = new List<AttachmentDto>(),
 				ChatId = message.ChatId,
-				MessageId = message.Id,
-				NewLastMessageId = lastMessageNow.Id,
-				NewLastMessageText = lastMessageNow.Text,
-				NewLastMessageAuthorDisplayName = lastMessageNow.Owner?.DisplayName,
-				NewLastMessageDateOfCreate = lastMessageNow.DateOfCreate
+				DateOfCreate = message.DateOfCreate
 			};
 			
-			await _hubContext.Clients.Group(message.ChatId.ToString()).DeleteMessageAsync(messageDeleteNotification);
-			
-			return new Result<MessageDto>(
-				new MessageDto
-				{
-					Id = message.Id,
-					Text = message.Text,
-					IsEdit = message.IsEdit,
-					OwnerId = message.OwnerId,
-					OwnerDisplayName = message.Owner?.DisplayName,
-					OwnerAvatarLink = message.Owner?.AvatarLink,
-					ReplyToMessageId = message.ReplyToMessageId,
-					ReplyToMessageText = message.ReplyToMessage?.Text,
-					ReplyToMessageAuthorDisplayName = message.ReplyToMessage?.Owner?.DisplayName,
-					Attachments = message.Attachments.Select(a => new AttachmentDto(a)).ToList(),
-					ChatId = message.ChatId,
-					DateOfCreate = message.DateOfCreate
-				}); 
+			return new Result<MessageDto>(messageDtoDeleteForAll);
 		}
+			
+		var deletedMessageByUser = new DeletedMessageByUser
+		{
+			MessageId = message.Id,
+			UserId = request.RequesterId
+		};
+
+		var lastMessageNow = await _context.Messages
+			.Include(m => m.Owner)
+			.Where(m => m.ChatId == message.ChatId && m.Id != message.Id)
+			.OrderBy(m => m.DateOfCreate)
+			.LastAsync(cancellationToken);
+			
+		_context.DeletedMessageByUsers.Add(deletedMessageByUser);
+		await _context.SaveChangesAsync(cancellationToken);
+
+		var messageDeleteNotification = new MessageDeleteNotificationDto()
+		{
+			OwnerId = message.OwnerId,
+			ChatId = message.ChatId,
+			MessageId = message.Id,
+			NewLastMessageId = lastMessageNow.Id,
+			NewLastMessageText = lastMessageNow.Text,
+			NewLastMessageAuthorDisplayName = lastMessageNow.Owner?.DisplayName,
+			NewLastMessageDateOfCreate = lastMessageNow.DateOfCreate
+		};
+			
+		await _hubContext.Clients.Group(message.ChatId.ToString()).DeleteMessageAsync(messageDeleteNotification);
+
+		var messageDto = new MessageDto
+		{
+			Id = message.Id,
+			Text = message.Text,
+			IsEdit = message.IsEdit,
+			OwnerId = message.OwnerId,
+			OwnerDisplayName = message.Owner?.DisplayName,
+			OwnerAvatarLink = message.Owner?.AvatarLink,
+			ReplyToMessageId = message.ReplyToMessageId,
+			ReplyToMessageText = message.ReplyToMessage?.Text,
+			ReplyToMessageAuthorDisplayName = message.ReplyToMessage?.Owner?.DisplayName,
+			Attachments = message.Attachments.Select(a => new AttachmentDto(a)).ToList(),
+			ChatId = message.ChatId,
+			DateOfCreate = message.DateOfCreate
+		};
 		
-		return new Result<MessageDto>(new ForbiddenError("It is forbidden to delete someone else's message"));
+		return new Result<MessageDto>(messageDto);
 	}
 }

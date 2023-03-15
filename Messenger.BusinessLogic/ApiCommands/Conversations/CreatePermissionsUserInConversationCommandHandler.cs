@@ -34,43 +34,42 @@ public class CreatePermissionsUserInConversationCommandHandler
 			return new Result<PermissionDto>(new ForbiddenError("No requester found in chat"));
 		}
 
-		if (chatUserByRequester.Role is { CanGivePermissionToUser: true } ||
-		    chatUserByRequester.Chat.OwnerId == request.RequesterId)
+		if ((chatUserByRequester.Role == null &&
+		     chatUserByRequester.Chat.OwnerId != request.RequesterId)  || 
+		    (chatUserByRequester.Role is { CanGivePermissionToUser: false } &&
+		     chatUserByRequester.Chat.OwnerId != request.RequesterId))
 		{
-			var chatUserByUser = await _context.ChatUsers
-				.Include(c => c.User)
-				.FirstOrDefaultAsync(c => c.ChatId == request.ChatId && c.UserId == request.UserId, cancellationToken);
-
-			if (chatUserByUser == null)
-			{
-				return new Result<PermissionDto>(new DbEntityNotFoundError("No user found in chat"));
-			}
-
-			var notifyPermissionForUserDto = new NotifyPermissionForUserDto(
-				chatId: request.ChatId,
-				canSendMedia: request.CanSendMedia,
-				muteDateOfExpire: null
-			); 
-			
-			if (request.MuteMinutes != null && request.MuteMinutes >= 1)
-			{
-				var muteDateOfExpire = DateTime.UtcNow.AddMinutes((int) request.MuteMinutes);
-
-				chatUserByUser.MuteDateOfExpire = muteDateOfExpire;
-				
-				notifyPermissionForUserDto.MuteDateOfExpire = muteDateOfExpire;
-			}
-			
-			chatUserByUser.CanSendMedia = request.CanSendMedia;
-
-			_context.ChatUsers.Update(chatUserByUser);
-			await _context.SaveChangesAsync(cancellationToken);
-
-			await _hubContext.Clients.User(request.UserId.ToString()).NotifyPermissionForUser(notifyPermissionForUserDto);
-			
-			return new Result<PermissionDto>(new PermissionDto(chatUserByUser));
+			return new Result<PermissionDto>(new ForbiddenError("No rights to create user permissions in the chat"));
 		}
 		
-		return new Result<PermissionDto>(new ForbiddenError("No rights to create user permissions in the chat"));
+		var chatUserByUser = await _context.ChatUsers
+			.Include(c => c.User)
+			.FirstOrDefaultAsync(c => c.ChatId == request.ChatId && c.UserId == request.UserId, cancellationToken);
+
+		if (chatUserByUser == null)
+		{
+			return new Result<PermissionDto>(new DbEntityNotFoundError("No user found in chat"));
+		}
+
+		var notifyPermissionForUserDto = new NotifyPermissionForUserDto(request.ChatId, request.CanSendMedia, null); 
+			
+		if (request.MuteMinutes is >= 1)
+		{
+			var muteDateOfExpire = DateTime.UtcNow.AddMinutes((int) request.MuteMinutes);
+
+			chatUserByUser.MuteDateOfExpire = muteDateOfExpire;
+				
+			notifyPermissionForUserDto.MuteDateOfExpire = muteDateOfExpire;
+		}
+			
+		chatUserByUser.CanSendMedia = request.CanSendMedia;
+
+		_context.ChatUsers.Update(chatUserByUser);
+		
+		await _context.SaveChangesAsync(cancellationToken);
+
+		await _hubContext.Clients.User(request.UserId.ToString()).NotifyPermissionForUser(notifyPermissionForUserDto);
+			
+		return new Result<PermissionDto>(new PermissionDto(chatUserByUser));
 	}
 }

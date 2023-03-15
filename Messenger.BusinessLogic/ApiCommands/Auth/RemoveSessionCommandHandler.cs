@@ -26,6 +26,7 @@ public class RemoveSessionCommandHandler : IRequestHandler<RemoveSessionCommand,
         }
 
         _context.Sessions.Remove(session);
+        
         await _context.SaveChangesAsync(cancellationToken);
         
         return new Result<SessionDto>(new SessionDto(session));

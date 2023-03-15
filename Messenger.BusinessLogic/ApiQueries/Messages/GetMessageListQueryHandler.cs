@@ -23,9 +23,9 @@ public class GetMessageListQueryHandler : IRequestHandler<GetMessageListQuery, R
 		}
 		
 		var banUserByChat = await _context.BanUserByChats
-			.FirstOrDefaultAsync(b => b.UserId == request.RequesterId && b.ChatId == request.ChatId, cancellationToken);
+			.AnyAsync(b => b.UserId == request.RequesterId && b.ChatId == request.ChatId, cancellationToken);
 
-		if (banUserByChat != null)
+		if (banUserByChat)
 		{
 			return new Result<List<MessageDto>>(new ForbiddenError("You are banned"));
 		}

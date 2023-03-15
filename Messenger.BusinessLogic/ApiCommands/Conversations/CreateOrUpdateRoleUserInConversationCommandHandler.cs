@@ -30,41 +30,46 @@ public class CreateOrUpdateRoleUserInConversationCommandHandler
 		{
 			return new Result<RoleUserByChatDto>(new DbEntityNotFoundError("No user found in chat"));
 		}
-		
-		if (chatUser.Chat.OwnerId == request.RequesterId)
+
+		if (chatUser.Chat.OwnerId != request.RequesterId)
 		{
-			if (chatUser.Role == null)
-			{
-				var role = new RoleUserByChat(
-					userId: chatUser.User.Id,
-					chatId: chatUser.Chat.Id,
-					roleTitle: request.RoleTitle,
-					roleColor: request.RoleColor,
-					canBanUser: request.CanBanUser,
-					canChangeChatData: request.CanChangeChatData,
-					canAddAndRemoveUserToConversation: request.CanAddAndRemoveUserToConversation,
-					canGivePermissionToUser: request.CanGivePermissionToUser,
-					isOwner: chatUser.Chat.OwnerId == request.UserId);
-
-				_context.RoleUserByChats.Add(role);
-				await _context.SaveChangesAsync(cancellationToken);
+			return new Result<RoleUserByChatDto>(new ForbiddenError("Only the creator can be given a role"));
+		}
 		
-				return new Result<RoleUserByChatDto>(new RoleUserByChatDto(role));
-			}
-
-			chatUser.Role.RoleTitle = request.RoleTitle;
-			chatUser.Role.RoleColor = request.RoleColor;
-			chatUser.Role.CanBanUser = request.CanBanUser;
-			chatUser.Role.CanChangeChatData = request.CanChangeChatData;
-			chatUser.Role.CanAddAndRemoveUserToConversation = request.CanAddAndRemoveUserToConversation;
-			chatUser.Role.CanGivePermissionToUser = request.CanGivePermissionToUser;
+		if (chatUser.Role == null)
+		{
+			var isOwner = chatUser.Chat.OwnerId == request.UserId;
 			
-			_context.ChatUsers.Update(chatUser);
+			var role = new RoleUserByChat(
+				chatUser.User.Id,
+				chatUser.Chat.Id,
+				request.RoleTitle,
+				request.RoleColor,
+				request.CanBanUser,
+				request.CanChangeChatData,
+				request.CanGivePermissionToUser,
+				request.CanAddAndRemoveUserToConversation,
+				isOwner);
+
+			_context.RoleUserByChats.Add(role);
+			
 			await _context.SaveChangesAsync(cancellationToken);
 		
-			return new Result<RoleUserByChatDto>(new RoleUserByChatDto(chatUser.Role));
+			return new Result<RoleUserByChatDto>(new RoleUserByChatDto(role));
 		}
 
-		return new Result<RoleUserByChatDto>(new ForbiddenError("Only the creator can be given a role"));
+		chatUser.Role.RoleTitle = request.RoleTitle;
+		chatUser.Role.RoleColor = request.RoleColor;
+		chatUser.Role.CanBanUser = request.CanBanUser;
+		chatUser.Role.CanChangeChatData = request.CanChangeChatData;
+		chatUser.Role.CanAddAndRemoveUserToConversation = request.CanAddAndRemoveUserToConversation;
+		chatUser.Role.CanGivePermissionToUser = request.CanGivePermissionToUser;
+			
+		_context.ChatUsers.Update(chatUser);
+		
+		await _context.SaveChangesAsync(cancellationToken);
+		
+		return new Result<RoleUserByChatDto>(new RoleUserByChatDto(chatUser.Role));
+
 	}
 }

@@ -23,7 +23,9 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 	
 	public async Task<Result<ChatDto>> Handle(CreateDialogCommand request, CancellationToken cancellationToken)
 	{
-		var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.UserId, CancellationToken.None);
+		var user = await _context.Users
+			.AsNoTracking()
+			.FirstOrDefaultAsync(u => u.Id == request.UserId, CancellationToken.None);
 
 		if (user == null)
 		{
@@ -50,10 +52,14 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 			ownerId: null,
 			avatarLink: null,
 			lastMessageId: null);
+
+		var chatUserForRequester = new ChatUser { ChatId = newDialog.Id, UserId = request.RequesterId };
+		var chatUserForInterlocutor = new ChatUser { ChatId = newDialog.Id, UserId = request.UserId };
 		
 		_context.Chats.Add(newDialog);
-		_context.ChatUsers.Add(new ChatUser {ChatId = newDialog.Id, UserId = request.RequesterId});
-		_context.ChatUsers.Add(new ChatUser {ChatId = newDialog.Id, UserId = request.UserId});
+		_context.ChatUsers.Add(chatUserForRequester);
+		_context.ChatUsers.Add(chatUserForInterlocutor);
+		
 		await _context.SaveChangesAsync(cancellationToken);
 
 		await _context.Entry(newDialog).Collection(d => d.ChatUsers).LoadAsync(cancellationToken);

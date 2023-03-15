@@ -5,12 +5,12 @@ namespace Messenger.Application.Services;
 
 public class FileService : IFileService
 {
-	public async Task<string> CreateFileAsync(string path, IFormFile file, string domainName)
+	public async Task<string> CreateFileAsync(string pathWwwRoot, IFormFile file, string domainName)
 	{
 		var fileName = $"{Guid.NewGuid().ToString()}.jpeg";
-		Directory.CreateDirectory(path);
+		Directory.CreateDirectory(pathWwwRoot);
 
-		await using (var stream = new FileStream(Path.Combine(path, fileName), FileMode.OpenOrCreate))
+		await using (var stream = new FileStream(Path.Combine(pathWwwRoot, fileName), FileMode.OpenOrCreate))
 		{
 			await file.CopyToAsync(stream);
 		}
@@ -18,9 +18,9 @@ public class FileService : IFileService
 		return $"{domainName}/{fileName}";
 	}
 
-	public void DeleteFile(string path)
+	public void DeleteFile(string avatarFilePath)
 	{
-		File.Delete(path);
+		File.Delete(avatarFilePath);
 	}
 
 	public bool IsFileExtension(IFormFile file, params string[] extensions)

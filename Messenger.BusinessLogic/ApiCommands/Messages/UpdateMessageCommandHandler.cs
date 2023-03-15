@@ -43,6 +43,7 @@ public class UpdateMessageCommandHandler : IRequestHandler<UpdateMessageCommand,
 		message.IsEdit = true;
 
 		_context.Messages.Update(message);
+		
 		await _context.SaveChangesAsync(cancellationToken);
 
 		var messageUpdateNotification = new MessageUpdateNotificationDto
@@ -55,22 +56,23 @@ public class UpdateMessageCommandHandler : IRequestHandler<UpdateMessageCommand,
 		};
 		
 		await _hubContext.Clients.Group(message.ChatId.ToString()).UpdateMessageAsync(messageUpdateNotification);
+
+		var messageDto = new MessageDto
+		{
+			Id = message.Id,
+			Text = message.Text,
+			IsEdit = message.IsEdit,
+			OwnerId = message.OwnerId,
+			OwnerDisplayName = message.Owner?.DisplayName,
+			OwnerAvatarLink = message.Owner?.AvatarLink,
+			ReplyToMessageId = message.ReplyToMessageId,
+			ReplyToMessageText = message.ReplyToMessage?.Text,
+			ReplyToMessageAuthorDisplayName = message.ReplyToMessage?.Owner?.DisplayName,
+			Attachments = message.Attachments.Select(a => new AttachmentDto(a)).ToList(),
+			ChatId = message.ChatId,
+			DateOfCreate = message.DateOfCreate
+		};
 		
-		return new Result<MessageDto>(
-			new MessageDto
-			{
-				Id = message.Id,
-				Text = message.Text,
-				IsEdit = message.IsEdit,
-				OwnerId = message.OwnerId,
-				OwnerDisplayName = message.Owner?.DisplayName,
-				OwnerAvatarLink = message.Owner?.AvatarLink,
-				ReplyToMessageId = message.ReplyToMessageId,
-				ReplyToMessageText = message.ReplyToMessage?.Text,
-				ReplyToMessageAuthorDisplayName = message.ReplyToMessage?.Owner?.DisplayName,
-				Attachments = message.Attachments.Select(a => new AttachmentDto(a)).ToList(),
-				ChatId = message.ChatId,
-				DateOfCreate = message.DateOfCreate
-			});
+		return new Result<MessageDto>(messageDto);
 	}
 }

@@ -34,17 +34,18 @@ public class RemoveRoleUserInConversationCommandHandler
 		{
 			return new Result<RoleUserByChatDto>(new DbEntityNotFoundError("Role not found"));
 		}
-			
-		if (chatUser.Chat.OwnerId == request.RequesterId)
+
+		if (chatUser.Chat.OwnerId != request.RequesterId)
 		{
-			var role = chatUser.Role;
-			
-			_context.RoleUserByChats.Remove(chatUser.Role);
-			await _context.SaveChangesAsync(cancellationToken);
-		
-			return new Result<RoleUserByChatDto>(new RoleUserByChatDto(role));
+			return new Result<RoleUserByChatDto>(new ForbiddenError("Only the creator can be given a role"));
 		}
 		
-		return new Result<RoleUserByChatDto>(new ForbiddenError("Only the creator can be given a role"));
+		var role = chatUser.Role;
+			
+		_context.RoleUserByChats.Remove(chatUser.Role);
+		await _context.SaveChangesAsync(cancellationToken);
+		
+		return new Result<RoleUserByChatDto>(new RoleUserByChatDto(role));
+
 	}
 }

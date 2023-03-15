@@ -43,24 +43,31 @@ public class DeleteChatCommandHandler : IRequestHandler<DeleteChatCommand, Resul
 
         if (chat.AvatarLink != null)
         {
-            _fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), chat.AvatarLink.Split("/")[^1]));
+            var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+            var avatarFileName = chat.AvatarLink.Split("/")[^1];
+
+            var avatarFilePath = Path.Combine(pathWwwRoot, avatarFileName);
+            
+            _fileService.DeleteFile(avatarFilePath);
         }
 		
         _context.Chats.Remove(chat);
+        
         await _context.SaveChangesAsync(cancellationToken);
 
-        return new Result<ChatDto>(
-            new ChatDto
-            {
-                Id = chat.Id,
-                Name = chat.Name,
-                Title = chat.Title,
-                Type = chat.Type,
-                LastMessageId = chat.LastMessageId,
-                LastMessageText = chat.LastMessage?.Text,
-                LastMessageAuthorDisplayName = chat.LastMessage is { Owner: { } } ? 
-                    chat.LastMessage.Owner.DisplayName : null,
-                LastMessageDateOfCreate = chat.LastMessage?.DateOfCreate,
-            });
+        var chatDto = new ChatDto
+        {
+            Id = chat.Id,
+            Name = chat.Name,
+            Title = chat.Title,
+            Type = chat.Type,
+            LastMessageId = chat.LastMessageId,
+            LastMessageText = chat.LastMessage?.Text,
+            LastMessageAuthorDisplayName =
+                chat.LastMessage is { Owner: { } } ? chat.LastMessage.Owner.DisplayName : null,
+            LastMessageDateOfCreate = chat.LastMessage?.DateOfCreate,
+        };
+        
+        return new Result<ChatDto>(chatDto);
     }
 }

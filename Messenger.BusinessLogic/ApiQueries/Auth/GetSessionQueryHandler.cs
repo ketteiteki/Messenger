@@ -18,6 +18,7 @@ public class GetSessionQueryHandler : IRequestHandler<GetSessionQuery, Result<Se
     public async Task<Result<SessionDto>> Handle(GetSessionQuery request, CancellationToken cancellationToken)
     {
         var session = await _context.Sessions
+            .AsNoTracking()
             .FirstOrDefaultAsync(s => 
                 s.AccessToken == request.AccessToken &&
                 s.UserId == request.RequesterId, cancellationToken);

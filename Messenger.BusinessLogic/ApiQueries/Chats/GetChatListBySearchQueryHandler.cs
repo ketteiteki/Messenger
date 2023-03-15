@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using MediatR;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
@@ -32,8 +31,8 @@ public class GetChatListBySearchQueryHandler : IRequestHandler<GetChatListBySear
                         into banUserByChatEnumerable
                     from banUserByChatItem in banUserByChatEnumerable.DefaultIfEmpty()
                     where chat.Type != ChatType.Dialog
-                    where Regex.IsMatch(chat.Title, $"{request.SearchText}") ||
-                          Regex.IsMatch(chat.Name, $"{request.SearchText}")
+                    where EF.Functions.Like(chat.Title, $"%{request.SearchText}%") ||
+                          EF.Functions.Like(chat.Name, $"%{request.SearchText}%")
                     select new ChatDto
                     {
                         Id = chat.Id,
