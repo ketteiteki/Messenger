@@ -51,19 +51,22 @@ public class CreatePermissionsUserInConversationCommandHandler
 			return new Result<PermissionDto>(new DbEntityNotFoundError("No user found in chat"));
 		}
 
-		var notifyPermissionForUserDto = new NotifyPermissionForUserDto(request.ChatId, request.CanSendMedia, null); 
+		var notifyPermissionForUserDto = new NotifyPermissionForUserDto(
+			request.ChatId,
+			request.CanSendMedia,
+			muteDateOfExpire: null); 
 			
 		if (request.MuteMinutes is >= 1)
 		{
 			var muteDateOfExpire = DateTime.UtcNow.AddMinutes((int) request.MuteMinutes);
 
-			chatUserByUser.MuteDateOfExpire = muteDateOfExpire;
-				
+			chatUserByUser.UpdateMuteDateOfExpire(muteDateOfExpire);	
+			
 			notifyPermissionForUserDto.MuteDateOfExpire = muteDateOfExpire;
 		}
 			
-		chatUserByUser.CanSendMedia = request.CanSendMedia;
-
+		chatUserByUser.UpdateCanSendMedia(request.CanSendMedia);
+		
 		_context.ChatUsers.Update(chatUserByUser);
 		
 		await _context.SaveChangesAsync(cancellationToken);

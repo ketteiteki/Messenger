@@ -39,15 +39,13 @@ public class UpdateProfileAvatarCommandHandler : IRequestHandler<UpdateProfileAv
 		if (requester.AvatarLink != null && request.AvatarFile == null)
 		{
 			var avatarFileName = requester.AvatarLink.Split("/")[^1];
-
 			var avatarFilePath = Path.Combine(pathWwwRoot, avatarFileName);
 			
 			_fileService.DeleteFile(avatarFilePath);
 			
-			requester.AvatarLink = null;
+			requester.UpdateAvatarLink(null);
 			
 			_context.Users.Update(requester);
-			
 			await _context.SaveChangesAsync(cancellationToken);
 
 			return new Result<UserDto>(new UserDto(requester));
@@ -55,10 +53,9 @@ public class UpdateProfileAvatarCommandHandler : IRequestHandler<UpdateProfileAv
 
 		var avatarLink = await _fileService.CreateFileAsync(pathWwwRoot, request.AvatarFile, messengerDomainName);
 
-		requester.AvatarLink = avatarLink;
+		requester.UpdateAvatarLink(avatarLink);
 			
 		_context.Users.Update(requester);
-		
 		await _context.SaveChangesAsync(cancellationToken);
 
 		return new Result<UserDto>(new UserDto(requester));

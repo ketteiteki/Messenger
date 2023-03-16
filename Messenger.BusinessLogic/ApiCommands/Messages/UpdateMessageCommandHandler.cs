@@ -39,9 +39,9 @@ public class UpdateMessageCommandHandler : IRequestHandler<UpdateMessageCommand,
 			return new Result<MessageDto>(new ForbiddenError("It is forbidden to change someone else's message")); 
 		}
 		
-		message.Text = request.Text;
-		message.IsEdit = true;
-
+		message.UpdateText(request.Text);
+		message.UpdateIsEdit(true);
+		
 		_context.Messages.Update(message);
 		
 		await _context.SaveChangesAsync(cancellationToken);

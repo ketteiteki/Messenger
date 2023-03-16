@@ -51,10 +51,10 @@ public class UpdateChatDataCommandHandler : IRequestHandler<UpdateChatDataComman
 				return new Result<ChatDto>(new DbEntityExistsError("Chat with that name already exists"));
 			}
 			
-			chatUserByRequester.Chat.Name = request.Name;
+			chatUserByRequester.Chat.UpdateName(request.Name);
 		}
 			
-		chatUserByRequester.Chat.Title = request.Title;
+		chatUserByRequester.Chat.UpdateTitle(request.Title);
 			
 		_context.Chats.Update(chatUserByRequester.Chat);
 		await _context.SaveChangesAsync(cancellationToken);

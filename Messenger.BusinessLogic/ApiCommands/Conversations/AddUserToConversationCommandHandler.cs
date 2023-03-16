@@ -59,15 +59,19 @@ public class AddUserToConversationCommandHandler : IRequestHandler<AddUserToConv
 			return new Result<UserDto>(new DbEntityExistsError("User already exists in conversation"));
 		}
 
-		var isUserAlreadyInChat =
-			await _context.ChatUsers.AnyAsync(c => c.UserId == request.UserId && c.ChatId == request.ChatId, cancellationToken);
+		var isUserAlreadyInChat = await _context.ChatUsers
+			.AnyAsync(c => c.UserId == request.UserId && c.ChatId == request.ChatId, cancellationToken);
 		
 		if (isUserAlreadyInChat)
 		{
 			return new Result<UserDto>(new  DbEntityExistsError("User is already in the chat"));
 		}
 
-		var chatUser = new ChatUser { UserId = request.UserId, ChatId = request.ChatId };
+		var chatUser = new ChatUserEntity(
+			request.UserId,
+			request.ChatId,
+			canSendMedia: true, 
+			muteDateOfExpire: null);
 		
 		_context.ChatUsers.Add(chatUser);
 		

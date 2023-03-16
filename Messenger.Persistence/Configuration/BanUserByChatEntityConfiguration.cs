@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class BanUserByChatConfiguration : IEntityTypeConfiguration<BanUserByChat>
+public class BanUserByChatEntityConfiguration : IEntityTypeConfiguration<BanUserByChatEntity>
 {
-	public void Configure(EntityTypeBuilder<BanUserByChat> builder)
+	public void Configure(EntityTypeBuilder<BanUserByChatEntity> builder)
 	{
 		builder
 			.HasKey(b => new {b.ChatId, b.UserId});
@@ -22,9 +22,5 @@ public class BanUserByChatConfiguration : IEntityTypeConfiguration<BanUserByChat
 			.WithMany(c => c.BanUserByChats)
 			.HasForeignKey(b => b.UserId)
 			.OnDelete(DeleteBehavior.Cascade);
-		
-		builder.Property(x => x.ChatId).IsRequired();
-		builder.Property(x => x.UserId).IsRequired();
-		builder.Property(x => x.BanDateOfExpire).IsRequired();
 	}
 }

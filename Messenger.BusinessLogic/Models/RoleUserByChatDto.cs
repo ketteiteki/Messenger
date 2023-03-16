@@ -23,7 +23,7 @@ public class RoleUserByChatDto
 	
 	public bool IsOwner { get; set; }
 	
-	public RoleUserByChatDto(RoleUserByChat roleUserByChat)
+	public RoleUserByChatDto(RoleUserByChatEntity roleUserByChat)
 	{
 		UserId = roleUserByChat.UserId;
 		ChatId = roleUserByChat.ChatId;

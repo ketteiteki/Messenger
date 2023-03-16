@@ -34,7 +34,7 @@ public class DeleteProfileCommandHandler : IRequestHandler<DeleteProfileCommand,
 			
 			_fileService.DeleteFile(avatarFilePath);
 			
-			requester.AvatarLink = null;
+			requester.UpdateAvatarLink(null);
 		}
 		
 		_context.Users.Remove(requester);

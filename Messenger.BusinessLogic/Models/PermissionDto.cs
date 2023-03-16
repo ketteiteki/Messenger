@@ -8,7 +8,7 @@ public class PermissionDto
 
 	public DateTime? MuteDateOfExpire { get; set; }
 
-	public PermissionDto(ChatUser chatUser)
+	public PermissionDto(ChatUserEntity chatUser)
 	{
 		CanSendMedia = chatUser.CanSendMedia;
 		MuteDateOfExpire = chatUser.MuteDateOfExpire;

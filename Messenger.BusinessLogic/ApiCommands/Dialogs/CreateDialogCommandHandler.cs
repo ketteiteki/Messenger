@@ -45,16 +45,25 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 			return new Result<ChatDto>(new DbEntityExistsError("Dialog already exists"));
 		}
 
-		var newDialog = new Chat(
+		var newDialog = new ChatEntity(
 			name: null,
 			title: null,
-			type: ChatType.Dialog,
+			ChatType.Dialog,
 			ownerId: null,
 			avatarLink: null,
 			lastMessageId: null);
 
-		var chatUserForRequester = new ChatUser { ChatId = newDialog.Id, UserId = request.RequesterId };
-		var chatUserForInterlocutor = new ChatUser { ChatId = newDialog.Id, UserId = request.UserId };
+		var chatUserForRequester = new ChatUserEntity(
+			request.RequesterId, 
+			newDialog.Id, 
+			canSendMedia: true, 
+			muteDateOfExpire: null);
+		
+		var chatUserForInterlocutor = new ChatUserEntity(
+			request.UserId,
+			newDialog.Id,
+			canSendMedia: true,
+			muteDateOfExpire: null);
 		
 		_context.Chats.Add(newDialog);
 		_context.ChatUsers.Add(chatUserForRequester);

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Messenger.Services.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230212051654_CreateDatabase")]
+    [Migration("20230316164149_CreateDatabase")]
     partial class CreateDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,7 +24,7 @@ namespace Messenger.Services.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Messenger.Domain.Entities.Attachment", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.AttachmentEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,7 +38,6 @@ namespace Messenger.Services.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<long>("Size")
@@ -51,7 +50,7 @@ namespace Messenger.Services.Migrations
                     b.ToTable("Attachments");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.BanUserByChat", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.BanUserByChatEntity", b =>
                 {
                     b.Property<Guid>("ChatId")
                         .HasColumnType("uuid");
@@ -69,7 +68,7 @@ namespace Messenger.Services.Migrations
                     b.ToTable("BanUserByChats");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.Chat", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.ChatEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -126,7 +125,7 @@ namespace Messenger.Services.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.ChatUser", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.ChatUserEntity", b =>
                 {
                     b.Property<Guid>("ChatId")
                         .HasColumnType("uuid");
@@ -174,7 +173,7 @@ namespace Messenger.Services.Migrations
                         new
                         {
                             ChatId = new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"),
-                            UserId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
+                            UserId = new Guid("9f40e295-8b43-4329-b37e-d267deee6c4a"),
                             CanSendMedia = true
                         },
                         new
@@ -203,7 +202,7 @@ namespace Messenger.Services.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.DeletedDialogByUser", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.DeletedDialogByUserEntity", b =>
                 {
                     b.Property<Guid>("ChatId")
                         .HasColumnType("uuid");
@@ -218,7 +217,7 @@ namespace Messenger.Services.Migrations
                     b.ToTable("DeletedDialogByUsers");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.DeletedMessageByUser", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.DeletedMessageByUserEntity", b =>
                 {
                     b.Property<Guid>("MessageId")
                         .HasColumnType("uuid");
@@ -233,7 +232,7 @@ namespace Messenger.Services.Migrations
                     b.ToTable("DeletedMessageByUsers");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.Message", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.MessageEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -249,7 +248,6 @@ namespace Messenger.Services.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<Guid?>("OwnerId")
-                        .IsRequired()
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("ReplyToMessageId")
@@ -273,63 +271,63 @@ namespace Messenger.Services.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("2a43fb8e-e1b3-4494-96ff-7bf7dac1aeb2"),
+                            Id = new Guid("6f6d7947-488d-4e7c-be7e-bfbf04bfef6f"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 2, 12, 5, 16, 53, 554, DateTimeKind.Utc).AddTicks(975),
+                            DateOfCreate = new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(4520),
                             IsEdit = false,
                             OwnerId = new Guid("a85825ba-f99b-4177-a858-96384303ea14"),
                             Text = "привет, какие книжки почитать?"
                         },
                         new
                         {
-                            Id = new Guid("1e26b88e-4c7d-4dfd-a37f-9ac73e820ba1"),
+                            Id = new Guid("d4b826c1-5f1c-4ae6-ac2a-8ee7b5b75e8a"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 2, 12, 5, 16, 53, 554, DateTimeKind.Utc).AddTicks(1909),
+                            DateOfCreate = new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(5787),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
-                            ReplyToMessageId = new Guid("2a43fb8e-e1b3-4494-96ff-7bf7dac1aeb2"),
+                            ReplyToMessageId = new Guid("6f6d7947-488d-4e7c-be7e-bfbf04bfef6f"),
                             Text = "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться..."
                         },
                         new
                         {
-                            Id = new Guid("f05c7ada-dd39-4cfa-b2b3-7e0441e58056"),
+                            Id = new Guid("5e162143-381e-4b77-b4fd-f5f028844eb5"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 2, 12, 5, 16, 53, 554, DateTimeKind.Utc).AddTicks(2432),
+                            DateOfCreate = new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(6339),
                             IsEdit = false,
                             OwnerId = new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"),
-                            ReplyToMessageId = new Guid("1e26b88e-4c7d-4dfd-a37f-9ac73e820ba1"),
+                            ReplyToMessageId = new Guid("d4b826c1-5f1c-4ae6-ac2a-8ee7b5b75e8a"),
                             Text = "ладно"
                         },
                         new
                         {
-                            Id = new Guid("acba511c-9151-47f3-b7c7-f6fa2504dc04"),
+                            Id = new Guid("ab52cc53-2afd-49df-b2c4-345851bcbee1"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 2, 12, 5, 16, 53, 554, DateTimeKind.Utc).AddTicks(2931),
+                            DateOfCreate = new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(6862),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "ага"
                         },
                         new
                         {
-                            Id = new Guid("4cbeba37-a686-413c-9bd3-932bb24f3bd6"),
+                            Id = new Guid("b1f3e620-7d31-46f0-ab07-791829539bf8"),
                             ChatId = new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"),
-                            DateOfCreate = new DateTime(2023, 2, 12, 5, 16, 53, 554, DateTimeKind.Utc).AddTicks(3400),
+                            DateOfCreate = new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(7512),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "привет"
                         },
                         new
                         {
-                            Id = new Guid("da8dee89-831d-44c3-9e35-e70ade4e0f3f"),
+                            Id = new Guid("a1077a79-a662-4e44-8ece-c9ce64c5a2d0"),
                             ChatId = new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"),
-                            DateOfCreate = new DateTime(2023, 2, 12, 5, 16, 53, 554, DateTimeKind.Utc).AddTicks(3889),
+                            DateOfCreate = new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(8026),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "привет, как дела?"
                         });
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.RoleUserByChat", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.RoleUserByChatEntity", b =>
                 {
                     b.Property<Guid>("ChatId")
                         .HasColumnType("uuid");
@@ -366,7 +364,7 @@ namespace Messenger.Services.Migrations
                     b.ToTable("RoleUserByChats");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.Session", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.SessionEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -403,7 +401,7 @@ namespace Messenger.Services.Migrations
                     b.ToTable("Sessions");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.User", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -474,9 +472,9 @@ namespace Messenger.Services.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.Attachment", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.AttachmentEntity", b =>
                 {
-                    b.HasOne("Messenger.Domain.Entities.Message", "Message")
+                    b.HasOne("Messenger.Domain.Entities.MessageEntity", "Message")
                         .WithMany("Attachments")
                         .HasForeignKey("MessageId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -485,15 +483,15 @@ namespace Messenger.Services.Migrations
                     b.Navigation("Message");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.BanUserByChat", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.BanUserByChatEntity", b =>
                 {
-                    b.HasOne("Messenger.Domain.Entities.Chat", "Chat")
+                    b.HasOne("Messenger.Domain.Entities.ChatEntity", "Chat")
                         .WithMany("BanUserByChats")
                         .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Messenger.Domain.Entities.User", "User")
+                    b.HasOne("Messenger.Domain.Entities.UserEntity", "User")
                         .WithMany("BanUserByChats")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -504,14 +502,14 @@ namespace Messenger.Services.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.Chat", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.ChatEntity", b =>
                 {
-                    b.HasOne("Messenger.Domain.Entities.Message", "LastMessage")
+                    b.HasOne("Messenger.Domain.Entities.MessageEntity", "LastMessage")
                         .WithOne("LastMessageByChat")
-                        .HasForeignKey("Messenger.Domain.Entities.Chat", "LastMessageId")
+                        .HasForeignKey("Messenger.Domain.Entities.ChatEntity", "LastMessageId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Messenger.Domain.Entities.User", "Owner")
+                    b.HasOne("Messenger.Domain.Entities.UserEntity", "Owner")
                         .WithMany("Chats")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -521,15 +519,15 @@ namespace Messenger.Services.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.ChatUser", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.ChatUserEntity", b =>
                 {
-                    b.HasOne("Messenger.Domain.Entities.Chat", "Chat")
+                    b.HasOne("Messenger.Domain.Entities.ChatEntity", "Chat")
                         .WithMany("ChatUsers")
                         .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Messenger.Domain.Entities.User", "User")
+                    b.HasOne("Messenger.Domain.Entities.UserEntity", "User")
                         .WithMany("ChatUsers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -540,15 +538,15 @@ namespace Messenger.Services.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.DeletedDialogByUser", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.DeletedDialogByUserEntity", b =>
                 {
-                    b.HasOne("Messenger.Domain.Entities.Chat", "Chat")
+                    b.HasOne("Messenger.Domain.Entities.ChatEntity", "Chat")
                         .WithMany("DeletedDialogByUsers")
                         .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Messenger.Domain.Entities.User", "User")
+                    b.HasOne("Messenger.Domain.Entities.UserEntity", "User")
                         .WithMany("DeletedDialogByUsers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -559,15 +557,15 @@ namespace Messenger.Services.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.DeletedMessageByUser", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.DeletedMessageByUserEntity", b =>
                 {
-                    b.HasOne("Messenger.Domain.Entities.Message", "Message")
+                    b.HasOne("Messenger.Domain.Entities.MessageEntity", "Message")
                         .WithMany("DeletedMessageByUsers")
                         .HasForeignKey("MessageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Messenger.Domain.Entities.User", "User")
+                    b.HasOne("Messenger.Domain.Entities.UserEntity", "User")
                         .WithMany("DeletedMessageByUsers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -578,23 +576,22 @@ namespace Messenger.Services.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.Message", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.MessageEntity", b =>
                 {
-                    b.HasOne("Messenger.Domain.Entities.Chat", "Chat")
+                    b.HasOne("Messenger.Domain.Entities.ChatEntity", "Chat")
                         .WithMany("Messages")
                         .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Messenger.Domain.Entities.User", "Owner")
+                    b.HasOne("Messenger.Domain.Entities.UserEntity", "Owner")
                         .WithMany("Messages")
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Messenger.Domain.Entities.Message", "ReplyToMessage")
+                    b.HasOne("Messenger.Domain.Entities.MessageEntity", "ReplyToMessage")
                         .WithOne()
-                        .HasForeignKey("Messenger.Domain.Entities.Message", "ReplyToMessageId")
+                        .HasForeignKey("Messenger.Domain.Entities.MessageEntity", "ReplyToMessageId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Chat");
@@ -604,17 +601,17 @@ namespace Messenger.Services.Migrations
                     b.Navigation("ReplyToMessage");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.RoleUserByChat", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.RoleUserByChatEntity", b =>
                 {
-                    b.HasOne("Messenger.Domain.Entities.User", "User")
+                    b.HasOne("Messenger.Domain.Entities.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Messenger.Domain.Entities.ChatUser", "ChatUser")
+                    b.HasOne("Messenger.Domain.Entities.ChatUserEntity", "ChatUser")
                         .WithOne("Role")
-                        .HasForeignKey("Messenger.Domain.Entities.RoleUserByChat", "ChatId", "UserId")
+                        .HasForeignKey("Messenger.Domain.Entities.RoleUserByChatEntity", "ChatId", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -623,9 +620,9 @@ namespace Messenger.Services.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.Session", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.SessionEntity", b =>
                 {
-                    b.HasOne("Messenger.Domain.Entities.User", "User")
+                    b.HasOne("Messenger.Domain.Entities.UserEntity", "User")
                         .WithMany("Sessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -634,7 +631,7 @@ namespace Messenger.Services.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.Chat", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.ChatEntity", b =>
                 {
                     b.Navigation("BanUserByChats");
 
@@ -645,12 +642,12 @@ namespace Messenger.Services.Migrations
                     b.Navigation("Messages");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.ChatUser", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.ChatUserEntity", b =>
                 {
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.Message", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.MessageEntity", b =>
                 {
                     b.Navigation("Attachments");
 
@@ -659,7 +656,7 @@ namespace Messenger.Services.Migrations
                     b.Navigation("LastMessageByChat");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.User", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.UserEntity", b =>
                 {
                     b.Navigation("BanUserByChats");
 

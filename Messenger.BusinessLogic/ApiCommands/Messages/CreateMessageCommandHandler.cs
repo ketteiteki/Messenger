@@ -32,6 +32,8 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 	
 	public async Task<Result<MessageDto>> Handle(CreateMessageCommand request, CancellationToken cancellationToken)
 	{
+		var messengerDomainName = _configuration[AppSettingConstants.MessengerDomainName];
+		
 		var chatUser = await _context.ChatUsers
 			.Include(c => c.Chat)
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
@@ -74,7 +76,7 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 
 		if (!isRequesterMuted)
 		{
-			chatUser.MuteDateOfExpire = null;
+			chatUser.UpdateMuteDateOfExpire(null);
 		}
 		
 		if (banUserByChat != null && !isRequesterBanned)
@@ -82,26 +84,27 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 			_context.BanUserByChats.Remove(banUserByChat);
 		}
 
-		var newMessage = new Message(
-				text: request.Text,
-				ownerId: request.RequesterId,
-				replyToMessageId: request.ReplyToId,
-				chatId: request.ChatId);
+		var newMessage = new MessageEntity(
+				request.Text,
+				request.RequesterId,
+				request.ReplyToId,
+				request.ChatId);
 		
 		if (request.Files != null)
 		{
-			var attachments = new List<Attachment>();
+			var attachments = new List<AttachmentEntity>();
         			
 			foreach (var file in request.Files)
 			{
-				var fileLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), file,
-					_configuration[AppSettingConstants.MessengerDomainName]);
+				var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+				
+				var fileLink = await _fileService.CreateFileAsync(pathWwwRoot, file, messengerDomainName);
         
-				var attachment = new Attachment(
-					name: file.FileName,
+				var attachment = new AttachmentEntity(
+					file.FileName,
 					size: file.Length,
-					messageId: newMessage.Id,
-					link: fileLink);
+					fileLink,
+					newMessage.Id);
         				
 				attachments.Add(attachment);
 			}
@@ -111,8 +114,8 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
         
 		_context.Messages.Add(newMessage);
         			
-		chatUser.Chat.LastMessageId = newMessage.Id;
-        			
+        chatUser.Chat.UpdateLastMessageId(newMessage.Id);			
+		
 		_context.Chats.Update(chatUser.Chat);
         			
 		await _context.SaveChangesAsync(cancellationToken);

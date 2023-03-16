@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class MessageConfiguration : IEntityTypeConfiguration<Message>
+public class MessageEntityConfiguration : IEntityTypeConfiguration<MessageEntity>
 {
-	public void Configure(EntityTypeBuilder<Message> builder)
+	public void Configure(EntityTypeBuilder<MessageEntity> builder)
 	{
 		builder
 			.HasOne(m => m.ReplyToMessage)
@@ -26,10 +26,10 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
 			.HasForeignKey(o => o.MessageId)
 			.OnDelete(DeleteBehavior.Cascade);
 		
-		builder.Property(x => x.ChatId).IsRequired();
-		builder.Property(x => x.OwnerId).IsRequired();
+		builder.Property(x => x.Text).IsRequired();
+		builder.Property(x => x.DateOfCreate).IsRequired();
 
-		var dotnetChatMessageByBob = new Message(
+		var dotnetChatMessageByBob = new MessageEntity(
 			ownerId: SeedDataConstants.BobUserId,
 			chatId: SeedDataConstants.DotnetChatId,
 			text: "привет, какие книжки почитать?",
@@ -38,7 +38,7 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
 			Id = Guid.NewGuid()
 		};;
 		
-		var dotnetChatMessageByKaminome1 = new Message(
+		var dotnetChatMessageByKaminome1 = new MessageEntity(
 			ownerId: SeedDataConstants.KaminomeUserId,
 			chatId: SeedDataConstants.DotnetChatId,
 			text: "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться...",
@@ -47,25 +47,25 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
 			Id = Guid.NewGuid()
 		};
 		
-		var dotnetChatMessageByAlice = new Message(
+		var dotnetChatMessageByAlice = new MessageEntity(
 			ownerId: SeedDataConstants.AliceUserId,
 			chatId: SeedDataConstants.DotnetChatId,
 			text: "ладно",
 			replyToMessageId: dotnetChatMessageByKaminome1.Id);
 
-		var dotnetChatMessageByKaminome2 = new Message(
+		var dotnetChatMessageByKaminome2 = new MessageEntity(
 			ownerId: SeedDataConstants.KaminomeUserId,
 			chatId: SeedDataConstants.DotnetChatId,
 			text: "ага",
 			replyToMessageId: null);
 
-		var dialogKaminomeAliceMessageByKaminome = new Message(
+		var dialogKaminomeAliceMessageByKaminome = new MessageEntity(
 			ownerId: SeedDataConstants.KaminomeUserId,
 			chatId: SeedDataConstants.DialogKaminomeAliceChatId,
 			replyToMessageId: null,
 			text: "привет");
 		
-		var dialogKaminomeAliceMessageByAlice = new Message(
+		var dialogKaminomeAliceMessageByAlice = new MessageEntity(
 			ownerId: SeedDataConstants.KaminomeUserId,
 			chatId: SeedDataConstants.DialogKaminomeAliceChatId,
 			replyToMessageId: null,

@@ -45,7 +45,11 @@ public class JoinToChatCommandHandler : IRequestHandler<JoinToChatCommand, Resul
 				new ForbiddenError($"You are banned in the chat. Unban date: {banUserByChat.BanDateOfExpire}"));
 		}
 		
-		var newChatUser = new ChatUser { UserId = request.RequesterId, ChatId = request.ChatId };
+		var newChatUser = new ChatUserEntity(
+			request.RequesterId,
+			request.ChatId,
+			canSendMedia: true,
+			muteDateOfExpire: null);
 		
 		_context.ChatUsers.Add(newChatUser);
 		await _context.SaveChangesAsync(cancellationToken);

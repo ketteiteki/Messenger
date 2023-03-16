@@ -4,9 +4,9 @@ using Messenger.Domain.Entities.Validation;
 
 namespace Messenger.Domain.Entities;
 
-public class Attachment : IBaseEntity
+public class AttachmentEntity : IBaseEntity
 {
-	public Guid Id { get; set; }
+	public Guid Id { get; set; } = Guid.NewGuid();
 	
 	public string Name { get; set; }
 	
@@ -16,15 +16,15 @@ public class Attachment : IBaseEntity
 	
 	public Guid MessageId { get; set; }
 	
-	public Message Message { get; set; }
+	public MessageEntity Message { get; set; }
 	
-	public Attachment(string name, long size, string link, Guid messageId)
+	public AttachmentEntity(string name, long size, string link, Guid messageId)
 	{
 		Name = name;
 		Size = size;
 		Link = link;
 		MessageId = messageId;
 		
-		new AttachmentValidator().ValidateAndThrow(this);
+		new AttachmentEntityValidator().ValidateAndThrow(this);
 	}
 }

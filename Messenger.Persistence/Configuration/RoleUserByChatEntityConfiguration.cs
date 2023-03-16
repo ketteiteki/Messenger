@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class RoleUserByChatConfiguration : IEntityTypeConfiguration<RoleUserByChat>
+public class RoleUserByChatEntityConfiguration : IEntityTypeConfiguration<RoleUserByChatEntity>
 {
-	public void Configure(EntityTypeBuilder<RoleUserByChat> builder)
+	public void Configure(EntityTypeBuilder<RoleUserByChatEntity> builder)
 	{
 		builder
 			.HasKey(c => new {c.ChatId, c.UserId});
@@ -14,10 +14,10 @@ public class RoleUserByChatConfiguration : IEntityTypeConfiguration<RoleUserByCh
 		builder
 			.HasOne(r => r.ChatUser)
 			.WithOne(c => c.Role)
-			.HasForeignKey<RoleUserByChat>(c => new {c.ChatId, c.UserId})
+			.HasForeignKey<RoleUserByChatEntity>(c => new {c.ChatId, c.UserId})
 			.OnDelete(DeleteBehavior.Cascade);
 		
-		builder.Property(x => x.ChatId).IsRequired();
-		builder.Property(x => x.UserId).IsRequired();
+		builder.Property(x => x.RoleTitle).IsRequired();
+		builder.Property(x => x.RoleColor).IsRequired();
 	}
 }

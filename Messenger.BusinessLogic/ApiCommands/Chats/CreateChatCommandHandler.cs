@@ -37,11 +37,11 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Resul
             return new Result<ChatDto>(new DbEntityExistsError("A chat by that name already exists"));
         }
 		
-        var newChat = new Chat(
-            name: request.Name,
-            title: request.Title,
-            type: request.Type,
-            ownerId: request.RequesterId,
+        var newChat = new ChatEntity(
+            request.Name,
+            request.Title,
+            request.Type,
+            request.RequesterId,
             avatarLink: null,
             lastMessageId: null
         );
@@ -52,10 +52,14 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Resul
             
             var avatarLink = await _fileService.CreateFileAsync(pathWwwRoot, request.AvatarFile, messengerDomainName);
 
-            newChat.AvatarLink = avatarLink;
+            newChat.UpdateAvatarLink(avatarLink);
         }
 
-        var newChatUser = new ChatUser { UserId = requester.Id, ChatId = newChat.Id };
+        var newChatUser = new ChatUserEntity(
+            requester.Id, 
+            newChat.Id, 
+            canSendMedia: true, 
+            muteDateOfExpire: null);
         
         _context.ChatUsers.Add(newChatUser);
         _context.Chats.Add(newChat);

@@ -56,12 +56,7 @@ public class BanUserInConversationCommandHandler : IRequestHandler<BanUserInConv
 
 		var banDateOfExpire = DateTime.UtcNow.AddMinutes(request.BanMinutes);
 
-		var banUserByChat = new BanUserByChat
-		{
-			UserId = request.UserId,
-			ChatId = request.ChatId,
-			BanDateOfExpire = banDateOfExpire
-		};
+		var banUserByChat = new BanUserByChatEntity(request.UserId, request.ChatId, banDateOfExpire);
 
 		_context.BanUserByChats.Add(banUserByChat);
 		_context.ChatUsers.Remove(chatUser);

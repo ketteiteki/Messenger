@@ -77,12 +77,8 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 			
 			return new Result<MessageDto>(messageDtoDeleteForAll);
 		}
-			
-		var deletedMessageByUser = new DeletedMessageByUser
-		{
-			MessageId = message.Id,
-			UserId = request.RequesterId
-		};
+
+		var deletedMessageByUser = new DeletedMessageByUserEntity(message.Id, request.RequesterId);
 
 		var lastMessageNow = await _context.Messages
 			.Include(m => m.Owner)
