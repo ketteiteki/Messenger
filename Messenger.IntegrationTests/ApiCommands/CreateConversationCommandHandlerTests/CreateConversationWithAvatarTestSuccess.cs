@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Chats;
-using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;

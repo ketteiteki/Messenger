@@ -3,7 +3,6 @@ using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
 using Messenger.Domain.Enum;
@@ -20,14 +19,20 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 	private readonly DatabaseContext _context;
 	private readonly IFileService _fileService;
 	private readonly IConfiguration _configuration;
+	private readonly IBaseDirService _baseDirService;
 
-	public CreateMessageCommandHandler(DatabaseContext context, IFileService fileService, IConfiguration configuration, 
-		IHubContext<ChatHub, IChatHub> hubContext)
+	public CreateMessageCommandHandler(
+		DatabaseContext context,
+		IFileService fileService,
+		IConfiguration configuration, 
+		IHubContext<ChatHub, IChatHub> hubContext, 
+		IBaseDirService baseDirService)
 	{
 		_context = context;
 		_fileService = fileService;
 		_configuration = configuration;
 		_hubContext = hubContext;
+		_baseDirService = baseDirService;
 	}
 	
 	public async Task<Result<MessageDto>> Handle(CreateMessageCommand request, CancellationToken cancellationToken)
@@ -96,7 +101,7 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
         			
 			foreach (var file in request.Files)
 			{
-				var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+				var pathWwwRoot = _baseDirService.GetPathWwwRoot();
 				
 				var fileLink = await _fileService.CreateFileAsync(pathWwwRoot, file, messengerDomainName);
         

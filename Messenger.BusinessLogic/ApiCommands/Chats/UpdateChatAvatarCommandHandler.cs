@@ -2,7 +2,6 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Constants;
 using Messenger.Domain.Enum;
 using Messenger.Services;
@@ -16,12 +15,18 @@ public class UpdateChatAvatarCommandHandler : IRequestHandler<UpdateChatAvatarCo
 	private readonly DatabaseContext _context;
 	private readonly IFileService _fileService;
 	private readonly IConfiguration _configuration;
+	private readonly IBaseDirService _baseDirService;
 	
-	public UpdateChatAvatarCommandHandler(DatabaseContext context, IFileService fileService, IConfiguration configuration)
+	public UpdateChatAvatarCommandHandler(
+		DatabaseContext context,
+		IFileService fileService, 
+		IConfiguration configuration,
+		IBaseDirService baseDirService)
 	{
 		_context = context;
 		_fileService = fileService;
 		_configuration = configuration;
+		_baseDirService = baseDirService;
 	}
 	
 	public async Task<Result<ChatDto>> Handle(UpdateChatAvatarCommand request, CancellationToken cancellationToken)
@@ -52,7 +57,7 @@ public class UpdateChatAvatarCommandHandler : IRequestHandler<UpdateChatAvatarCo
 
 		if (chatUserByRequester.Chat.AvatarLink != null)
 		{
-			var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+			var pathWwwRoot = _baseDirService.GetPathWwwRoot();
 			var avatarFileName = chatUserByRequester.Chat.AvatarLink.Split("/")[^1];
 
 			var avatarFilePath = Path.Combine(pathWwwRoot, avatarFileName);
@@ -64,7 +69,7 @@ public class UpdateChatAvatarCommandHandler : IRequestHandler<UpdateChatAvatarCo
 			
 		if (request.AvatarFile != null)
 		{
-			var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+			var pathWwwRoot = _baseDirService.GetPathWwwRoot();
 				
 			var avatarLink = await _fileService.CreateFileAsync(pathWwwRoot, request.AvatarFile, messengerDomainName);
 				

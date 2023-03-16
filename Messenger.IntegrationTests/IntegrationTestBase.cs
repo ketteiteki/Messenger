@@ -1,4 +1,5 @@
-using Messenger.BusinessLogic.Services;
+using Messenger.Application.Interfaces;
+using Messenger.Application.Services;
 using Messenger.Domain.Constants;
 using Messenger.Infrastructure;
 using Messenger.Infrastructure.Configuration;
@@ -19,6 +20,8 @@ public class IntegrationTestBase : IAsyncLifetime
 	
 	private IServiceProvider ServiceProvider { get; }
 
+	protected readonly IBaseDirService BaseDirService = new BaseDirService();
+	
 	protected IntegrationTestBase()
 	{
 		var pathAppSettingsDevelopment = BaseDirService.GetPathAppSettingsJson(isDevelopment: true);
