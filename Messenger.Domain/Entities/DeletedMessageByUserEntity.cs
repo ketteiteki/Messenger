@@ -1,3 +1,6 @@
+using FluentValidation;
+using Messenger.Domain.Entities.Validation;
+
 namespace Messenger.Domain.Entities;
 
 public class DeletedMessageByUserEntity
@@ -14,5 +17,7 @@ public class DeletedMessageByUserEntity
 	{
 		MessageId = messageId;
 		UserId = userId;
+		
+		new DeletedMessageByUserEntityValidator().ValidateAndThrow(this);
 	}
 }

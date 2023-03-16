@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class MessageConfiguration : IEntityTypeConfiguration<MessageEntity>
+public class MessageEntityConfiguration : IEntityTypeConfiguration<MessageEntity>
 {
 	public void Configure(EntityTypeBuilder<MessageEntity> builder)
 	{
@@ -26,8 +26,8 @@ public class MessageConfiguration : IEntityTypeConfiguration<MessageEntity>
 			.HasForeignKey(o => o.MessageId)
 			.OnDelete(DeleteBehavior.Cascade);
 		
-		builder.Property(x => x.ChatId).IsRequired();
-		builder.Property(x => x.OwnerId).IsRequired();
+		builder.Property(x => x.Text).IsRequired();
+		builder.Property(x => x.DateOfCreate).IsRequired();
 
 		var dotnetChatMessageByBob = new MessageEntity(
 			ownerId: SeedDataConstants.BobUserId,

@@ -6,7 +6,7 @@ public class DeletedDialogByUserEntityValidator : AbstractValidator<DeletedDialo
 {
     public DeletedDialogByUserEntityValidator()
     {
-        RuleFor(x => x.UserId).NotNull();
-        RuleFor(x => x.ChatId).NotNull();
+        RuleFor(x => x.UserId).NotEmpty();
+        RuleFor(x => x.ChatId).NotEmpty();
     }
 }

@@ -38,10 +38,10 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Resul
         }
 		
         var newChat = new ChatEntity(
-            name: request.Name,
-            title: request.Title,
-            type: request.Type,
-            ownerId: request.RequesterId,
+            request.Name,
+            request.Title,
+            request.Type,
+            request.RequesterId,
             avatarLink: null,
             lastMessageId: null
         );
@@ -52,7 +52,7 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Resul
             
             var avatarLink = await _fileService.CreateFileAsync(pathWwwRoot, request.AvatarFile, messengerDomainName);
 
-            newChat.AvatarLink = avatarLink;
+            newChat.UpdateAvatarLink(avatarLink);
         }
 
         var newChatUser = new ChatUserEntity(

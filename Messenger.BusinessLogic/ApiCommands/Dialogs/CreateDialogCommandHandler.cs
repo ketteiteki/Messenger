@@ -48,7 +48,7 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 		var newDialog = new ChatEntity(
 			name: null,
 			title: null,
-			type: ChatType.Dialog,
+			ChatType.Dialog,
 			ownerId: null,
 			avatarLink: null,
 			lastMessageId: null);

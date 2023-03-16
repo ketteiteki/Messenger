@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class ChatUserConfiguration : IEntityTypeConfiguration<ChatUserEntity>
+public class ChatUserEntityConfiguration : IEntityTypeConfiguration<ChatUserEntity>
 {
 	public void Configure(EntityTypeBuilder<ChatUserEntity> builder)
 	{
@@ -24,9 +24,6 @@ public class ChatUserConfiguration : IEntityTypeConfiguration<ChatUserEntity>
 			.HasForeignKey(p => p.UserId)
 			.OnDelete(DeleteBehavior.Cascade);
 		
-		builder.Property(x => x.ChatId).IsRequired();
-		builder.Property(x => x.UserId).IsRequired();
-
 		var dotnetChatKaminome = new ChatUserEntity(
 			SeedDataConstants.KaminomeUserId, 
 			SeedDataConstants.DotnetChatId, 

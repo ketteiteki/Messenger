@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
+public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
 {
     public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
@@ -15,9 +15,10 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
             .HasForeignKey(s => s.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Property(x => x.Id).IsRequired();
         builder.Property(x => x.DisplayName).IsRequired();
         builder.Property(x => x.Nickname).IsRequired();
+        builder.Property(x => x.PasswordSalt).IsRequired();
+        builder.Property(x => x.PasswordHash).IsRequired();
 
         var kaminome = new UserEntity(
             displayName: "kami no me",

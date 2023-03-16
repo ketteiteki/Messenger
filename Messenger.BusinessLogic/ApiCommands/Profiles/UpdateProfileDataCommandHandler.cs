@@ -37,21 +37,20 @@ public class UpdateProfileDataCommandHandler : IRequestHandler<UpdateProfileData
 				return new Result<UserDto>(new DbEntityExistsError("User with this nickname already exists")); 
 			}
 			
-			requester.Nickname = request.Nickname;
+			requester.UpdateNickname(request.Nickname);
 		}
 
 		if (request.DisplayName != null)
 		{
-			requester.DisplayName = request.DisplayName;
+			requester.UpdateDisplayName(request.DisplayName);
 		}
 		
 		if (request.Bio != null)
 		{
-			requester.Bio = request.Bio;
+			requester.UpdateBio(request.Bio);
 		}
 		
 		_context.Users.Update(requester);
-		
 		await _context.SaveChangesAsync(cancellationToken);
 
 		return new Result<UserDto>(new UserDto(requester));

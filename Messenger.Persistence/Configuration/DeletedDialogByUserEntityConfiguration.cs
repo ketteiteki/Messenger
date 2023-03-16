@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class DeletedDialogByUserConfiguration : IEntityTypeConfiguration<DeletedDialogByUserEntity>
+public class DeletedDialogByUserEntityConfiguration : IEntityTypeConfiguration<DeletedDialogByUserEntity>
 {
 	public void Configure(EntityTypeBuilder<DeletedDialogByUserEntity> builder)
 	{
@@ -22,8 +22,5 @@ public class DeletedDialogByUserConfiguration : IEntityTypeConfiguration<Deleted
 			.WithMany(u => u.DeletedDialogByUsers)
 			.HasForeignKey(p => p.UserId)
 			.OnDelete(DeleteBehavior.Cascade);
-		
-		builder.Property(x => x.ChatId).IsRequired();
-		builder.Property(x => x.UserId).IsRequired();
 	}
 }

@@ -6,7 +6,8 @@ public class SessionEntityValidator : AbstractValidator<SessionEntity>
 {
     public SessionEntityValidator()
     {
-        RuleFor(x => x.UserId).NotNull();
+        RuleFor(x => x.Id).NotEmpty();
+        RuleFor(x => x.UserId).NotEmpty();
         RuleFor(x => x.AccessToken).NotEmpty();
         RuleFor(x => x.RefreshToken).NotNull();
         RuleFor(x => x.Ip).NotNull();

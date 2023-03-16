@@ -55,11 +55,11 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<Authoriz
 		var sessionExpiresAt = DateTime.UtcNow.AddDays(int.Parse(refreshTokenLifetimeDays));
 		
 		var session = new SessionEntity(
-			accessToken: accessToken,
-			userId: requester.Id,
-			ip: request.Ip,
-			userAgent: request.UserAgent,
-			expiresAt: sessionExpiresAt);
+			requester.Id,
+			accessToken,
+			request.Ip,
+			request.UserAgent,
+			sessionExpiresAt);
 
 		if (requester.Sessions.Count >= 7)
 		{
@@ -69,6 +69,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<Authoriz
 		}
 		
 		_context.Sessions.Add(session);
+		
 		await _context.SaveChangesAsync(cancellationToken);
 		
 		return new Result<AuthorizationResponse>(new AuthorizationResponse(requester, accessToken, session.RefreshToken));

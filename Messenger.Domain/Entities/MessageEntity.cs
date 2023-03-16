@@ -14,11 +14,11 @@ public class MessageEntity : IBaseEntity
 	
 	public Guid? OwnerId { get; set; }
 
-	public UserEntity? Owner { get; set; }
+	public UserEntity Owner { get; set; }
 
 	public Guid? ReplyToMessageId { get; set; }
 	
-	public MessageEntity? ReplyToMessage { get; set; }
+	public MessageEntity ReplyToMessage { get; set; }
 	
 	public Guid ChatId { get; set; }
 
@@ -28,7 +28,7 @@ public class MessageEntity : IBaseEntity
 
 	public DateTime DateOfCreate { get; set; } = DateTime.UtcNow;
 	
-	public ChatEntity? LastMessageByChat { get; set; }
+	public ChatEntity LastMessageByChat { get; set; }
 
 	public List<DeletedMessageByUserEntity> DeletedMessageByUsers { get; set; }
 
@@ -39,6 +39,18 @@ public class MessageEntity : IBaseEntity
 		ReplyToMessageId = replyToMessageId;
 		ChatId = chatId;
 
+		new MessageEntityValidator().ValidateAndThrow(this);
+	}
+
+	public void UpdateText(string text)
+	{
+		Text = text;
+		new MessageEntityValidator().ValidateAndThrow(this);
+	}
+	
+	public void UpdateIsEdit(bool isEdit)
+	{
+		IsEdit = isEdit;
 		new MessageEntityValidator().ValidateAndThrow(this);
 	}
 }

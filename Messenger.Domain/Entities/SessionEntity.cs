@@ -6,7 +6,7 @@ namespace Messenger.Domain.Entities;
 
 public class SessionEntity : IBaseEntity
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     
     public Guid UserId { get; set; }
 
@@ -24,7 +24,7 @@ public class SessionEntity : IBaseEntity
 
     public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
-    public SessionEntity(Guid userId, string ip, string userAgent, DateTime expiresAt, string accessToken)
+    public SessionEntity(Guid userId, string accessToken, string ip, string userAgent, DateTime expiresAt)
     {
         AccessToken = accessToken;
         UserId = userId;
@@ -32,6 +32,12 @@ public class SessionEntity : IBaseEntity
         UserAgent = userAgent;
         ExpiresAt = expiresAt;
 
+        new SessionEntityValidator().ValidateAndThrow(this);
+    }
+
+    public void UpdateAccessToken(string accessToken)
+    {
+        AccessToken = accessToken;
         new SessionEntityValidator().ValidateAndThrow(this);
     }
     

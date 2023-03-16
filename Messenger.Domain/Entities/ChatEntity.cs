@@ -9,21 +9,21 @@ public class ChatEntity : IBaseEntity
 {
 	public Guid Id { get; set; } = Guid.NewGuid();
 
-	public string? Name { get; set; }
+	public string Name { get; set; }
 	
-	public string? Title { get; set; }
+	public string Title { get; set; }
 
 	public ChatType Type { get; set; }
 	
 	public Guid? OwnerId { get; set; }
 	
-	public UserEntity? Owner { get; set; }
+	public UserEntity Owner { get; set; }
 
-	public string? AvatarLink { get; set; }
+	public string AvatarLink { get; set; }
 	
 	public Guid? LastMessageId { get; set; }
 	
-	public MessageEntity? LastMessage { get; set; }
+	public MessageEntity LastMessage { get; set; }
 	
 	public List<ChatUserEntity> ChatUsers { get; set; } = new();
 	
@@ -33,7 +33,7 @@ public class ChatEntity : IBaseEntity
 
 	public List<BanUserByChatEntity> BanUserByChats { get; set; } = new();
 	
-	public ChatEntity(string? name, string? title, ChatType type, Guid? ownerId, string? avatarLink, Guid? lastMessageId)
+	public ChatEntity(string name, string title, ChatType type, Guid? ownerId, string avatarLink, Guid? lastMessageId)
 	{
 		Name = name;
 		Title = title;
@@ -42,6 +42,30 @@ public class ChatEntity : IBaseEntity
 		AvatarLink = avatarLink;
 		LastMessageId = lastMessageId;
 		
+		new ChatEntityValidator().ValidateAndThrow(this);
+	}
+
+	public void UpdateName(string name)
+	{
+		Name = name;
+		new ChatEntityValidator().ValidateAndThrow(this);
+	}
+	
+	public void UpdateTitle(string title)
+	{
+		Title = title;
+		new ChatEntityValidator().ValidateAndThrow(this);
+	}
+	
+	public void UpdateAvatarLink(string avatarLink)
+	{
+		AvatarLink = avatarLink;
+		new ChatEntityValidator().ValidateAndThrow(this);
+	}
+
+	public void UpdateLastMessageId(Guid? lastMessageId)
+	{
+		LastMessageId = lastMessageId;
 		new ChatEntityValidator().ValidateAndThrow(this);
 	}
 }

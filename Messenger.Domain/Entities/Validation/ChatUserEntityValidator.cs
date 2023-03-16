@@ -2,9 +2,9 @@ using FluentValidation;
 
 namespace Messenger.Domain.Entities.Validation;
 
-public class BanUserByChatEntityValidator : AbstractValidator<BanUserByChatEntity>
+public class ChatUserEntityValidator : AbstractValidator<ChatUserEntity>
 {
-    public BanUserByChatEntityValidator()
+    public ChatUserEntityValidator()
     {
         RuleFor(x => x.ChatId).NotEmpty();
         RuleFor(x => x.UserId).NotEmpty();

@@ -1,3 +1,6 @@
+using FluentValidation;
+using Messenger.Domain.Entities.Validation;
+
 namespace Messenger.Domain.Entities;
 
 public class DeletedDialogByUserEntity
@@ -14,5 +17,7 @@ public class DeletedDialogByUserEntity
 	{
 		UserId = userId;
 		ChatId = chatId;
+		
+		new DeletedDialogByUserEntityValidator().ValidateAndThrow(this);
 	}
 }

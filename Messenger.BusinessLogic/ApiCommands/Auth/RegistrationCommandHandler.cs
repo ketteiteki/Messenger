@@ -30,6 +30,7 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 	{
 		var accessTokenSignKey = _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
 		var accessTokenLifeTimeMinutes = _configuration[AppSettingConstants.MessengerAccessTokenLifetimeMinutes];
+		var refreshTokenLifetimeDays = _configuration[AppSettingConstants.MessengerRefreshTokenLifetimeDays];
 		
 		var isUserByNicknameExists = await _context.Users.AnyAsync(u => u.Nickname == request.Nickname, cancellationToken);
 		
@@ -41,24 +42,23 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 		var hmac512CryptoHash = _hashService.Hmacsha512CryptoHash(request.Password, out var salt);
 
 		var newUser = new UserEntity(
-			displayName: request.DisplayName,
-			nickname: request.Nickname,
-			passwordHash: hmac512CryptoHash,
-			passwordSalt: salt,
+			request.DisplayName,
+			request.Nickname,
 			bio: null,
-			avatarLink: null);
+			avatarLink: null,
+			passwordHash: hmac512CryptoHash,
+			passwordSalt: salt);
 
 		var accessToken = _tokenService.CreateAccessToken(newUser, accessTokenSignKey, int.Parse(accessTokenLifeTimeMinutes));
 
-		var sessionExpiresAt =
-			DateTime.UtcNow.AddDays(int.Parse(_configuration[AppSettingConstants.MessengerRefreshTokenLifetimeDays]));
+		var sessionExpiresAt = DateTime.UtcNow.AddDays(int.Parse(refreshTokenLifetimeDays));
 		
 		var session = new SessionEntity(
-			accessToken: accessToken,
-			userId: newUser.Id,
-			ip: request.Ip,
-			userAgent: request.UserAgent,
-			expiresAt: sessionExpiresAt);
+			newUser.Id,
+			accessToken,
+			request.Ip,
+			request.UserAgent,
+			sessionExpiresAt);
 
 		_context.Users.Add(newUser);
 		_context.Sessions.Add(session);

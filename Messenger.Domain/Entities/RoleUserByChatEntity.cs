@@ -44,4 +44,17 @@ public class RoleUserByChatEntity
 		
 		new RoleUserByChatEntityValidator().ValidateAndThrow(this);
 	}
+
+	public void UpdateRole(string roleTitle, RoleColor roleColor, bool canBanUser, bool canChangeChatData,
+		bool canAddAndRemoveUserToConversation, bool canGivePermissionToUser)
+	{
+		RoleTitle = roleTitle;
+		RoleColor = roleColor;
+		CanBanUser = canBanUser;
+		CanChangeChatData = canChangeChatData;
+		CanAddAndRemoveUserToConversation = canAddAndRemoveUserToConversation;
+		CanGivePermissionToUser = canGivePermissionToUser;
+		
+		new RoleUserByChatEntityValidator().ValidateAndThrow(this);
+	}
 }

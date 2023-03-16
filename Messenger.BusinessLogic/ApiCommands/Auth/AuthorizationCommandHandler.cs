@@ -47,8 +47,8 @@ public class AuthorizationCommandHandler : IRequestHandler<AuthorizationCommand,
 		
 		var accessToken = _tokenService.CreateAccessToken(requester, accessTokenSignKey, int.Parse(accessTokenLifeTimeMinutes));
 
-		session.AccessToken = accessToken;
-
+		session.UpdateAccessToken(accessToken);
+		
 		await _context.SaveChangesAsync(cancellationToken);
 
 		return new Result<AuthorizationResponse>(new AuthorizationResponse(requester,accessToken,session.RefreshToken));

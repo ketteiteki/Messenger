@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class ChatConfiguration : IEntityTypeConfiguration<ChatEntity>
+public class ChatEntityConfiguration : IEntityTypeConfiguration<ChatEntity>
 {
 	public void Configure(EntityTypeBuilder<ChatEntity> builder)
 	{
@@ -28,9 +28,6 @@ public class ChatConfiguration : IEntityTypeConfiguration<ChatEntity>
 			.HasForeignKey(m => m.OwnerId)
 			.OnDelete(DeleteBehavior.SetNull);
 		
-		builder.Property(x => x.Id).IsRequired();
-		builder.Property(x => x.Type).IsRequired();
-
 		var dotnetChat = new ChatEntity(
 			title: "DotNetRuChat",
 			name: "DotNetRuChat",

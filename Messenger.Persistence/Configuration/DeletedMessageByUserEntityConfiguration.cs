@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Messenger.Services.Configuration;
 
-public class DeletedMessageByUserConfiguration : IEntityTypeConfiguration<DeletedMessageByUserEntity>
+public class DeletedMessageByUserEntityConfiguration : IEntityTypeConfiguration<DeletedMessageByUserEntity>
 {
 	public void Configure(EntityTypeBuilder<DeletedMessageByUserEntity> builder)
 	{
@@ -22,8 +22,5 @@ public class DeletedMessageByUserConfiguration : IEntityTypeConfiguration<Delete
 			.WithMany(u => u.DeletedMessageByUsers)
 			.HasForeignKey(p => p.UserId)
 			.OnDelete(DeleteBehavior.Cascade);
-		
-		builder.Property(x => x.MessageId).IsRequired();
-		builder.Property(x => x.UserId).IsRequired();
 	}
 }

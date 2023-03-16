@@ -6,8 +6,8 @@ public class RoleUserByChatEntityValidator : AbstractValidator<RoleUserByChatEnt
 {
 	public RoleUserByChatEntityValidator()
 	{
-		RuleFor(x => x.UserId).NotNull();
-		RuleFor(x => x.ChatId).NotNull();
+		RuleFor(x => x.UserId).NotEmpty();
+		RuleFor(x => x.ChatId).NotEmpty();
 		RuleFor(x => x.RoleTitle).NotEmpty().Length(1, 15);
 		RuleFor(x => x.RoleColor).NotNull();
 	}

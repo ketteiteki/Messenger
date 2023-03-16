@@ -55,7 +55,7 @@ namespace Messenger.Services.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: true),
                     Size = table.Column<long>(type: "bigint", nullable: false),
                     Link = table.Column<string>(type: "text", nullable: false),
                     MessageId = table.Column<Guid>(type: "uuid", nullable: false)
@@ -164,7 +164,7 @@ namespace Messenger.Services.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Text = table.Column<string>(type: "text", nullable: false),
                     IsEdit = table.Column<bool>(type: "boolean", nullable: false),
-                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OwnerId = table.Column<Guid>(type: "uuid", nullable: true),
                     ReplyToMessageId = table.Column<Guid>(type: "uuid", nullable: true),
                     ChatId = table.Column<Guid>(type: "uuid", nullable: false),
                     DateOfCreate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -286,8 +286,8 @@ namespace Messenger.Services.Migrations
                 columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
                 values: new object[,]
                 {
-                    { new Guid("64f156e3-a120-4525-a906-41fd170f1ad0"), new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new DateTime(2023, 3, 15, 18, 25, 43, 960, DateTimeKind.Utc).AddTicks(6151), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "привет, как дела?" },
-                    { new Guid("816e41f9-ba76-4b9c-9273-46db28d82917"), new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new DateTime(2023, 3, 15, 18, 25, 43, 960, DateTimeKind.Utc).AddTicks(5647), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "привет" }
+                    { new Guid("a1077a79-a662-4e44-8ece-c9ce64c5a2d0"), new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(8026), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "привет, как дела?" },
+                    { new Guid("b1f3e620-7d31-46f0-ab07-791829539bf8"), new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"), new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(7512), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "привет" }
                 });
 
             migrationBuilder.InsertData(
@@ -309,19 +309,19 @@ namespace Messenger.Services.Migrations
                 columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
                 values: new object[,]
                 {
-                    { new Guid("c5b500ad-9506-47cc-a52a-475621e3a10d"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 3, 15, 18, 25, 43, 960, DateTimeKind.Utc).AddTicks(5139), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "ага" },
-                    { new Guid("ef6ac908-b32a-4193-8f0c-33e5ee5348de"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 3, 15, 18, 25, 43, 960, DateTimeKind.Utc).AddTicks(3266), false, new Guid("a85825ba-f99b-4177-a858-96384303ea14"), null, "привет, какие книжки почитать?" }
+                    { new Guid("6f6d7947-488d-4e7c-be7e-bfbf04bfef6f"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(4520), false, new Guid("a85825ba-f99b-4177-a858-96384303ea14"), null, "привет, какие книжки почитать?" },
+                    { new Guid("ab52cc53-2afd-49df-b2c4-345851bcbee1"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(6862), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), null, "ага" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Messages",
                 columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
-                values: new object[] { new Guid("c0313c63-f159-4a00-9de1-8f14f04a3bae"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 3, 15, 18, 25, 43, 960, DateTimeKind.Utc).AddTicks(4078), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), new Guid("ef6ac908-b32a-4193-8f0c-33e5ee5348de"), "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться..." });
+                values: new object[] { new Guid("d4b826c1-5f1c-4ae6-ac2a-8ee7b5b75e8a"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(5787), false, new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"), new Guid("6f6d7947-488d-4e7c-be7e-bfbf04bfef6f"), "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться..." });
 
             migrationBuilder.InsertData(
                 table: "Messages",
                 columns: new[] { "Id", "ChatId", "DateOfCreate", "IsEdit", "OwnerId", "ReplyToMessageId", "Text" },
-                values: new object[] { new Guid("173936c3-9cf0-407a-9631-d04ebe8e1abc"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 3, 15, 18, 25, 43, 960, DateTimeKind.Utc).AddTicks(4625), false, new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), new Guid("c0313c63-f159-4a00-9de1-8f14f04a3bae"), "ладно" });
+                values: new object[] { new Guid("5e162143-381e-4b77-b4fd-f5f028844eb5"), new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"), new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(6339), false, new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"), new Guid("d4b826c1-5f1c-4ae6-ac2a-8ee7b5b75e8a"), "ладно" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attachments_MessageId",

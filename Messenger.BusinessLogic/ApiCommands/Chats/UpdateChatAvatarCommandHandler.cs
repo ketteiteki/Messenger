@@ -59,7 +59,7 @@ public class UpdateChatAvatarCommandHandler : IRequestHandler<UpdateChatAvatarCo
 				
 			_fileService.DeleteFile(avatarFilePath);
 				
-			chatUserByRequester.Chat.AvatarLink = null;
+			chatUserByRequester.Chat.UpdateAvatarLink(null);
 		}
 			
 		if (request.AvatarFile != null)
@@ -68,7 +68,7 @@ public class UpdateChatAvatarCommandHandler : IRequestHandler<UpdateChatAvatarCo
 				
 			var avatarLink = await _fileService.CreateFileAsync(pathWwwRoot, request.AvatarFile, messengerDomainName);
 				
-			chatUserByRequester.Chat.AvatarLink = avatarLink;
+			chatUserByRequester.Chat.UpdateAvatarLink(avatarLink);
 		}
 			
 		_context.Chats.Update(chatUserByRequester.Chat);
