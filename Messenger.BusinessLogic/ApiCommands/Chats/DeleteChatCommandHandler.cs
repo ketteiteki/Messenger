@@ -2,7 +2,6 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Enum;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
@@ -13,11 +12,16 @@ public class DeleteChatCommandHandler : IRequestHandler<DeleteChatCommand, Resul
 {
     private readonly DatabaseContext _context;
     private readonly IFileService _fileService;
+    private readonly IBaseDirService _baseDirService;
 	
-    public DeleteChatCommandHandler(DatabaseContext context, IFileService fileService)
+    public DeleteChatCommandHandler(
+        DatabaseContext context, 
+        IFileService fileService,
+        IBaseDirService baseDirService)
     {
         _context = context;
         _fileService = fileService;
+        _baseDirService = baseDirService;
     }
 	
     public async Task<Result<ChatDto>> Handle(DeleteChatCommand request, CancellationToken cancellationToken)
@@ -43,7 +47,7 @@ public class DeleteChatCommandHandler : IRequestHandler<DeleteChatCommand, Resul
 
         if (chat.AvatarLink != null)
         {
-            var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+            var pathWwwRoot = _baseDirService.GetPathWwwRoot();
             var avatarFileName = chat.AvatarLink.Split("/")[^1];
 
             var avatarFilePath = Path.Combine(pathWwwRoot, avatarFileName);

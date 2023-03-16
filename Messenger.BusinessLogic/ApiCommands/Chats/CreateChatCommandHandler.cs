@@ -2,7 +2,6 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
 using Messenger.Services;
@@ -16,12 +15,18 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Resul
     private readonly DatabaseContext _context;
     private readonly IFileService _fileService;
     private readonly IConfiguration _configuration;
+    private readonly IBaseDirService _baseDirService;
 	
-    public CreateChatCommandHandler(DatabaseContext context, IFileService fileService, IConfiguration configuration)
+    public CreateChatCommandHandler(
+        DatabaseContext context, 
+        IFileService fileService,
+        IConfiguration configuration, 
+        IBaseDirService baseDirService)
     {
         _context = context;
         _fileService = fileService;
         _configuration = configuration;
+        _baseDirService = baseDirService;
     }
     
     public async Task<Result<ChatDto>> Handle(CreateChatCommand request, CancellationToken cancellationToken)
@@ -48,7 +53,7 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Resul
 
         if (request.AvatarFile != null)
         {
-            var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+            var pathWwwRoot = _baseDirService.GetPathWwwRoot();
             
             var avatarLink = await _fileService.CreateFileAsync(pathWwwRoot, request.AvatarFile, messengerDomainName);
 

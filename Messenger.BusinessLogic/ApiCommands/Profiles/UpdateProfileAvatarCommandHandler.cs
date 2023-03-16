@@ -2,7 +2,6 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Constants;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
@@ -15,12 +14,18 @@ public class UpdateProfileAvatarCommandHandler : IRequestHandler<UpdateProfileAv
 	private readonly DatabaseContext _context;
 	private readonly IFileService _fileService;
 	private readonly IConfiguration _configuration;
+	private readonly IBaseDirService _baseDirService;
 
-	public UpdateProfileAvatarCommandHandler(DatabaseContext context, IFileService fileService, IConfiguration configuration)
+	public UpdateProfileAvatarCommandHandler(
+		DatabaseContext context, 
+		IFileService fileService,
+		IConfiguration configuration, 
+		IBaseDirService baseDirService)
 	{
 		_context = context;
 		_fileService = fileService;
 		_configuration = configuration;
+		_baseDirService = baseDirService;
 	}
 	
 	public async Task<Result<UserDto>> Handle(UpdateProfileAvatarCommand request, CancellationToken cancellationToken)
@@ -34,7 +39,7 @@ public class UpdateProfileAvatarCommandHandler : IRequestHandler<UpdateProfileAv
 			return new Result<UserDto>(new ConflictError("Avatar not exists"));
 		}
 
-		var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+		var pathWwwRoot = _baseDirService.GetPathWwwRoot();
 
 		if (requester.AvatarLink != null && request.AvatarFile == null)
 		{

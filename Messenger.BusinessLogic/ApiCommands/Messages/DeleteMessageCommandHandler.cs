@@ -3,7 +3,6 @@ using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Entities;
 using Messenger.Services;
 using Microsoft.AspNetCore.SignalR;
@@ -16,12 +15,18 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 	private readonly DatabaseContext _context;
 	private readonly IFileService _fileService;
+	private readonly IBaseDirService _baseDirService;
 
-	public DeleteMessageCommandHandler(DatabaseContext context, IFileService fileService, IHubContext<ChatHub, IChatHub> hubContext)
+	public DeleteMessageCommandHandler(
+		DatabaseContext context, 
+		IFileService fileService, 
+		IHubContext<ChatHub, IChatHub> hubContext, 
+		IBaseDirService baseDirService)
 	{
 		_context = context;
 		_fileService = fileService;
 		_hubContext = hubContext;
+		_baseDirService = baseDirService;
 	}
 	
 	public async Task<Result<MessageDto>> Handle(DeleteMessageCommand request, CancellationToken cancellationToken)
@@ -46,7 +51,7 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 		{
 			foreach (var attachment in message.Attachments)
 			{
-				var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+				var pathWwwRoot = _baseDirService.GetPathWwwRoot();
 				var attachmentFileName = attachment.Link.Split("/")[^1];
 
 				var attachmentPath = Path.Combine(pathWwwRoot, attachmentFileName);

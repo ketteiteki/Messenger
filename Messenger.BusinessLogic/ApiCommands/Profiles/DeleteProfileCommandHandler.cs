@@ -2,7 +2,6 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.BusinessLogic.Services;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,11 +11,16 @@ public class DeleteProfileCommandHandler : IRequestHandler<DeleteProfileCommand,
 {
 	private readonly DatabaseContext _context;
 	private readonly IFileService _fileService;
+	private readonly IBaseDirService _baseDirService;
 
-	public DeleteProfileCommandHandler(DatabaseContext context, IFileService fileService)
+	public DeleteProfileCommandHandler(
+		DatabaseContext context, 
+		IFileService fileService, 
+		IBaseDirService baseDirService)
 	{
 		_context = context;
 		_fileService = fileService;
+		_baseDirService = baseDirService;
 	}
 	
 	public async Task<Result<UserDto>> Handle(DeleteProfileCommand request, CancellationToken cancellationToken)
@@ -27,7 +31,7 @@ public class DeleteProfileCommandHandler : IRequestHandler<DeleteProfileCommand,
 
 		if (requester.AvatarLink != null)
 		{
-			var pathWwwRoot = BaseDirService.GetPathWwwRoot();
+			var pathWwwRoot = _baseDirService.GetPathWwwRoot();
 			var avatarFileName = requester.AvatarLink.Split("/")[^1];
 
 			var avatarFilePath = Path.Combine(pathWwwRoot, avatarFileName);
