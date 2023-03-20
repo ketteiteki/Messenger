@@ -11,7 +11,10 @@ public static class MessengerStartup
 	public static void Initialize(
 		IConfigurationRoot configuration,
 		string databaseConnectionString,
-		string signKey)
+		string signKey,
+		string messengerBlobContainerName,
+		string messengerBlobAccess,
+		string messengerBlobUrl)
 	{
 		var serviceCollection = new ServiceCollection();
 
@@ -21,7 +24,7 @@ public static class MessengerStartup
 		
 		serviceCollection.AddInfrastructureServices(signKey);
 	
-		serviceCollection.AddMessengerServices();
+		serviceCollection.AddMessengerServices(messengerBlobContainerName, messengerBlobAccess, messengerBlobUrl);
 
 		serviceCollection.AddLogging(builder =>
 		{

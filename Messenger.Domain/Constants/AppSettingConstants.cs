@@ -15,4 +15,11 @@ public static class AppSettingConstants
     public const string DatabaseConnectionString = "MESSENGER_DATABASE_CONNECTION_STRING"; 
 
     public const string DatabaseConnectionStringForIntegrationTests = "MESSENGER_DATABASE_CONNECTION_STRING_INTEGRATION_TESTS"; 
+    
+    public const string BlobUrl = "BLOB_URL"; 
+
+    public const string BlobContainer = "BLOB_CONTAINER"; 
+
+    public const string BlobAccess = "BLOB_ACCESS"; 
+
 }

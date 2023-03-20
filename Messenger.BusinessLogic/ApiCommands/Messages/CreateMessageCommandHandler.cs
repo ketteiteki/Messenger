@@ -3,13 +3,11 @@ using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
 using Messenger.Domain.Enum;
 using Messenger.Services;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Messenger.BusinessLogic.ApiCommands.Messages;
 
@@ -17,28 +15,20 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 {
 	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 	private readonly DatabaseContext _context;
-	private readonly IFileService _fileService;
-	private readonly IConfiguration _configuration;
-	private readonly IBaseDirService _baseDirService;
+	private readonly IBlobService _blobService;
 
 	public CreateMessageCommandHandler(
 		DatabaseContext context,
-		IFileService fileService,
-		IConfiguration configuration, 
 		IHubContext<ChatHub, IChatHub> hubContext, 
-		IBaseDirService baseDirService)
+		IBlobService blobService)
 	{
 		_context = context;
-		_fileService = fileService;
-		_configuration = configuration;
 		_hubContext = hubContext;
-		_baseDirService = baseDirService;
+		_blobService = blobService;
 	}
 	
 	public async Task<Result<MessageDto>> Handle(CreateMessageCommand request, CancellationToken cancellationToken)
 	{
-		var messengerDomainName = _configuration[AppSettingConstants.MessengerDomainName];
-		
 		var chatUser = await _context.ChatUsers
 			.Include(c => c.Chat)
 			.FirstOrDefaultAsync(c => c.UserId == request.RequesterId && c.ChatId == request.ChatId, cancellationToken);
@@ -101,10 +91,8 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
         			
 			foreach (var file in request.Files)
 			{
-				var pathWwwRoot = _baseDirService.GetPathWwwRoot();
-				
-				var fileLink = await _fileService.CreateFileAsync(pathWwwRoot, file, messengerDomainName);
-        
+				var fileLink =await _blobService.UploadFileBlobAsync(file);
+			
 				var attachment = new AttachmentEntity(
 					file.FileName,
 					size: file.Length,

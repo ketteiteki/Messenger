@@ -29,6 +29,13 @@ jobs:
         run: |
           dotnet build --no-restore /p:ContinuousIntegrationBuild=true --configuration Release
 
+      - name: Install and Run Azurite
+        shell: bash
+        run: |
+          npm install -g azurite
+          mkdir azurite
+          azurite --silent --location azurite --debug azurite\debug.log &
+
       - name: Start PostgreSQL container
         run: |
           docker run --name "messenger-pgsql-db" -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:latest

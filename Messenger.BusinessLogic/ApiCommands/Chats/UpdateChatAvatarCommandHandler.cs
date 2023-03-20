@@ -2,37 +2,27 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.Domain.Constants;
 using Messenger.Domain.Enum;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Messenger.BusinessLogic.ApiCommands.Chats;
 
 public class UpdateChatAvatarCommandHandler : IRequestHandler<UpdateChatAvatarCommand, Result<ChatDto>>
 {
 	private readonly DatabaseContext _context;
-	private readonly IFileService _fileService;
-	private readonly IConfiguration _configuration;
-	private readonly IBaseDirService _baseDirService;
-	
+	private readonly IBlobService _blobService;
+
 	public UpdateChatAvatarCommandHandler(
 		DatabaseContext context,
-		IFileService fileService, 
-		IConfiguration configuration,
-		IBaseDirService baseDirService)
+		IBlobService blobService)
 	{
 		_context = context;
-		_fileService = fileService;
-		_configuration = configuration;
-		_baseDirService = baseDirService;
+		_blobService = blobService;
 	}
 	
 	public async Task<Result<ChatDto>> Handle(UpdateChatAvatarCommand request, CancellationToken cancellationToken)
 	{
-		var messengerDomainName = _configuration[AppSettingConstants.MessengerDomainName];
-		
 		var chatUserByRequester = await _context.ChatUsers
 			.Include(c => c.Chat)
 			.ThenInclude(c => c.Owner)
@@ -57,27 +47,22 @@ public class UpdateChatAvatarCommandHandler : IRequestHandler<UpdateChatAvatarCo
 
 		if (chatUserByRequester.Chat.AvatarLink != null)
 		{
-			var pathWwwRoot = _baseDirService.GetPathWwwRoot();
 			var avatarFileName = chatUserByRequester.Chat.AvatarLink.Split("/")[^1];
 
-			var avatarFilePath = Path.Combine(pathWwwRoot, avatarFileName);
-				
-			_fileService.DeleteFile(avatarFilePath);
-				
+			await _blobService.DeleteBlobAsync(avatarFileName);
+			
 			chatUserByRequester.Chat.UpdateAvatarLink(null);
 		}
 			
 		if (request.AvatarFile != null)
 		{
-			var pathWwwRoot = _baseDirService.GetPathWwwRoot();
-				
-			var avatarLink = await _fileService.CreateFileAsync(pathWwwRoot, request.AvatarFile, messengerDomainName);
-				
+			var avatarLink = await _blobService.UploadFileBlobAsync(request.AvatarFile);
+			
 			chatUserByRequester.Chat.UpdateAvatarLink(avatarLink);
 		}
 			
-		_context.Chats.Update(chatUserByRequester.Chat);
 			
+		_context.Chats.Update(chatUserByRequester.Chat);
 		await _context.SaveChangesAsync(cancellationToken);
 
 		var chatDto = new ChatDto

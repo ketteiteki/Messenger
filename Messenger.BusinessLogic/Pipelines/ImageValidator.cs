@@ -7,7 +7,7 @@ public class ImageValidator : AbstractValidator<IFormFile>
 {
     private readonly List<string> _allowedExtensions = new()
     {
-        "jpg", "JPG", "png", "PNG",
+        "jpg", "JPG", "jpeg", "JPEG", "png", "PNG"
     };
 
     public ImageValidator()

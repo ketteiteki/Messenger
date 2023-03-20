@@ -24,12 +24,16 @@ public class Startup
         var databaseConnectionString = _configuration[AppSettingConstants.DatabaseConnectionString];
         var signKey = _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
         var allowOrigins = _configuration[AppSettingConstants.AllowedHosts];
+        
+        var messengerBlobContainerName = _configuration[AppSettingConstants.BlobContainer];
+        var messengerBlobAccess = _configuration[AppSettingConstants.BlobAccess];
+        var messengerBlobUrl = _configuration[AppSettingConstants.BlobUrl];
 
         serviceCollection.AddDatabaseServices(databaseConnectionString);
 
         serviceCollection.AddInfrastructureServices(signKey);
 
-        serviceCollection.AddMessengerServices();
+        serviceCollection.AddMessengerServices(messengerBlobContainerName, messengerBlobAccess, messengerBlobUrl);
         
         serviceCollection.ConfigureCors(CorsPolicyName, allowOrigins);
 
