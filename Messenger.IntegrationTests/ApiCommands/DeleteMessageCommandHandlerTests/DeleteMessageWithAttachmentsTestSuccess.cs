@@ -18,9 +18,6 @@ public class DeleteMessageWithAttachmentsTestSuccess : IntegrationTestBase, IInt
         var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
         var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
-        await using var fileStream = 
-            new FileStream(Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
-       
         var createConversationCommand = new CreateChatCommand(
             RequesterId: user21Th.Value.Id,
             Name: "qwerty",
@@ -45,18 +42,8 @@ public class DeleteMessageWithAttachmentsTestSuccess : IntegrationTestBase, IInt
             ChatId: conversation.Value.Id,
             Files: new FormFileCollection
             {
-                new FormFile(
-                    baseStream: fileStream,
-                    baseStreamOffset: 0,
-                    length: fileStream.Length,
-                    name: "qwerty",
-                    fileName: "qwerty.jpg"),
-                new FormFile(
-                    baseStream: fileStream,
-                    baseStreamOffset: 0,
-                    length: fileStream.Length,
-                    name: "qwerty",
-                    fileName: "qwerty.jpg")
+                FilesHelper.GetFile(),
+                FilesHelper.GetFile()
             }), CancellationToken.None);
 
         var createSecondMessageByAliceResult = await MessengerModule.RequestAsync(new CreateMessageCommand(
@@ -66,33 +53,13 @@ public class DeleteMessageWithAttachmentsTestSuccess : IntegrationTestBase, IInt
             ChatId: conversation.Value.Id,
             Files: new FormFileCollection
             {
-                new FormFile(
-                    baseStream: fileStream,
-                    baseStreamOffset: 0,
-                    length: fileStream.Length,
-                    name: "qwerty",
-                    fileName: "qwerty.jpg"),
-                new FormFile(
-                    baseStream: fileStream,
-                    baseStreamOffset: 0,
-                    length: fileStream.Length,
-                    name: "qwerty",
-                    fileName: "qwerty.jpg")
+                FilesHelper.GetFile(),
+                FilesHelper.GetFile()
             }), CancellationToken.None);
 
-        foreach (var attachment in createFirstMessageByAliceResult.Value.Attachments)
-        {
-            var pathAvatar = Path.Combine(BaseDirService.GetPathWwwRoot(), attachment.Link.Split("/")[^1]);
+        createFirstMessageByAliceResult.Value.Attachments.Count.Should().Be(2);
             
-            File.Exists(pathAvatar).Should().BeTrue();
-        }
-            
-        foreach (var attachment in createSecondMessageByAliceResult.Value.Attachments)
-        {
-            var pathAvatar = Path.Combine(BaseDirService.GetPathWwwRoot(), attachment.Link.Split("/")[^1]);
-            
-            File.Exists(pathAvatar).Should().BeTrue();
-        }
+        createSecondMessageByAliceResult.Value.Attachments.Count.Should().Be(2);
             
         var deleteMessageAliceByBobResult = await MessengerModule.RequestAsync(new DeleteMessageCommand(
             RequesterId: bob.Value.Id,
@@ -114,19 +81,5 @@ public class DeleteMessageWithAttachmentsTestSuccess : IntegrationTestBase, IInt
         deleteMessageAliceBy21ThResult.IsSuccess.Should().BeTrue();
             
         deleteMessageAliceByAliceResult.IsSuccess.Should().BeTrue();
-            
-        foreach (var attachment in createFirstMessageByAliceResult.Value.Attachments)
-        {
-            var pathAvatar = Path.Combine(BaseDirService.GetPathWwwRoot(), attachment.Link.Split("/")[^1]);
-            
-            File.Exists(pathAvatar).Should().BeFalse();
-        }
-            
-        foreach (var attachment in createSecondMessageByAliceResult.Value.Attachments)
-        {
-            var pathAvatar = Path.Combine(BaseDirService.GetPathWwwRoot(), attachment.Link.Split("/")[^1]);
-            
-            File.Exists(pathAvatar).Should().BeFalse();
-        }
     }
 }

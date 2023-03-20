@@ -14,19 +14,16 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 {
 	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 	private readonly DatabaseContext _context;
-	private readonly IFileService _fileService;
-	private readonly IBaseDirService _baseDirService;
+	private readonly IBlobService _blobService;
 
 	public DeleteMessageCommandHandler(
 		DatabaseContext context, 
-		IFileService fileService, 
-		IHubContext<ChatHub, IChatHub> hubContext, 
-		IBaseDirService baseDirService)
+		IHubContext<ChatHub, IChatHub> hubContext,
+		IBlobService blobService)
 	{
 		_context = context;
-		_fileService = fileService;
 		_hubContext = hubContext;
-		_baseDirService = baseDirService;
+		_blobService = blobService;
 	}
 	
 	public async Task<Result<MessageDto>> Handle(DeleteMessageCommand request, CancellationToken cancellationToken)
@@ -51,12 +48,9 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 		{
 			foreach (var attachment in message.Attachments)
 			{
-				var pathWwwRoot = _baseDirService.GetPathWwwRoot();
-				var attachmentFileName = attachment.Link.Split("/")[^1];
+				var fileName = attachment.Link.Split("/")[^1];
 
-				var attachmentPath = Path.Combine(pathWwwRoot, attachmentFileName);
-					
-				_fileService.DeleteFile(attachmentPath);
+				await _blobService.DeleteBlobAsync(fileName);
 			}
 			
 			_context.Messages.Remove(message);

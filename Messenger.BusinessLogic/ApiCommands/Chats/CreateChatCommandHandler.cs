@@ -2,37 +2,27 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Messenger.BusinessLogic.ApiCommands.Chats;
 
 public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Result<ChatDto>>
 {
     private readonly DatabaseContext _context;
-    private readonly IFileService _fileService;
-    private readonly IConfiguration _configuration;
-    private readonly IBaseDirService _baseDirService;
+    private readonly IBlobService _blobService;
 	
     public CreateChatCommandHandler(
         DatabaseContext context, 
-        IFileService fileService,
-        IConfiguration configuration, 
-        IBaseDirService baseDirService)
+        IBlobService blobService)
     {
         _context = context;
-        _fileService = fileService;
-        _configuration = configuration;
-        _baseDirService = baseDirService;
+        _blobService = blobService;
     }
     
     public async Task<Result<ChatDto>> Handle(CreateChatCommand request, CancellationToken cancellationToken)
     {
-        var messengerDomainName = _configuration[AppSettingConstants.MessengerDomainName];
-        
         var requester = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, cancellationToken);
 
         var chatByName = await _context.Chats.AnyAsync(c => c.Name == request.Name, cancellationToken);
@@ -53,10 +43,8 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Resul
 
         if (request.AvatarFile != null)
         {
-            var pathWwwRoot = _baseDirService.GetPathWwwRoot();
+            var avatarLink = await _blobService.UploadFileBlobAsync(request.AvatarFile);
             
-            var avatarLink = await _fileService.CreateFileAsync(pathWwwRoot, request.AvatarFile, messengerDomainName);
-
             newChat.UpdateAvatarLink(avatarLink);
         }
 

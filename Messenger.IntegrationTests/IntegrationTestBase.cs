@@ -32,11 +32,18 @@ public class IntegrationTestBase : IAsyncLifetime
 
 		var databaseConnectionString = configuration[AppSettingConstants.DatabaseConnectionStringForIntegrationTests];
 		var signKey = configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
+		
+		var messengerBlobContainerName = configuration[AppSettingConstants.BlobContainer];
+		var messengerBlobAccess = configuration[AppSettingConstants.BlobAccess];
+		var messengerBlobUrl = configuration[AppSettingConstants.BlobUrl];
 
 		MessengerStartup.Initialize(
 			configuration,
 			databaseConnectionString,
-			signKey);
+			signKey,
+			messengerBlobContainerName,
+			messengerBlobAccess,
+			messengerBlobUrl);
 
 		ServiceProvider = MessengerCompositionRoot.Provider;
 

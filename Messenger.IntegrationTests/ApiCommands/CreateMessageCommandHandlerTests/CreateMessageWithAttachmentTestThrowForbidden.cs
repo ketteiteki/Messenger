@@ -17,9 +17,6 @@ public class CreateMessageWithAttachmentTestThrowForbidden : IntegrationTestBase
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-        await using var fileStream =
-            new FileStream(Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
-        
         var createConversationCommand = new CreateChatCommand(
             RequesterId: user21Th.Value.Id,
             Name: "qwerty",
@@ -36,36 +33,11 @@ public class CreateMessageWithAttachmentTestThrowForbidden : IntegrationTestBase
             ChatId: conversation.Value.Id,
             Files: new FormFileCollection
             {
-                new FormFile(
-                    baseStream: fileStream,
-                    baseStreamOffset: 0,
-                    length: fileStream.Length,
-                    name: "qwerty",
-                    fileName: "qwerty.jpg"),
-                new FormFile(
-                    baseStream: fileStream,
-                    baseStreamOffset: 0,
-                    length: fileStream.Length,
-                    name: "qwerty",
-                    fileName: "qwerty.jpg"),
-                new FormFile(
-                    baseStream: fileStream,
-                    baseStreamOffset: 0,
-                    length: fileStream.Length,
-                    name: "qwerty",
-                    fileName: "qwerty.jpg"),
-                new FormFile(
-                    baseStream: fileStream,
-                    baseStreamOffset: 0,
-                    length: fileStream.Length,
-                    name: "qwerty",
-                    fileName: "qwerty.jpg"),
-                new FormFile(
-                    baseStream: fileStream,
-                    baseStreamOffset: 0,
-                    length: fileStream.Length,
-                    name: "qwerty",
-                    fileName: "qwerty.jpg")
+                FilesHelper.GetFile(),
+                FilesHelper.GetFile(),
+                FilesHelper.GetFile(),
+                FilesHelper.GetFile(),
+                FilesHelper.GetFile()
             });
 
         var createMessageBy21ThResult = await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
