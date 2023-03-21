@@ -15,16 +15,16 @@ public class CreateConversationTestSuccess : IntegrationTestBase, IIntegrationTe
 		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateChatCommand(
-			RequesterId: user21Th.Value.Id,
+			user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
-			Type: ChatType.Conversation,
+			ChatType.Conversation,
 			AvatarFile: null);
 		
-		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 		
-		conversation.IsSuccess.Should().BeTrue();
-		conversation.Value.IsOwner.Should().BeTrue();
-		conversation.Value.IsMember.Should().BeTrue();
+		createConversationResult.IsSuccess.Should().BeTrue();
+		createConversationResult.Value.IsOwner.Should().BeTrue();
+		createConversationResult.Value.IsMember.Should().BeTrue();
 	}
 }

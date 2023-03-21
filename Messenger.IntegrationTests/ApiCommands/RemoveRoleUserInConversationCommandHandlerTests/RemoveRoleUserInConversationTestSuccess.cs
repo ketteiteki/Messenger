@@ -17,40 +17,38 @@ public class RemoveRoleUserInConversationTestSuccess : IntegrationTestBase, IInt
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		
 		var createConversationCommand = new CreateChatCommand(
-			RequesterId: user21Th.Value.Id,
+			user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
-			Type: ChatType.Conversation,
+			ChatType.Conversation,
 			AvatarFile: null);
 
-		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 		
-		var joinToConversationCommand = new JoinToChatCommand(
-			RequesterId: alice.Value.Id,
-			ChatId: conversation.Value.Id);
+		var aliceJoinConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
 
-		await MessengerModule.RequestAsync(joinToConversationCommand, CancellationToken.None);
+		await MessengerModule.RequestAsync(aliceJoinConversationCommand, CancellationToken.None);
 
-		var createRoleUserAliceInConversationBy21ThCommand = new CreateOrUpdateRoleUserInConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: alice.Value.Id,
+		var createAliceRoleInConversationBy21ThCommand = new CreateOrUpdateRoleUserInConversationCommand(
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id,
 			RoleTitle: "moderator",
-			RoleColor: RoleColor.Cyan,
+			RoleColor.Cyan,
 			CanBanUser: true,
 			CanChangeChatData: false,
 			CanAddAndRemoveUserToConversation: false,
 			CanGivePermissionToUser:false);
 
-		await MessengerModule.RequestAsync(createRoleUserAliceInConversationBy21ThCommand, CancellationToken.None);
+		await MessengerModule.RequestAsync(createAliceRoleInConversationBy21ThCommand, CancellationToken.None);
 
-		var removeRoleUserInConversationCommand = new RemoveRoleUserInConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: alice.Value.Id);
+		var removeAliceRoleInConversationCommand = new RemoveRoleUserInConversationCommand(
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id);
 
-		var removeRoleUserInConversationResult = await MessengerModule.RequestAsync(removeRoleUserInConversationCommand, CancellationToken.None);
+		var removeAliceRoleInConversationResult = await MessengerModule.RequestAsync(removeAliceRoleInConversationCommand, CancellationToken.None);
 
-		removeRoleUserInConversationResult.IsSuccess.Should().BeTrue();
+		removeAliceRoleInConversationResult.IsSuccess.Should().BeTrue();
 	}
 }

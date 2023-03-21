@@ -15,22 +15,20 @@ public class DeleteChannelWithAvatarTestSuccess : IntegrationTestBase, IIntegrat
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var createChannelCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Channel,
+            ChatType.Channel,
             AvatarFile: FilesHelper.GetFile());
 		
-        var channel = await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
+        var createChannelResult = await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
 
-        channel.Value.AvatarLink.Should().NotBeNull();
+        createChannelResult.Value.AvatarLink.Should().NotBeNull();
         
-        var deleteChannelCommand = new DeleteChatCommand(
-            RequesterId: user21Th.Value.Id,
-            ChatId: channel.Value.Id);
+        var deleteChannelCommand = new DeleteChatCommand(user21Th.Value.Id, createChannelResult.Value.Id);
 		
-        var deletedChannel = await MessengerModule.RequestAsync(deleteChannelCommand, CancellationToken.None);
+        var deletedChannelResult = await MessengerModule.RequestAsync(deleteChannelCommand, CancellationToken.None);
 
-        deletedChannel.IsSuccess.Should().BeTrue();
+        deletedChannelResult.IsSuccess.Should().BeTrue();
     }
 }

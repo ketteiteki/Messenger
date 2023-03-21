@@ -18,28 +18,24 @@ public class DeleteChannelTestThrowForbidden : IntegrationTestBase, IIntegration
         var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
         
         var createChannelCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Channel,
+            ChatType.Channel,
             AvatarFile: null);
 		
         var channel = await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
 
-        await MessengerModule.RequestAsync(new JoinToChatCommand(
-            RequesterId: alice.Value.Id,
-            ChatId: channel.Value.Id), CancellationToken.None);
+        var aliceJoinToConversationCommand = new JoinToChatCommand(alice.Value.Id, channel.Value.Id);
         
-        var deleteChannelByAliceCommand = new DeleteChatCommand(
-            RequesterId: alice.Value.Id,
-            ChatId: channel.Value.Id);
+        await MessengerModule.RequestAsync(aliceJoinToConversationCommand, CancellationToken.None);
+        
+        var deleteChannelByAliceCommand = new DeleteChatCommand(alice.Value.Id, channel.Value.Id);
 		
         var deleteChannelByAliceResult = 
             await MessengerModule.RequestAsync(deleteChannelByAliceCommand, CancellationToken.None);
         
-        var deleteChannelByBobCommand = new DeleteChatCommand(
-            RequesterId: bob.Value.Id,
-            ChatId: channel.Value.Id);
+        var deleteChannelByBobCommand = new DeleteChatCommand(bob.Value.Id, channel.Value.Id);
 		
         var deleteChannelByBobResult = 
             await MessengerModule.RequestAsync(deleteChannelByBobCommand, CancellationToken.None);

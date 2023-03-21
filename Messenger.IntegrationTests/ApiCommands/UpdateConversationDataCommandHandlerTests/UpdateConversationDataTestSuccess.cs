@@ -17,52 +17,51 @@ public class UpdateConversationDataTestSuccess : IntegrationTestBase, IIntegrati
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateChatCommand(
-			RequesterId: user21Th.Value.Id,
+			user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
-			Type: ChatType.Conversation,
+			ChatType.Conversation,
 			AvatarFile: null);
 
-		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+
+		var aliceJoinConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
 		
-		await MessengerModule.RequestAsync(
-			new JoinToChatCommand(
-			RequesterId: alice.Value.Id,
-			ChatId: conversation.Value.Id), CancellationToken.None);
+		await MessengerModule.RequestAsync(aliceJoinConversationCommand, CancellationToken.None);
 		
-		var createRoleAliceCommand = new CreateOrUpdateRoleUserInConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			UserId: alice.Value.Id,
-			ChatId: conversation.Value.Id,
+		var createAliceRoleCommand = new CreateOrUpdateRoleUserInConversationCommand(
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id,
 			RoleTitle: "moderator",
-			RoleColor: RoleColor.Blue,
+			RoleColor.Blue,
 			CanBanUser: false,
 			CanChangeChatData: true,
 			CanGivePermissionToUser: false,
 			CanAddAndRemoveUserToConversation: false);
 
-		await MessengerModule.RequestAsync(createRoleAliceCommand, CancellationToken.None);
+		await MessengerModule.RequestAsync(createAliceRoleCommand, CancellationToken.None);
 		
 		var updateConversationBy21ThCommand = new UpdateChatDataCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
 			Name: "21thName",
 			Title: "21thTitle");
 		
 		var updateConversationByAliceCommand =new UpdateChatDataCommand(
-			RequesterId: alice.Value.Id,
-			ChatId: conversation.Value.Id,
+			alice.Value.Id,
+			createConversationResult.Value.Id,
 			Name: "AliceName",
 			Title: "AliceTitle");
 
-		var updateConversationBy21ThResult = await MessengerModule.RequestAsync(updateConversationBy21ThCommand,
-			CancellationToken.None);
+		var updateConversationBy21ThResult = 
+			await MessengerModule.RequestAsync(updateConversationBy21ThCommand, CancellationToken.None);
 
 		updateConversationBy21ThResult.Value.Name.Should().Be(updateConversationBy21ThCommand.Name);
 		updateConversationBy21ThResult.Value.Title.Should().Be(updateConversationBy21ThCommand.Title);
 		
-		var updateConversationByAliceResult = await MessengerModule.RequestAsync(updateConversationByAliceCommand, 
-			CancellationToken.None);
+		var updateConversationByAliceResult = 
+			await MessengerModule.RequestAsync(updateConversationByAliceCommand, CancellationToken.None);
 		
 		updateConversationByAliceResult.Value.Name.Should().Be(updateConversationByAliceCommand.Name);
 		updateConversationByAliceResult.Value.Title.Should().Be(updateConversationByAliceCommand.Title);

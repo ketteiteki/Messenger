@@ -17,50 +17,52 @@ public class UpdateConversationAvatarTestSuccess : IntegrationTestBase, IIntegra
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateChatCommand(
-			RequesterId: user21Th.Value.Id,
+			user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
-			Type: ChatType.Conversation,
+			ChatType.Conversation,
 			AvatarFile: null);
 
-		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+
+		var aliceJoinConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
 		
-		await MessengerModule.RequestAsync(
-			new JoinToChatCommand(
-			RequesterId: alice.Value.Id,
-			ChatId: conversation.Value.Id), CancellationToken.None);
+		await MessengerModule.RequestAsync(aliceJoinConversationCommand, CancellationToken.None);
 		
 		var createRoleAliceCommand = new CreateOrUpdateRoleUserInConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			UserId: alice.Value.Id,
-			ChatId: conversation.Value.Id,
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id,
 			RoleTitle: "moderator",
-			RoleColor: RoleColor.Blue,
+			RoleColor.Blue,
 			CanBanUser: false,
 			CanChangeChatData: true,
-			CanGivePermissionToUser: false,
-			CanAddAndRemoveUserToConversation: false);
+			CanAddAndRemoveUserToConversation: false,
+			CanGivePermissionToUser: false);
 
 		await MessengerModule.RequestAsync(createRoleAliceCommand, CancellationToken.None);
 
 		var updateAvatarConversationBy21ThCommand = new UpdateChatAvatarCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			AvatarFile: FilesHelper.GetFile());
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			FilesHelper.GetFile());
 		
 		var updateAvatarConversationByAliceCommand =new UpdateChatAvatarCommand(
-			RequesterId: alice.Value.Id,
-			ChatId: conversation.Value.Id,
-			AvatarFile: FilesHelper.GetFile());
+			alice.Value.Id,
+			createConversationResult.Value.Id,
+			FilesHelper.GetFile());
 
 		var updateAvatarConversationBy21ThResult = 
 			await MessengerModule.RequestAsync(updateAvatarConversationBy21ThCommand, CancellationToken.None);
 
-		updateAvatarConversationBy21ThResult.Value.AvatarLink.Should().NotBeNull();
-		
 		var updateAvatarConversationByAliceResult = 
 			await MessengerModule.RequestAsync(updateAvatarConversationByAliceCommand, CancellationToken.None);
-		
+
+		updateAvatarConversationBy21ThResult.Value.AvatarLink.Should().NotBeNull();
 		updateAvatarConversationByAliceResult.Value.AvatarLink.Should().NotBeNull();
+
+		var avatarFileName = updateAvatarConversationByAliceResult.Value.AvatarLink.Split("/")[^1];
+
+		await BlobService.DeleteBlobAsync(avatarFileName);
     }
 }

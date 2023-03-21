@@ -16,34 +16,46 @@ public class RefreshCommandTestSuccess : IntegrationTestBase, IIntegrationTest
         var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
         var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
-        await MessengerModule.RequestAsync(new LoginCommand(
-            Nickname: CommandHelper.RegistrationAliceCommand().Nickname,
-            Password: CommandHelper.RegistrationAliceCommand().Password,
-            Ip: CommandHelper.RegistrationAliceCommand().Ip,
-            UserAgent: CommandHelper.RegistrationAliceCommand().UserAgent), CancellationToken.None);
+        var firstAliceLoginCommand = new LoginCommand(
+            CommandHelper.RegistrationAliceCommand().Nickname,
+            CommandHelper.RegistrationAliceCommand().Password,
+            CommandHelper.RegistrationAliceCommand().Ip,
+            CommandHelper.RegistrationAliceCommand().UserAgent);
+        
+        await MessengerModule.RequestAsync(firstAliceLoginCommand, CancellationToken.None);
 
         for (var i = 0; i < 9; i++)
         {
-            await MessengerModule.RequestAsync(new LoginCommand(
+            var bobLoginCommand = new LoginCommand(
                 Nickname: CommandHelper.RegistrationBobCommand().Nickname,
                 Password: CommandHelper.RegistrationBobCommand().Password,
                 Ip: CommandHelper.RegistrationBobCommand().Ip,
-                UserAgent: CommandHelper.RegistrationBobCommand().UserAgent), CancellationToken.None);
+                UserAgent: CommandHelper.RegistrationBobCommand().UserAgent);
+            
+            await MessengerModule.RequestAsync(bobLoginCommand, CancellationToken.None);
         }
-        
-        var refreshBy21ThResult = await MessengerModule.RequestAsync(new RefreshCommand(
-            RefreshToken: user21Th.Value.RefreshToken,
-            UserAgent: "Google",
-            Ip: "434.321.54.211"), CancellationToken.None);
 
-        var getSessionListBy21ThResult = await MessengerModule.RequestAsync(new GetSessionListQuery(
-            RequesterId: user21Th.Value.Id), CancellationToken.None);
+        var refreshBy21ThCommand = new RefreshCommand(
+            UserAgent: "Google",
+            Ip: "434.321.54.211",
+            user21Th.Value.RefreshToken);
         
-        var getSessionListByAliceResult = await MessengerModule.RequestAsync(new GetSessionListQuery(
-            RequesterId: alice.Value.Id), CancellationToken.None);
+        var refreshBy21ThResult = await MessengerModule.RequestAsync(refreshBy21ThCommand, CancellationToken.None);
+
+        var getSessionListBy21ThCommand = new GetSessionListQuery(user21Th.Value.Id);
         
-        var getSessionListByBobResult = await MessengerModule.RequestAsync(new GetSessionListQuery(
-            RequesterId: bob.Value.Id), CancellationToken.None);
+        var getSessionListBy21ThResult = 
+            await MessengerModule.RequestAsync(getSessionListBy21ThCommand, CancellationToken.None);
+
+        var getSessionListByAliceCommand = new GetSessionListQuery(alice.Value.Id);
+        
+        var getSessionListByAliceResult = 
+            await MessengerModule.RequestAsync(getSessionListByAliceCommand, CancellationToken.None);
+
+        var getSessionListByBobCommand = new GetSessionListQuery(bob.Value.Id);
+        
+        var getSessionListByBobResult =
+            await MessengerModule.RequestAsync(getSessionListByBobCommand, CancellationToken.None);
         
         refreshBy21ThResult.Value.RefreshToken.Should().NotBe(user21Th.Value.RefreshToken);
         refreshBy21ThResult.Value.AccessToken.Should().NotBe(user21Th.Value.AccessToken);

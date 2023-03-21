@@ -13,18 +13,18 @@ public class RegistrationTestThrowAuthentication : IntegrationTestBase, IIntegra
     public async Task Test()
     {
         var firstRegistrationCommand = new RegistrationCommand(
-            DisplayName: CommandHelper.Registration21ThCommand().DisplayName,
-            Nickname: CommandHelper.Registration21ThCommand().Nickname,
-            Password: CommandHelper.Registration21ThCommand().Password,
+            CommandHelper.Registration21ThCommand().DisplayName,
+            CommandHelper.Registration21ThCommand().Nickname,
+            CommandHelper.Registration21ThCommand().Password,
             UserAgent: "Mozilla",
             Ip: "323.432.21.542");
 
         await MessengerModule.RequestAsync(firstRegistrationCommand, CancellationToken.None);
         
         var secondRegistrationCommand = new RegistrationCommand(
-            DisplayName: CommandHelper.Registration21ThCommand().DisplayName,
-            Nickname: CommandHelper.Registration21ThCommand().Nickname,
-            Password: CommandHelper.Registration21ThCommand().Password,
+            CommandHelper.Registration21ThCommand().DisplayName,
+            CommandHelper.Registration21ThCommand().Nickname,
+            CommandHelper.Registration21ThCommand().Password,
             UserAgent: "Mozilla",
             Ip: "428.764.324.653");
 

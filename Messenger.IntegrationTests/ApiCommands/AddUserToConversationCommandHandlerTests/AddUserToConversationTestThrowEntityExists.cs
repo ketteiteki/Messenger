@@ -18,18 +18,18 @@ public class AddUserToConversationTestThrowEntityExists : IntegrationTestBase, I
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateChatCommand(
-			RequesterId: user21Th.Value.Id,
+			user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
-			Type: ChatType.Conversation,
+			ChatType.Conversation,
 			AvatarFile: null);
 		
-		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
 		var addUserAliceToConversationBy21ThCommand = new AddUserToConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: alice.Value.Id);
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id);
 		
 	    await MessengerModule.RequestAsync(addUserAliceToConversationBy21ThCommand, CancellationToken.None);
 		

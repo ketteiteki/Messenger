@@ -16,26 +16,22 @@ public class DeleteConversationTestSuccess : IntegrationTestBase, IIntegrationTe
 		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateChatCommand(
-			RequesterId: user21Th.Value.Id,
+			user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
-			Type: ChatType.Conversation,
+			ChatType.Conversation,
 			AvatarFile: null);
 		
-		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-		var deleteConversationCommand = new DeleteChatCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id);
+		var deleteConversationCommand = new DeleteChatCommand(user21Th.Value.Id, createConversationResult.Value.Id);
 		
 		await MessengerModule.RequestAsync(deleteConversationCommand, CancellationToken.None);
 
-		var conversationForCheckCommand = new GetChatQuery(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id);
+		var getConversationCommand = new GetChatQuery(user21Th.Value.Id, createConversationResult.Value.Id);
 
-		var conversationForCheck = await MessengerModule.RequestAsync(conversationForCheckCommand, CancellationToken.None);
+		var getConversationResult = await MessengerModule.RequestAsync(getConversationCommand, CancellationToken.None);
 		
-		conversationForCheck.Value.Should().BeNull();
+		getConversationResult.Value.Should().BeNull();
 	}
 }

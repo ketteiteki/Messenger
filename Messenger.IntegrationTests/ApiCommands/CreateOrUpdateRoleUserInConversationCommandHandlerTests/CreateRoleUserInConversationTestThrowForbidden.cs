@@ -20,49 +20,47 @@ public class CreateRoleUserInConversationTestThrowForbidden : IntegrationTestBas
         var alex = await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 		
-        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-        await MessengerModule.RequestAsync(new JoinToChatCommand(
-            RequesterId: alice.Value.Id,
-            ChatId: conversation.Value.Id), CancellationToken.None);
+        var userAliceJoinToConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
+        var userAlexJoinToConversationCommand = new JoinToChatCommand(alex.Value.Id, createConversationResult.Value.Id);
         
-        await MessengerModule.RequestAsync(new JoinToChatCommand(
-            RequesterId: alex.Value.Id,
-            ChatId: conversation.Value.Id), CancellationToken.None);
+        await MessengerModule.RequestAsync(userAliceJoinToConversationCommand, CancellationToken.None);
+        await MessengerModule.RequestAsync(userAlexJoinToConversationCommand, CancellationToken.None);
 
-        var createRoleUserAlexInConversationByAliceCommand = new CreateOrUpdateRoleUserInConversationCommand(
-            RequesterId: alice.Value.Id,
-            ChatId: conversation.Value.Id,
-            UserId: alex.Value.Id,
+        var createAlexRoleInConversationByAliceCommand = new CreateOrUpdateRoleUserInConversationCommand(
+            alice.Value.Id,
+            createConversationResult.Value.Id,
+            alex.Value.Id,
             RoleTitle: "moderator",
-            RoleColor: RoleColor.Cyan,
+            RoleColor.Cyan,
             CanBanUser: true,
             CanChangeChatData: false,
             CanAddAndRemoveUserToConversation: true,
             CanGivePermissionToUser: false);
 
         var createRoleUserAlexInConversationByAliceResult =
-            await MessengerModule.RequestAsync(createRoleUserAlexInConversationByAliceCommand, CancellationToken.None);
+            await MessengerModule.RequestAsync(createAlexRoleInConversationByAliceCommand, CancellationToken.None);
         
-        var createRoleUserAliceInConversationByBobCommand = new CreateOrUpdateRoleUserInConversationCommand(
-            RequesterId: bob.Value.Id,
-            ChatId: conversation.Value.Id,
-            UserId: alice.Value.Id,
+        var createAliceRoleInConversationByBobCommand = new CreateOrUpdateRoleUserInConversationCommand(
+            bob.Value.Id,
+            createConversationResult.Value.Id,
+            alice.Value.Id,
             RoleTitle: "moderator",
-            RoleColor: RoleColor.Cyan,
+            RoleColor.Cyan,
             CanBanUser: true,
             CanChangeChatData: false,
             CanAddAndRemoveUserToConversation: true,
             CanGivePermissionToUser: false);
 
         var createRoleUserAliceInConversationByBobResult =
-            await MessengerModule.RequestAsync(createRoleUserAliceInConversationByBobCommand, CancellationToken.None);
+            await MessengerModule.RequestAsync(createAliceRoleInConversationByBobCommand, CancellationToken.None);
 
         createRoleUserAlexInConversationByAliceResult.Error.Should().BeOfType<ForbiddenError>();
         createRoleUserAliceInConversationByBobResult.Error.Should().BeOfType<ForbiddenError>();

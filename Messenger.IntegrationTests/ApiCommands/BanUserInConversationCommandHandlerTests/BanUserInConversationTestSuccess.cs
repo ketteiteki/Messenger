@@ -19,67 +19,61 @@ public class BanUserInConversationTestSuccess : IntegrationTestBase, IIntegratio
 		var alex = await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateChatCommand(
-			RequesterId: user21Th.Value.Id,
+			user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
-			Type: ChatType.Conversation,
+			ChatType.Conversation,
 			AvatarFile: null);
 		
-		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-		await MessengerModule.RequestAsync(
-			new JoinToChatCommand(
-				RequesterId: alice.Value.Id,
-				ChatId: conversation.Value.Id), CancellationToken.None);
-		await MessengerModule.RequestAsync(
-			new JoinToChatCommand(
-					RequesterId: bob.Value.Id,
-					ChatId: conversation.Value.Id), CancellationToken.None);
-		await MessengerModule.RequestAsync(
-			new JoinToChatCommand(
-				RequesterId: alex.Value.Id,
-				ChatId: conversation.Value.Id), CancellationToken.None);
+		var userAliceJoinToConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
+		var userBobJoinToConversationCommand = new JoinToChatCommand(bob.Value.Id, createConversationResult.Value.Id);
+		var userAlexJoinToConversationCommand = new JoinToChatCommand(alex.Value.Id, createConversationResult.Value.Id);
+		
+		await MessengerModule.RequestAsync(userAliceJoinToConversationCommand, CancellationToken.None);
+		await MessengerModule.RequestAsync(userBobJoinToConversationCommand, CancellationToken.None);
+		await MessengerModule.RequestAsync(userAlexJoinToConversationCommand, CancellationToken.None);
 
-		var createRoleBobInConversationBy21ThCommand = new CreateOrUpdateRoleUserInConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			UserId: bob.Value.Id,
-			ChatId: conversation.Value.Id,
-			RoleColor: RoleColor.Black,
+		var createBobRoleInConversationBy21ThCommand = new CreateOrUpdateRoleUserInConversationCommand(
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			bob.Value.Id,
 			RoleTitle: "moderator",
+			RoleColor.Black,
 			CanBanUser: true,
 			CanChangeChatData: false,
-			CanGivePermissionToUser: false,
-			CanAddAndRemoveUserToConversation: false);
+			CanAddAndRemoveUserToConversation: false,
+			CanGivePermissionToUser: false);
 		
-		await MessengerModule.RequestAsync(createRoleBobInConversationBy21ThCommand, CancellationToken.None);
+		await MessengerModule.RequestAsync(createBobRoleInConversationBy21ThCommand, CancellationToken.None);
 
 		var banUserAliceInConversationBy21ThCommand = new BanUserInConversationCommand(
 			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
+			ChatId: createConversationResult.Value.Id,
 			UserId: alice.Value.Id,
 			BanMinutes: 15);
 
 		var banUserAlexInConversationCommandByBobCommand = new BanUserInConversationCommand(
 			RequesterId: bob.Value.Id,
-			ChatId: conversation.Value.Id,
+			ChatId: createConversationResult.Value.Id,
 			UserId: alex.Value.Id,
 			BanMinutes: 15);
 
 		await MessengerModule.RequestAsync(banUserAliceInConversationBy21ThCommand, CancellationToken.None);
 		await MessengerModule.RequestAsync(banUserAlexInConversationCommandByBobCommand, CancellationToken.None);
 
-		var joinInChatByAliceResult = await MessengerModule.RequestAsync(
-			new JoinToChatCommand(
-				RequesterId: alice.Value.Id,
-				ChatId: conversation.Value.Id), CancellationToken.None);
-		
-		var joinInChatByAlexCommand = await MessengerModule.RequestAsync(
-			new JoinToChatCommand(
-				RequesterId: alex.Value.Id, 
-				ChatId: conversation.Value.Id), CancellationToken.None);
+		var secondUserAliceJoinToConversationCommand =
+			new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
+		var secondUserAlexJoinToConversationCommand =
+			new JoinToChatCommand(alex.Value.Id, createConversationResult.Value.Id);
 
-		joinInChatByAliceResult.IsSuccess.Should().BeFalse();
-		
-		joinInChatByAlexCommand.IsSuccess.Should().BeFalse();
+		var secondUserAliceJoinToConversationResult =
+			await MessengerModule.RequestAsync(secondUserAliceJoinToConversationCommand, CancellationToken.None);
+		var secondUserAlexJoinToConversationResult =
+			await MessengerModule.RequestAsync(secondUserAlexJoinToConversationCommand, CancellationToken.None);
+
+		secondUserAliceJoinToConversationResult.IsSuccess.Should().BeFalse();
+		secondUserAlexJoinToConversationResult.IsSuccess.Should().BeFalse();
 	}
 }

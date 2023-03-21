@@ -21,6 +21,8 @@ public class IntegrationTestBase : IAsyncLifetime
 	private IServiceProvider ServiceProvider { get; }
 
 	protected readonly IBaseDirService BaseDirService = new BaseDirService();
+
+	protected readonly IBlobService BlobService;
 	
 	protected IntegrationTestBase()
 	{
@@ -51,6 +53,9 @@ public class IntegrationTestBase : IAsyncLifetime
 		
 		DatabaseContextFixture = ServiceProvider.GetRequiredService<DatabaseContext>() ??
 		                         throw new InvalidOperationException("DatabaseContext service is not registered in the DI.");
+
+		BlobService = ServiceProvider.GetRequiredService<IBlobService>() ??
+		              throw new InvalidOperationException("BlobService is not registered in the DI.");;
 	}
 
 	public async Task InitializeAsync()

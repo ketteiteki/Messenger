@@ -14,8 +14,9 @@ public class AuthorizationTestThrowAuthentication : IntegrationTestBase, IIntegr
     {
         await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-        var authorizationResult = await MessengerModule.RequestAsync(new AuthorizationCommand(
-            AuthorizationToken: "wrong token"), CancellationToken.None);
+        var authorizationCommand = new AuthorizationCommand(AuthorizationToken: "wrong token");
+        
+        var authorizationResult = await MessengerModule.RequestAsync(authorizationCommand, CancellationToken.None);
 
         authorizationResult.Error.Should().BeOfType<AuthenticationError>();
     }

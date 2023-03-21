@@ -15,21 +15,21 @@ public class CreateChannelWithAvatarTestSuccess : IntegrationTestBase, IIntegrat
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: FilesHelper.GetFile());
 		
-        var channel = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-        channel.IsSuccess.Should().BeTrue();
-        channel.Value.IsOwner.Should().BeTrue();
-        channel.Value.IsMember.Should().BeTrue();
-        channel.Value.AvatarLink.Should().NotBeNull();
+        createConversationResult.IsSuccess.Should().BeTrue();
+        createConversationResult.Value.IsOwner.Should().BeTrue();
+        createConversationResult.Value.IsMember.Should().BeTrue();
+        createConversationResult.Value.AvatarLink.Should().NotBeNull();
 
-        var deleteChatCommand = new DeleteChatCommand(user21Th.Value.Id, channel.Value.Id);
-
-        await MessengerModule.RequestAsync(deleteChatCommand, CancellationToken.None);
+        var avatarFileName = createConversationResult.Value.AvatarLink.Split("/")[^1];
+        
+        await BlobService.DeleteBlobAsync(avatarFileName);
     }
 }

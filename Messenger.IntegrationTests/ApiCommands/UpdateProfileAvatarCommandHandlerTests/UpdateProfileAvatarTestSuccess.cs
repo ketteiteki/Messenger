@@ -13,10 +13,16 @@ public class UpdateProfileAvatarTestSuccess : IntegrationTestBase, IIntegrationT
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-        var userAfterUpdateAvatarResult = await MessengerModule.RequestAsync(new UpdateProfileAvatarCommand(
-            RequesterId: user21Th.Value.Id,
-            AvatarFile: FilesHelper.GetFile()), CancellationToken.None);
+        var updateProfileAvatarCommand = new UpdateProfileAvatarCommand(user21Th.Value.Id, FilesHelper.GetFile());
+        
+        var updateProfileAvatarResult = 
+            await MessengerModule.RequestAsync(updateProfileAvatarCommand, CancellationToken.None);
 
-        userAfterUpdateAvatarResult.IsSuccess.Should().BeTrue();
+        updateProfileAvatarResult.IsSuccess.Should().BeTrue();
+        updateProfileAvatarResult.Value.AvatarLink.Should().NotBeNull();
+        
+        var avatarFileName = updateProfileAvatarResult.Value.AvatarLink.Split("/")[^1];
+
+        await BlobService.DeleteBlobAsync(avatarFileName);
     }
 }

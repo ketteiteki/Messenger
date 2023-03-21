@@ -17,60 +17,66 @@ public class UpdateRoleUserInConversationTestSuccess : IntegrationTestBase, IInt
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateChatCommand(
-			RequesterId: user21Th.Value.Id,
+			user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
-			Type: ChatType.Conversation,
+			ChatType.Conversation,
 			AvatarFile: null);
 		
-		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
 		var addAliceInConversationBy21ThCommand = new AddUserToConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: alice.Value.Id);
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id);
 
 		await MessengerModule.RequestAsync(addAliceInConversationBy21ThCommand, CancellationToken.None);
 		
-		var createRoleUserAliceInConversationBy21ThCommand = new CreateOrUpdateRoleUserInConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: alice.Value.Id,
+		var createAliceRoleInConversationBy21ThCommand = new CreateOrUpdateRoleUserInConversationCommand(
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id,
 			RoleTitle: "moderator",
-			RoleColor: RoleColor.Cyan,
+			RoleColor.Cyan,
 			CanBanUser: true,
 			CanChangeChatData: false,
 			CanAddAndRemoveUserToConversation: true,
 			CanGivePermissionToUser: false);
 
-	    await MessengerModule.RequestAsync(createRoleUserAliceInConversationBy21ThCommand, CancellationToken.None);
+	    await MessengerModule.RequestAsync(createAliceRoleInConversationBy21ThCommand, CancellationToken.None);
 
-		var updateRoleUserAliceInConversationBy21ThCommand = new CreateOrUpdateRoleUserInConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: alice.Value.Id,
+		var updateAliceRoleInConversationBy21ThCommand = new CreateOrUpdateRoleUserInConversationCommand(
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id,
 			RoleTitle: "moderator",
-			RoleColor: RoleColor.Cyan,
+			RoleColor.Cyan,
 			CanBanUser: false,
 			CanChangeChatData: true,
 			CanAddAndRemoveUserToConversation: true,
 			CanGivePermissionToUser: true);
 
-		var updateRoleUserAliceInConversationBy21ThResult =
-			await MessengerModule.RequestAsync(updateRoleUserAliceInConversationBy21ThCommand, CancellationToken.None);
+		var updateAliceRoleInConversationBy21ThResult =
+			await MessengerModule.RequestAsync(updateAliceRoleInConversationBy21ThCommand, CancellationToken.None);
 		
-		updateRoleUserAliceInConversationBy21ThResult.Value.RoleColor
-			.Should().Be(updateRoleUserAliceInConversationBy21ThCommand.RoleColor);
-		updateRoleUserAliceInConversationBy21ThResult.Value.RoleTitle
-			.Should().Be(updateRoleUserAliceInConversationBy21ThCommand.RoleTitle);
-		updateRoleUserAliceInConversationBy21ThResult.Value.CanBanUser
-			.Should().Be(updateRoleUserAliceInConversationBy21ThCommand.CanBanUser);
-		updateRoleUserAliceInConversationBy21ThResult.Value.CanChangeChatData
-			.Should().Be(updateRoleUserAliceInConversationBy21ThCommand.CanChangeChatData);
-		updateRoleUserAliceInConversationBy21ThResult.Value.CanGivePermissionToUser
-			.Should().Be(updateRoleUserAliceInConversationBy21ThCommand.CanGivePermissionToUser);
-		updateRoleUserAliceInConversationBy21ThResult.Value.CanAddAndRemoveUserToConversation
-			.Should().Be(updateRoleUserAliceInConversationBy21ThCommand.CanAddAndRemoveUserToConversation);
-		updateRoleUserAliceInConversationBy21ThResult.Value.IsOwner.Should().BeFalse();
+		updateAliceRoleInConversationBy21ThResult.Value.RoleColor
+			.Should().Be(updateAliceRoleInConversationBy21ThCommand.RoleColor);
+		
+		updateAliceRoleInConversationBy21ThResult.Value.RoleTitle
+			.Should().Be(updateAliceRoleInConversationBy21ThCommand.RoleTitle);
+		
+		updateAliceRoleInConversationBy21ThResult.Value.CanBanUser
+			.Should().Be(updateAliceRoleInConversationBy21ThCommand.CanBanUser);
+		
+		updateAliceRoleInConversationBy21ThResult.Value.CanChangeChatData
+			.Should().Be(updateAliceRoleInConversationBy21ThCommand.CanChangeChatData);
+		
+		updateAliceRoleInConversationBy21ThResult.Value.CanGivePermissionToUser
+			.Should().Be(updateAliceRoleInConversationBy21ThCommand.CanGivePermissionToUser);
+
+		updateAliceRoleInConversationBy21ThResult.Value.CanAddAndRemoveUserToConversation
+			.Should().Be(updateAliceRoleInConversationBy21ThCommand.CanAddAndRemoveUserToConversation);
+			
+		updateAliceRoleInConversationBy21ThResult.Value.IsOwner.Should().BeFalse();
     }
 }
