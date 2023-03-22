@@ -14,9 +14,9 @@ public class GetConversationTestThrowEntityNotFound : IntegrationTestBase, IInte
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-        var getConversationResult = await MessengerModule.RequestAsync(new GetChatQuery(
-            RequesterId: user21Th.Value.Id,
-            ChatId: Guid.NewGuid()), CancellationToken.None);
+        var getChatQuery = new GetChatQuery(user21Th.Value.Id, Guid.NewGuid());
+        
+        var getConversationResult = await MessengerModule.RequestAsync(getChatQuery, CancellationToken.None);
 
         getConversationResult.Error.Should().BeOfType<DbEntityNotFoundError>();
     }

@@ -25,31 +25,24 @@ public class GetChannelTestSuccess : IntegrationTestBase, IIntegrationTest
 			Type: ChatType.Channel,
 			AvatarFile: null);
 
-		var channel = await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
-		
-		await MessengerModule.RequestAsync(
-			new JoinToChatCommand(
-				RequesterId: bob.Value.Id,
-				ChatId: channel.Value.Id), CancellationToken.None);
+		var createChannelResult = await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
 
-		var createPermissionsUserBobBy21ThCommand = new CreatePermissionsUserInConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			UserId: bob.Value.Id,
-			ChatId: channel.Value.Id,
+		var bobJoinChannelCommand = new JoinToChatCommand(bob.Value.Id, createChannelResult.Value.Id);
+		
+		await MessengerModule.RequestAsync(bobJoinChannelCommand, CancellationToken.None);
+
+		var createBobPermissionsBy21ThCommand = new CreatePermissionsUserInConversationCommand(
+			user21Th.Value.Id,
+			createChannelResult.Value.Id,
+			bob.Value.Id,
 			CanSendMedia: false,
 			MuteMinutes: null);
 
-		await MessengerModule.RequestAsync(createPermissionsUserBobBy21ThCommand, CancellationToken.None);
+		await MessengerModule.RequestAsync(createBobPermissionsBy21ThCommand, CancellationToken.None);
 
-		var getChannelBy21ThQuery = new GetChatQuery(
-			RequesterId: user21Th.Value.Id,
-			ChatId: channel.Value.Id);
-		var getChannelByAliceQuery = new GetChatQuery(
-			RequesterId: alice.Value.Id,
-			ChatId: channel.Value.Id);
-		var getChannelByBobQuery = new GetChatQuery(
-			RequesterId: bob.Value.Id,
-			ChatId: channel.Value.Id);
+		var getChannelBy21ThQuery = new GetChatQuery(user21Th.Value.Id, createChannelResult.Value.Id);
+		var getChannelByAliceQuery = new GetChatQuery(alice.Value.Id, createChannelResult.Value.Id);
+		var getChannelByBobQuery = new GetChatQuery(bob.Value.Id, createChannelResult.Value.Id);
 
 		var getChannelBy21ThResult = await MessengerModule.RequestAsync(getChannelBy21ThQuery, CancellationToken.None);
 		var getChannelByAliceResult = await MessengerModule.RequestAsync(getChannelByAliceQuery, CancellationToken.None);

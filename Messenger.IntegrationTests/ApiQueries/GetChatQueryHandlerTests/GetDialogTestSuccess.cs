@@ -15,13 +15,13 @@ public class GetDialogTestSuccess : IntegrationTestBase, IIntegrationTest
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
         var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
-        var createDialogResult = await MessengerModule.RequestAsync(new CreateDialogCommand(
-            RequesterId: user21Th.Value.Id,
-            UserId: alice.Value.Id), CancellationToken.None);
+        var createDialogCommand = new CreateDialogCommand(user21Th.Value.Id, alice.Value.Id);
+        
+        var createDialogResult = await MessengerModule.RequestAsync(createDialogCommand, CancellationToken.None);
 
-        var getDialogResult = await MessengerModule.RequestAsync(new GetChatQuery(
-            RequesterId: user21Th.Value.Id,
-            ChatId: createDialogResult.Value.Id), CancellationToken.None);
+        var getDialogQuery = new GetChatQuery(user21Th.Value.Id, createDialogResult.Value.Id);
+        
+        var getDialogResult = await MessengerModule.RequestAsync(getDialogQuery, CancellationToken.None);
 
         getDialogResult.Value.MembersCount.Should().Be(2);
         getDialogResult.Value.Members.Count.Should().Be(2);

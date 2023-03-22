@@ -16,29 +16,41 @@ public class GetUserListTestSuccess : IntegrationTestBase, IIntegrationTest
         await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
         await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
-        var getUserListLimit2Page1Result = await MessengerModule.RequestAsync(new GetUserListBySearchQuery(
-            RequesterId: user21Th.Value.Id,
+        var getUserListLimit2Page1Query = new GetUserListBySearchQuery(
+            user21Th.Value.Id,
+            SearchText: null,
             Limit: 2,
-            Page: 1,
-            SearchText: null), CancellationToken.None);
+            Page: 1);
         
-        var getUserListLimit2Page2Result = await MessengerModule.RequestAsync(new GetUserListBySearchQuery(
-            RequesterId: user21Th.Value.Id,
-            Limit: 2,
-            Page: 2,
-            SearchText: null), CancellationToken.None);
-        
-        var getUserListLimit2Page3Result = await MessengerModule.RequestAsync(new GetUserListBySearchQuery(
-            RequesterId: user21Th.Value.Id,
-            Limit: 2,
-            Page: 3,
-            SearchText: null), CancellationToken.None);
+        var getUserListLimit2Page1Result = 
+            await MessengerModule.RequestAsync(getUserListLimit2Page1Query, CancellationToken.None);
 
-        var getUserListBySearchResult = await MessengerModule.RequestAsync(new GetUserListBySearchQuery(
+        var getUserListLimit2Page2Query = new GetUserListBySearchQuery(
             RequesterId: user21Th.Value.Id,
+            SearchText: null,
+            Limit: 2,
+            Page: 2);
+        
+        var getUserListLimit2Page2Result = 
+            await MessengerModule.RequestAsync(getUserListLimit2Page2Query, CancellationToken.None);
+
+        var getUserListLimit2Page3Query = new GetUserListBySearchQuery(
+            RequesterId: user21Th.Value.Id,
+            SearchText: null,
+            Limit: 2,
+            Page: 3);
+        
+        var getUserListLimit2Page3Result =
+            await MessengerModule.RequestAsync(getUserListLimit2Page3Query, CancellationToken.None);
+
+        var getUserListBySearchQuery = new GetUserListBySearchQuery(
+            RequesterId: user21Th.Value.Id,
+            SearchText: "123",
             Limit: 20,
-            Page: 1,
-            SearchText: "123"), CancellationToken.None);
+            Page: 1);
+        
+        var getUserListBySearchResult = 
+            await MessengerModule.RequestAsync(getUserListBySearchQuery, CancellationToken.None);
         
         for (var i = 0; i < getUserListLimit2Page1Result.Value.Count; i++)
         {

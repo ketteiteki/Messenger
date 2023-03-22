@@ -13,15 +13,18 @@ public class GetSessionListTestSuccess : IntegrationTestBase, IIntegrationTest
     public async Task Test()
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        
-        await MessengerModule.RequestAsync(new LoginCommand(
-            Nickname: CommandHelper.Registration21ThCommand().Nickname,
-            Password: CommandHelper.Registration21ThCommand().Password,
-            Ip: CommandHelper.Registration21ThCommand().Ip,
-            UserAgent: CommandHelper.Registration21ThCommand().UserAgent), CancellationToken.None);
 
-        var getSessionListResult = await MessengerModule.RequestAsync(new GetSessionListQuery(
-            RequesterId: user21Th.Value.Id), CancellationToken.None);
+        var loginCommand = new LoginCommand(
+            CommandHelper.Registration21ThCommand().Nickname,
+            CommandHelper.Registration21ThCommand().Password,
+            CommandHelper.Registration21ThCommand().Ip,
+            CommandHelper.Registration21ThCommand().UserAgent);
+        
+        await MessengerModule.RequestAsync(loginCommand, CancellationToken.None);
+
+        var getSessionListQuery = new GetSessionListQuery(user21Th.Value.Id);
+        
+        var getSessionListResult = await MessengerModule.RequestAsync(getSessionListQuery, CancellationToken.None);
 
         getSessionListResult.Value.Count.Should().Be(2);
     }
