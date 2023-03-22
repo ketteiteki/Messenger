@@ -19,34 +19,38 @@ public class DeleteMessageTestThrowForbidden : IntegrationTestBase, IIntegration
         var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 
-        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+
+        var aliceJoinToConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id); 
+        var bobJoinToConversationCommand = new JoinToChatCommand(bob.Value.Id, createConversationResult.Value.Id); 
         
-        await MessengerModule.RequestAsync(new JoinToChatCommand(
-            RequesterId: alice.Value.Id,
-            ChatId: conversation.Value.Id), CancellationToken.None);
-        
-        await MessengerModule.RequestAsync(new JoinToChatCommand(
-            RequesterId: bob.Value.Id,
-            ChatId: conversation.Value.Id), CancellationToken.None);
-        
-        var createFirstMessageByAliceResult = await MessengerModule.RequestAsync(new CreateMessageCommand(
-            RequesterId: alice.Value.Id,
+        await MessengerModule.RequestAsync(aliceJoinToConversationCommand, CancellationToken.None);
+        await MessengerModule.RequestAsync(bobJoinToConversationCommand, CancellationToken.None);
+
+        var createMessageByAliceCommand = new CreateMessageCommand(
+            alice.Value.Id,
             Text: "qwerty2",
             ReplyToId: null,
-            ChatId: conversation.Value.Id,
-            Files: null), CancellationToken.None);
+            createConversationResult.Value.Id,
+            Files: null);
         
-        var deleteMessageAliceByBobResult = await MessengerModule.RequestAsync(new DeleteMessageCommand(
-            RequesterId: bob.Value.Id,
-            MessageId: createFirstMessageByAliceResult.Value.Id,
-            IsDeleteForAll: true), CancellationToken.None);
+        var createMessageByAliceResult = 
+            await MessengerModule.RequestAsync(createMessageByAliceCommand, CancellationToken.None);
+
+        var deleteAliceMessageByBobCommand = new DeleteMessageCommand(
+            bob.Value.Id,
+            createMessageByAliceResult.Value.Id,
+            IsDeleteForAll: true);
         
-        deleteMessageAliceByBobResult.Error.Should().BeOfType<ForbiddenError>();
+        var deleteAliceMessageByBobResult = 
+            await MessengerModule.RequestAsync(deleteAliceMessageByBobCommand, CancellationToken.None);
+        
+        deleteAliceMessageByBobResult.Error.Should().BeOfType<ForbiddenError>();
     }
 }

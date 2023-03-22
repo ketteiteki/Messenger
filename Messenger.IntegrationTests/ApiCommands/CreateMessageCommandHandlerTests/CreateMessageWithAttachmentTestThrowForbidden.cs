@@ -18,19 +18,19 @@ public class CreateMessageWithAttachmentTestThrowForbidden : IntegrationTestBase
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 		
         var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
         var createMessageBy21ThCommand = new CreateMessageCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Text: "qwerty1",
             ReplyToId: null,
-            ChatId: conversation.Value.Id,
+            conversation.Value.Id,
             Files: new FormFileCollection
             {
                 FilesHelper.GetFile(),

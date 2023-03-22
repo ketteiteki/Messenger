@@ -16,19 +16,19 @@ public class JoinToChatTestSuccess : IntegrationTestBase, IIntegrationTest
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		
 		var createConversationCommand = new CreateChatCommand(
-			RequesterId: user21Th.Value.Id,
+			user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
-			Type: ChatType.Conversation,
+			ChatType.Conversation,
 			AvatarFile: null);
 
-		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var createConversationResult = 
+			await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 		
-		var joinToConversationCommand = new JoinToChatCommand(
-			RequesterId: alice.Value.Id,
-			ChatId: conversation.Value.Id);
+		var aliceJoinToConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
 
-		var joinToConversation = await MessengerModule.RequestAsync(joinToConversationCommand, CancellationToken.None);
+		var joinToConversation = 
+			await MessengerModule.RequestAsync(aliceJoinToConversationCommand, CancellationToken.None);
 
 		joinToConversation.IsSuccess.Should().BeTrue();
 	}

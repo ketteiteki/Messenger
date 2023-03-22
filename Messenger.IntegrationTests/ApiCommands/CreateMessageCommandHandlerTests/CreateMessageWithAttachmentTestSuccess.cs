@@ -17,20 +17,20 @@ public class CreateMessageWithAttachmentTestSuccess : IntegrationTestBase, IInte
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 		
-        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
         var createMessageBy21ThCommand = new CreateMessageCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Text: "qwerty1",
             ReplyToId: null,
-            ChatId: conversation.Value.Id,
-            Files: new FormFileCollection
+            createConversationResult.Value.Id,
+            new FormFileCollection
             {
                 FilesHelper.GetFile(),
                 FilesHelper.GetFile()
@@ -39,12 +39,12 @@ public class CreateMessageWithAttachmentTestSuccess : IntegrationTestBase, IInte
         var createMessageBy21ThResult = await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
 
         createMessageBy21ThResult.Value.Attachments.Count.Should().Be(2);
-        
-        var deleteMessageCommand = new DeleteMessageCommand(
-            user21Th.Value.Id,
-            createMessageBy21ThResult.Value.Id, 
-            IsDeleteForAll: true);
 
-        await MessengerModule.RequestAsync(deleteMessageCommand, CancellationToken.None);
+        foreach (var attachment in createMessageBy21ThResult.Value.Attachments)
+        {
+            var avatarFileName = attachment.Link.Split("/")[^1];
+        
+            await BlobService.DeleteBlobAsync(avatarFileName);
+        }
     }
 }

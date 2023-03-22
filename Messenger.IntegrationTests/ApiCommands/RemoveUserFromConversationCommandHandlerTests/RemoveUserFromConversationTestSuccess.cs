@@ -19,62 +19,62 @@ public class RemoveUserFromConversationTestSuccess : IntegrationTestBase, IInteg
 		var alex = await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateChatCommand(
-			RequesterId: user21Th.Value.Id,
+			user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
-			Type: ChatType.Conversation,
+			ChatType.Conversation,
 			AvatarFile: null);
 
-		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 		
 		var addAliceInConversationCommand = new AddUserToConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: alice.Value.Id);
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id);
 		
 		var addBobInConversationCommand = new AddUserToConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: bob.Value.Id);
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			bob.Value.Id);
 		
 		var addAlexInConversationCommand = new AddUserToConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: alex.Value.Id);
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alex.Value.Id);
 
 		await MessengerModule.RequestAsync(addAliceInConversationCommand, CancellationToken.None);
 		await MessengerModule.RequestAsync(addBobInConversationCommand, CancellationToken.None);
 		await MessengerModule.RequestAsync(addAlexInConversationCommand, CancellationToken.None);
 
-		var createRoleForBobCommand = new CreateOrUpdateRoleUserInConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			UserId: bob.Value.Id,
-			ChatId: conversation.Value.Id,
+		var createBobRoleBy21ThCommand = new CreateOrUpdateRoleUserInConversationCommand(
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			bob.Value.Id,
 			RoleTitle: "moderator",
-			RoleColor: RoleColor.Blue,
+			RoleColor.Blue,
 			CanBanUser: false,
 			CanChangeChatData: false,
-			CanGivePermissionToUser: false,
-			CanAddAndRemoveUserToConversation: true);
+			CanAddAndRemoveUserToConversation: true,
+			CanGivePermissionToUser: false);
 
-		await MessengerModule.RequestAsync(createRoleForBobCommand, CancellationToken.None);
+		await MessengerModule.RequestAsync(createBobRoleBy21ThCommand, CancellationToken.None);
 
-		var removeUserAliceFromConversationBy21ThCommand= new RemoveUserFromConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: alice.Value.Id);
+		var removeAliceFromConversationBy21ThCommand= new RemoveUserFromConversationCommand(
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id);
 		
-		var removeUserAlexFromConversationByBobCommand = new RemoveUserFromConversationCommand(
-			RequesterId: bob.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: alex.Value.Id);
+		var removeAlexFromConversationByBobCommand = new RemoveUserFromConversationCommand(
+			bob.Value.Id,
+			createConversationResult.Value.Id,
+			alex.Value.Id);
 
-		var removeUserAliceFromConversationBy21ThResult =
-			await MessengerModule.RequestAsync(removeUserAliceFromConversationBy21ThCommand, CancellationToken.None);
-		var removeUserAlexFromConversationByBobResult =
-			await MessengerModule.RequestAsync(removeUserAlexFromConversationByBobCommand, CancellationToken.None);
+		var removeAliceFromConversationBy21ThResult =
+			await MessengerModule.RequestAsync(removeAliceFromConversationBy21ThCommand, CancellationToken.None);
+		var removeAlexFromConversationByBobResult =
+			await MessengerModule.RequestAsync(removeAlexFromConversationByBobCommand, CancellationToken.None);
 
-		removeUserAliceFromConversationBy21ThResult.IsSuccess.Should().BeTrue();
-		removeUserAlexFromConversationByBobResult.IsSuccess.Should().BeTrue();
+		removeAliceFromConversationBy21ThResult.IsSuccess.Should().BeTrue();
+		removeAlexFromConversationByBobResult.IsSuccess.Should().BeTrue();
 	}
 }

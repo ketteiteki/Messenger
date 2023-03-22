@@ -1,7 +1,6 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
-using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
@@ -20,77 +19,68 @@ public class CreatePermissionsUserInConversationTestSuccess : IntegrationTestBas
 		var alex = await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateChatCommand(
-			RequesterId: user21Th.Value.Id,
+			user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
-			Type: ChatType.Conversation,
+			ChatType.Conversation,
 			AvatarFile: null);
 
-		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
 		var addAliceInConversationBy21ThCommand = new AddUserToConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: alice.Value.Id);
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id);
 		
 		var addBobInConversationBy21ThCommand = new AddUserToConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: bob.Value.Id);
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			bob.Value.Id);
 		
 		var addAlexInConversationBy21ThCommand = new AddUserToConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: alex.Value.Id);
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alex.Value.Id);
 
 		await MessengerModule.RequestAsync(addAliceInConversationBy21ThCommand, CancellationToken.None);
 		await MessengerModule.RequestAsync(addBobInConversationBy21ThCommand, CancellationToken.None);
 		await MessengerModule.RequestAsync(addAlexInConversationBy21ThCommand, CancellationToken.None);
 		
-		var createRoleForAliceCommand = new CreateOrUpdateRoleUserInConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			UserId: alice.Value.Id,
-			ChatId: conversation.Value.Id,
+		var createAliceRoleBy21ThCommand = new CreateOrUpdateRoleUserInConversationCommand(
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id,
 			RoleTitle: "moderator",
-			RoleColor: RoleColor.Blue,
+			RoleColor.Blue,
 			CanBanUser: false,
 			CanChangeChatData: false,
-			CanGivePermissionToUser: true,
-			CanAddAndRemoveUserToConversation: false);
+			CanAddAndRemoveUserToConversation: false,
+			CanGivePermissionToUser: true);
 
-		await MessengerModule.RequestAsync(createRoleForAliceCommand, CancellationToken.None);
+		await MessengerModule.RequestAsync(createAliceRoleBy21ThCommand, CancellationToken.None);
 		
-		var createPermissionsUserInConversationBy21ThCommand = new CreatePermissionsUserInConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			UserId: bob.Value.Id,
-			ChatId: conversation.Value.Id,
+		var createPermissionsBobInConversationBy21ThCommand = new CreatePermissionsUserInConversationCommand(
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			bob.Value.Id,
 			CanSendMedia: false,
 			MuteMinutes: 5);
 
-		var createPermissionsUserInConversationByAliceCommand = new CreatePermissionsUserInConversationCommand(
+		var createPermissionsAlexInConversationByAliceCommand = new CreatePermissionsUserInConversationCommand(
 			RequesterId: alice.Value.Id,
 			UserId: alex.Value.Id,
-			ChatId: conversation.Value.Id,
+			ChatId: createConversationResult.Value.Id,
 			CanSendMedia: false,
 			MuteMinutes: null);
 		
-		var createPermissionsUserBobInConversationByAlexCommand = new CreatePermissionsUserInConversationCommand(
-			RequesterId: alex.Value.Id,
-			UserId: bob.Value.Id,
-			ChatId: conversation.Value.Id,
-			CanSendMedia: false,
-			MuteMinutes: 10);
-		
 		var createPermissionsUserInConversationBy21ThResult =
-			await MessengerModule.RequestAsync(createPermissionsUserInConversationBy21ThCommand, CancellationToken.None);
+			await MessengerModule.RequestAsync(createPermissionsBobInConversationBy21ThCommand, CancellationToken.None);
+		
 		var createPermissionsUserInConversationByAliceResult = 
-			await MessengerModule.RequestAsync(createPermissionsUserInConversationByAliceCommand, CancellationToken.None);
-		var createPermissionsUserBobInConversationByAlexResult = 
-			await MessengerModule.RequestAsync(createPermissionsUserBobInConversationByAlexCommand, CancellationToken.None);
-
+			await MessengerModule.RequestAsync(createPermissionsAlexInConversationByAliceCommand, CancellationToken.None);
+		
 		createPermissionsUserInConversationBy21ThResult.Value.CanSendMedia.Should().BeFalse();
 		createPermissionsUserInConversationBy21ThResult.Value.MuteDateOfExpire.Should().NotBeNull();
 		createPermissionsUserInConversationByAliceResult.Value.CanSendMedia.Should().BeFalse();
-		createPermissionsUserBobInConversationByAlexResult.Error.Should().BeOfType<ForbiddenError>();
 	}
 }

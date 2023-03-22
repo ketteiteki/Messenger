@@ -16,26 +16,29 @@ public class RemoveSessionTestSuccess : IntegrationTestBase, IIntegrationTest
 
         const string loginIp = "432.64.879.989";
         
-        await MessengerModule.RequestAsync(new LoginCommand(
-            Nickname: CommandHelper.Registration21ThCommand().Nickname,
-            Password: CommandHelper.Registration21ThCommand().Password,
-            Ip: loginIp,
-            UserAgent: CommandHelper.Registration21ThCommand().UserAgent), CancellationToken.None);
-
-        var firstGetSessionList = await MessengerModule.RequestAsync(new GetSessionListQuery(
-            RequesterId: user21Th.Value.Id), CancellationToken.None);
-
-        var firstCreatedSession = firstGetSessionList.Value.DistinctBy(s => s.CreateAt).First();
-
-        await MessengerModule.RequestAsync(new RemoveSessionCommand(
-            RequesterId: user21Th.Value.Id,
-            SessionId: firstCreatedSession.Id), CancellationToken.None);
+        var loginCommand = new LoginCommand(
+            CommandHelper.Registration21ThCommand().Nickname,
+            CommandHelper.Registration21ThCommand().Password,
+            loginIp,
+            CommandHelper.Registration21ThCommand().UserAgent);
         
-        var secondGetSessionList = await MessengerModule.RequestAsync(new GetSessionListQuery(
-            RequesterId: user21Th.Value.Id), CancellationToken.None);
+        await MessengerModule.RequestAsync(loginCommand, CancellationToken.None);
 
-        secondGetSessionList.Value.Count.Should().Be(1);
+        var firstGetSessionListQuery = new GetSessionListQuery(user21Th.Value.Id);
         
-        secondGetSessionList.Value.First().Ip.Should().Be(loginIp);
+        var firstGetSessionListResult = await MessengerModule.RequestAsync(firstGetSessionListQuery, CancellationToken.None);
+
+        var firstCreatedSession = firstGetSessionListResult.Value.DistinctBy(s => s.CreateAt).First();
+
+        var removeFirstCreatedSessionCommand = new RemoveSessionCommand(user21Th.Value.Id, firstCreatedSession.Id); 
+        
+        await MessengerModule.RequestAsync(removeFirstCreatedSessionCommand, CancellationToken.None);
+
+        var secondGetSessionListQuery = new GetSessionListQuery(user21Th.Value.Id);
+        
+        var secondGetSessionListResult = await MessengerModule.RequestAsync(secondGetSessionListQuery, CancellationToken.None);
+
+        secondGetSessionListResult.Value.Count.Should().Be(1);
+        secondGetSessionListResult.Value.First().Ip.Should().Be(loginIp);
     }
 }

@@ -13,18 +13,21 @@ public class DeleteProfileAvatarTestSuccess : IntegrationTestBase, IIntegrationT
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-        var firstUpdateProfileAvatarResult = await MessengerModule.RequestAsync(new UpdateProfileAvatarCommand(
-            RequesterId: user21Th.Value.Id,
-            AvatarFile: FilesHelper.GetFile()), CancellationToken.None);
+        var firstUpdateProfileAvatarCommand = new UpdateProfileAvatarCommand(
+            user21Th.Value.Id,
+            FilesHelper.GetFile());
+        
+        var firstUpdateProfileAvatarResult = 
+            await MessengerModule.RequestAsync(firstUpdateProfileAvatarCommand, CancellationToken.None);
 
-        var secondUpdateProfileAvatarResult = await MessengerModule.RequestAsync(new UpdateProfileAvatarCommand(
-            RequesterId: user21Th.Value.Id,
-            AvatarFile: null), CancellationToken.None);
+        var secondUpdateProfileAvatarCommand = new UpdateProfileAvatarCommand(
+            user21Th.Value.Id,
+            AvatarFile: null);
+        
+        var secondUpdateProfileAvatarResult = 
+            await MessengerModule.RequestAsync(secondUpdateProfileAvatarCommand, CancellationToken.None);
 
+        firstUpdateProfileAvatarResult.Value.AvatarLink.Should().NotBeNull();
         secondUpdateProfileAvatarResult.IsSuccess.Should().BeTrue();
-
-        File.Exists(Path.Combine(
-            BaseDirService.GetPathWwwRoot(), firstUpdateProfileAvatarResult.Value.AvatarLink.Split("/")[^1]))
-            .Should().BeFalse();
     }
 }

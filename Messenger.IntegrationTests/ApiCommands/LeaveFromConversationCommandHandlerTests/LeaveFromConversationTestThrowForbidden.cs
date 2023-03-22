@@ -17,18 +17,19 @@ public class LeaveFromConversationTestThrowForbidden : IntegrationTestBase, IInt
         var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 
-        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-        var leaveFromConversationResult = await MessengerModule.RequestAsync(new LeaveFromChatCommand(
-            RequesterId: alice.Value.Id,
-            ChatId: conversation.Value.Id), CancellationToken.None);
+        var aliceLeaveConversationCommand = new LeaveFromChatCommand(alice.Value.Id, createConversationResult.Value.Id);
+        
+        var aliceLeaveConversationResult = 
+            await MessengerModule.RequestAsync(aliceLeaveConversationCommand, CancellationToken.None);
 
-        leaveFromConversationResult.Error.Should().BeOfType<ForbiddenError>();
+        aliceLeaveConversationResult.Error.Should().BeOfType<ForbiddenError>();
     }
 }

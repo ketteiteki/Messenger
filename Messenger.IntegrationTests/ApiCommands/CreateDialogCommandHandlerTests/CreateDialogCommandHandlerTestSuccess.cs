@@ -15,9 +15,7 @@ public class CreateDialogCommandHandlerTestSuccess : IntegrationTestBase, IInteg
 		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		
-		var createDialogCommand = new CreateDialogCommand(
-			RequesterId: user21Th.Value.Id,
-			UserId: alice.Value.Id);
+		var createDialogCommand = new CreateDialogCommand(user21Th.Value.Id, alice.Value.Id);
 
 		var createDialogResult = await MessengerModule.RequestAsync(createDialogCommand, CancellationToken.None);
 
@@ -25,7 +23,7 @@ public class CreateDialogCommandHandlerTestSuccess : IntegrationTestBase, IInteg
 		createDialogResult.Value.MembersCount.Should().Be(2);
 		createDialogResult.Value.Members.Count.Should().Be(2);
 		createDialogResult.Value.Members.Exists(m => m.Id == user21Th.Value.Id).Should().BeTrue();
-		createDialogResult.Value.Members.Exists(m => m.Id != user21Th.Value.Id).Should().BeTrue();
+		createDialogResult.Value.Members.Exists(m => m.Id == alice.Value.Id).Should().BeTrue();
 		createDialogResult.Value.Type.Should().Be(ChatType.Dialog);
 	}
 }

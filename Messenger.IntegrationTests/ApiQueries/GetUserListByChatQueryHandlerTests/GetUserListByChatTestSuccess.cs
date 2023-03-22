@@ -19,25 +19,25 @@ public class GetUserListByChatTestSuccess : IntegrationTestBase, IIntegrationTes
         var alex = await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
         var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
-        var conversation = await MessengerModule.RequestAsync(new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+        var createConversationCommand = new CreateChatCommand(
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
-            AvatarFile: null), CancellationToken.None);
-
-        await MessengerModule.RequestAsync(new JoinToChatCommand(
-            RequesterId: alice.Value.Id,
-            ChatId: conversation.Value.Id), CancellationToken.None);
+            ChatType.Conversation,
+            AvatarFile: null);
         
-        await MessengerModule.RequestAsync(new JoinToChatCommand(
-            RequesterId: alex.Value.Id,
-            ChatId: conversation.Value.Id), CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-        var createRoleUserAliceCommand = new CreateOrUpdateRoleUserInConversationCommand(
-            RequesterId: user21Th.Value.Id,
-            ChatId: conversation.Value.Id,
-            UserId: alice.Value.Id,
+        var aliceJoinConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
+        var alexJoinConversationCommand = new JoinToChatCommand(alex.Value.Id, createConversationResult.Value.Id);
+        
+        await MessengerModule.RequestAsync(aliceJoinConversationCommand, CancellationToken.None);
+        await MessengerModule.RequestAsync(alexJoinConversationCommand, CancellationToken.None);
+
+        var createAliceRoleCommand = new CreateOrUpdateRoleUserInConversationCommand(
+            user21Th.Value.Id,
+            createConversationResult.Value.Id,
+            alice.Value.Id,
             RoleTitle: "qwerty",
             RoleColor.Blue,
             CanBanUser: false,
@@ -45,14 +45,16 @@ public class GetUserListByChatTestSuccess : IntegrationTestBase, IIntegrationTes
             CanAddAndRemoveUserToConversation: false,
             CanGivePermissionToUser: true);
         
-        await MessengerModule.RequestAsync(createRoleUserAliceCommand, CancellationToken.None);
+        await MessengerModule.RequestAsync(createAliceRoleCommand, CancellationToken.None);
 
-        var userListByChatResult = await MessengerModule.RequestAsync(new GetUserListByChatQuery(
-            RequesterId: bob.Value.Id,
-            ChatId: conversation.Value.Id,
+        var getUserListByChatQuery = new GetUserListByChatQuery(
+            bob.Value.Id,
+            createConversationResult.Value.Id,
             Limit: 40,
-            Page: 1), CancellationToken.None);
+            Page: 1);
+        
+        var getUserListByChatResult = await MessengerModule.RequestAsync(getUserListByChatQuery, CancellationToken.None);
 
-        userListByChatResult.Value.Count.Should().Be(3);
+        getUserListByChatResult.Value.Count.Should().Be(3);
     }
 }

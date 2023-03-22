@@ -13,12 +13,13 @@ public class GetUserTestSuccess : IntegrationTestBase, IIntegrationTest
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-        var user = await MessengerModule.RequestAsync(new GetUserQuery(
-            UserId: user21Th.Value.Id), CancellationToken.None);
+        var getUserQuery = new GetUserQuery(user21Th.Value.Id);
+        
+        var getUserResult = await MessengerModule.RequestAsync(getUserQuery, CancellationToken.None);
 
-        user.Value.Id.Should().Be(user21Th.Value.Id);
-        user.Value.Nickname.Should().Be(user21Th.Value.NickName);
-        user.Value.DisplayName.Should().Be(user21Th.Value.DisplayName);
-        user.Value.Bio.Should().Be(user21Th.Value.Bio);
+        getUserResult.Value.Id.Should().Be(user21Th.Value.Id);
+        getUserResult.Value.Nickname.Should().Be(user21Th.Value.NickName);
+        getUserResult.Value.DisplayName.Should().Be(user21Th.Value.DisplayName);
+        getUserResult.Value.Bio.Should().Be(user21Th.Value.Bio);
     }
 }

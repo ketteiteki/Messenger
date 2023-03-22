@@ -15,19 +15,23 @@ public class GetMessageListTestThrowBadRequest : IntegrationTestBase, IIntegrati
     public async Task Test()
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        
-        var conversation = await MessengerModule.RequestAsync(new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+
+        var createConversationCommand = new CreateChatCommand(
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
-            AvatarFile: null), CancellationToken.None);
+            ChatType.Conversation,
+            AvatarFile: null);
+        
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-        var getMessageListResult = await MessengerModule.RequestAsync(new GetMessageListQuery(
-            RequesterId: user21Th.Value.Id,
-            ChatId: conversation.Value.Id,
+        var getMessageListQuery = new GetMessageListQuery(
+            user21Th.Value.Id,
+            createConversationResult.Value.Id,
             Limit: 61,
-            FromMessageDateTime: null), CancellationToken.None);
+            FromMessageDateTime: null);
+        
+        var getMessageListResult = await MessengerModule.RequestAsync(getMessageListQuery, CancellationToken.None);
 
         getMessageListResult.Error.Should().BeOfType<BadRequestError>();
     }

@@ -19,30 +19,30 @@ public class AddUserToConversationTestThrowForbidden : IntegrationTestBase, IInt
         var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 		
-        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
         var addUserAliceToConversationByBobCommand = new AddUserToConversationCommand(
-            RequesterId: bob.Value.Id,
-            ChatId: conversation.Value.Id,
-            UserId: alice.Value.Id);
+            bob.Value.Id,
+            createConversationResult.Value.Id,
+            alice.Value.Id);
 
         var addUserAliceToConversationByBobResult =
             await MessengerModule.RequestAsync(addUserAliceToConversationByBobCommand, CancellationToken.None);
 
-        await MessengerModule.RequestAsync(new JoinToChatCommand(
-            RequesterId: alice.Value.Id,
-            ChatId: conversation.Value.Id), CancellationToken.None);
+        var userAliceJoinToConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
+        
+        await MessengerModule.RequestAsync(userAliceJoinToConversationCommand, CancellationToken.None);
         
         var addUserBobToConversationByAliceCommand = new AddUserToConversationCommand(
-            RequesterId: bob.Value.Id,
-            ChatId: conversation.Value.Id,
-            UserId: alice.Value.Id);
+            bob.Value.Id,
+            createConversationResult.Value.Id,
+            alice.Value.Id);
 
         var addUserBobToConversationByAliceResult =
             await MessengerModule.RequestAsync(addUserBobToConversationByAliceCommand, CancellationToken.None);

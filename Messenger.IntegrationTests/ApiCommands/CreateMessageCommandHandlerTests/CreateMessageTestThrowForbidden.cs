@@ -18,19 +18,19 @@ public class CreateMessageTestThrowForbidden : IntegrationTestBase, IIntegration
         var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 		
-        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
         
         var createdMessageByBobCommand = new CreateMessageCommand(
-            RequesterId: bob.Value.Id,
+            bob.Value.Id,
             Text: "qwerty3",
             ReplyToId: null,
-            ChatId: conversation.Value.Id,
+            createConversationResult.Value.Id,
             Files: null);
         
         var createMessageByBobResult = await MessengerModule.RequestAsync(createdMessageByBobCommand, CancellationToken.None);
