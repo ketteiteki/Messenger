@@ -45,7 +45,7 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 			request.DisplayName,
 			request.Nickname,
 			bio: null,
-			avatarLink: null,
+			avatarFileName: null,
 			passwordHash: hmac512CryptoHash,
 			passwordSalt: salt);
 
@@ -63,7 +63,16 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 		_context.Users.Add(newUser);
 		_context.Sessions.Add(session);
 		await _context.SaveChangesAsync(cancellationToken);
+		
+		var authorizationResponse = new AuthorizationResponse(
+			accessToken,
+			session.RefreshToken,
+			newUser.Id,
+			newUser.DisplayName,
+			newUser.Nickname,
+			newUser.Bio,
+			avatarLink: null);
 
-		return new Result<AuthorizationResponse>(new AuthorizationResponse(newUser, accessToken, session.RefreshToken));
+		return new Result<AuthorizationResponse>(authorizationResponse);
 	}
 }

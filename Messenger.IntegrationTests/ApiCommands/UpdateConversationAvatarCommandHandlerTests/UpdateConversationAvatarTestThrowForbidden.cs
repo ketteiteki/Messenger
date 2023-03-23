@@ -4,7 +4,6 @@ using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
-using Microsoft.AspNetCore.Http;
 using Xunit;
 
 namespace Messenger.IntegrationTests.ApiCommands.UpdateConversationAvatarCommandHandlerTests;

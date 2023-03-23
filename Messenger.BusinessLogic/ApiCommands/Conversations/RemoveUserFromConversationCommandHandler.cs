@@ -1,4 +1,5 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Services;
@@ -9,10 +10,14 @@ namespace Messenger.BusinessLogic.ApiCommands.Conversations;
 public class RemoveUserFromConversationCommandHandler : IRequestHandler<RemoveUserFromConversationCommand, Result<UserDto>>
 {
 	private readonly DatabaseContext _context;
+	private readonly IBlobServiceSettings _blobServiceSettings;
 
-	public RemoveUserFromConversationCommandHandler(DatabaseContext context)
+	public RemoveUserFromConversationCommandHandler(
+		DatabaseContext context,
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
+		_blobServiceSettings = blobServiceSettings;
 	}
 	
 	public async Task<Result<UserDto>> Handle(RemoveUserFromConversationCommand request, CancellationToken cancellationToken)
@@ -49,7 +54,18 @@ public class RemoveUserFromConversationCommandHandler : IRequestHandler<RemoveUs
 		
 		await _context.SaveChangesAsync(cancellationToken);
 			
-		return new Result<UserDto>(new UserDto(chatUserByUser.User));
+		var avatarLink = chatUserByUser.User.AvatarFileName != null
+			? $"{_blobServiceSettings.MessengerBlobAccess}/{chatUserByUser.User.AvatarFileName}"
+			: null;
+		
+		var userDto = new UserDto(
+			chatUserByUser.User.Id,
+			chatUserByUser.User.DisplayName,
+			chatUserByUser.User.Nickname,
+			chatUserByUser.User.Bio,
+			avatarLink);
+		
+		return new Result<UserDto>(userDto);
 		
 	}
 }

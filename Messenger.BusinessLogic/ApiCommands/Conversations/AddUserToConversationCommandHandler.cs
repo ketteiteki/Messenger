@@ -1,4 +1,5 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
@@ -13,11 +14,16 @@ public class AddUserToConversationCommandHandler : IRequestHandler<AddUserToConv
 {
 	private readonly DatabaseContext _context;
 	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
+	private readonly IBlobServiceSettings _blobServiceSettings;
 
-	public AddUserToConversationCommandHandler(DatabaseContext context, IHubContext<ChatHub, IChatHub> hubContext)
+	public AddUserToConversationCommandHandler(
+		DatabaseContext context, 
+		IHubContext<ChatHub, IChatHub> hubContext,
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
 		_hubContext = hubContext;
+		_blobServiceSettings = blobServiceSettings;
 	}
 	
 	public async Task<Result<UserDto>> Handle(AddUserToConversationCommand request, CancellationToken cancellationToken)
@@ -91,7 +97,9 @@ public class AddUserToConversationCommandHandler : IRequestHandler<AddUserToConv
 			Name = chatUserByRequester.Chat.Name,
 			Title = chatUserByRequester.Chat.Title,
 			Type = chatUserByRequester.Chat.Type,
-			AvatarLink = chatUserByRequester.Chat.AvatarLink,
+			AvatarLink = chatUserByRequester.Chat.AvatarFileName != null ? 
+				$"{_blobServiceSettings.MessengerBlobAccess}/{chatUserByRequester.Chat.AvatarFileName}"
+				: null,
 			LastMessageId = chatUserByRequester.Chat.LastMessage?.Id,
 			LastMessageText = chatUserByRequester.Chat.LastMessage?.Text,
 			LastMessageAuthorDisplayName = chatUserByRequester.Chat.LastMessage?.Owner?.DisplayName,
@@ -104,8 +112,19 @@ public class AddUserToConversationCommandHandler : IRequestHandler<AddUserToConv
 		};
 			
 		await _hubContext.Clients.User(request.UserId.ToString()).CreateChatForUserAfterAddUserInChat(chatDto);
-			
-		return new Result<UserDto>(new UserDto(user));
+
+		var userAvatarLink = user.AvatarFileName != null
+			? $"{_blobServiceSettings.MessengerBlobAccess}/{user.AvatarFileName}"
+			: null;
+		
+		var userDto = new UserDto(
+			user.Id, 
+			user.DisplayName,
+			user.Nickname,
+			user.Bio,
+			avatarLink: userAvatarLink);
+		
+		return new Result<UserDto>(userDto);
 		
 	}
 }

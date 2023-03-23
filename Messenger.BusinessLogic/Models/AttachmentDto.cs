@@ -1,22 +1,17 @@
-using Messenger.Domain.Entities;
-
 namespace Messenger.BusinessLogic.Models;
 
 public class AttachmentDto
 { 
 	public Guid Id { get; init; }
     	
-	public string Name { get; init; }
-    	
 	public long Size { get; init; }
     	
 	public string Link { get; init; }
 
-	public AttachmentDto(AttachmentEntity attachment)
+	public AttachmentDto(Guid id, string link, long size)
 	{
-		Id = attachment.Id;
-		Name = attachment.Name;
-		Size = attachment.Size;
-		Link = attachment.Link;
+		Id = id;
+		Link = link;
+		Size = size;
 	} 
 }

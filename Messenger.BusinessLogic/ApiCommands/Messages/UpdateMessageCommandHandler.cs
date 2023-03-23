@@ -1,4 +1,5 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
@@ -12,11 +13,16 @@ public class UpdateMessageCommandHandler : IRequestHandler<UpdateMessageCommand,
 {
 	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 	private readonly DatabaseContext _context;
+	private readonly IBlobServiceSettings _blobServiceSettings;
 
-	public UpdateMessageCommandHandler(DatabaseContext context, IHubContext<ChatHub, IChatHub> hubContext)
+	public UpdateMessageCommandHandler(
+		DatabaseContext context,
+		 IHubContext<ChatHub, IChatHub> hubContext,
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
 		_hubContext = hubContext;
+		_blobServiceSettings = blobServiceSettings;
 	}
 	
 	public async Task<Result<MessageDto>> Handle(UpdateMessageCommand request, CancellationToken cancellationToken)
@@ -64,11 +70,18 @@ public class UpdateMessageCommandHandler : IRequestHandler<UpdateMessageCommand,
 			IsEdit = message.IsEdit,
 			OwnerId = message.OwnerId,
 			OwnerDisplayName = message.Owner?.DisplayName,
-			OwnerAvatarLink = message.Owner?.AvatarLink,
+			OwnerAvatarLink = message.Owner?.AvatarFileName != null ? 
+				$"{_blobServiceSettings.MessengerBlobAccess}/{message.Owner.AvatarFileName}" 
+				: null,
 			ReplyToMessageId = message.ReplyToMessageId,
 			ReplyToMessageText = message.ReplyToMessage?.Text,
 			ReplyToMessageAuthorDisplayName = message.ReplyToMessage?.Owner?.DisplayName,
-			Attachments = message.Attachments.Select(a => new AttachmentDto(a)).ToList(),
+			Attachments = message.Attachments
+				.Select(a => new AttachmentDto(
+					a.Id, 
+					$"{_blobServiceSettings.MessengerBlobAccess}/{a.FileName}", 
+					a.Size))
+				.ToList(),
 			ChatId = message.ChatId,
 			DateOfCreate = message.DateOfCreate
 		};

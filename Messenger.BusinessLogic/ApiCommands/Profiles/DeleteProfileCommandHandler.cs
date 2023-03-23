@@ -26,19 +26,24 @@ public class DeleteProfileCommandHandler : IRequestHandler<DeleteProfileCommand,
 			.Include(u => u.ChatUsers)
 			.FirstAsync(u => u.Id == request.RequesterId, cancellationToken);
 
-		if (requester.AvatarLink != null)
+		if (requester.AvatarFileName != null)
 		{
-			var avatarFileName = requester.AvatarLink.Split("/")[^1];
-
-			await _blobService.DeleteBlobAsync(avatarFileName);
+			await _blobService.DeleteBlobAsync(requester.AvatarFileName);
 			
-			requester.UpdateAvatarLink(null);
+			requester.UpdateAvatarFileName(null);
 		}
 		
 		_context.Users.Remove(requester);
 		
 		await _context.SaveChangesAsync(cancellationToken);
 
-		return new Result<UserDto>(new UserDto(requester));
+		var userDto = new UserDto(
+			requester.Id,
+			requester.DisplayName,
+			requester.Nickname,
+			requester.Bio,
+			avatarLink: null);
+		
+		return new Result<UserDto>(userDto);
 	}
 }

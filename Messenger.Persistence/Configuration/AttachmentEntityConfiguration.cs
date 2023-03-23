@@ -8,6 +8,6 @@ public class AttachmentEntityConfiguration : IEntityTypeConfiguration<Attachment
 {
     public void Configure(EntityTypeBuilder<AttachmentEntity> builder)
     {
-        builder.Property(x => x.Link).IsRequired();
+        builder.Property(x => x.FileName).IsRequired();
     }
 }

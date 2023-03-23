@@ -8,21 +8,18 @@ public class AttachmentEntity : IBaseEntity
 {
 	public Guid Id { get; set; } = Guid.NewGuid();
 	
-	public string Name { get; set; }
+	public string FileName { get; set; }
 	
 	public long Size { get; set; }
-	
-	public string Link { get; set; }
 	
 	public Guid MessageId { get; set; }
 	
 	public MessageEntity Message { get; set; }
 	
-	public AttachmentEntity(string name, long size, string link, Guid messageId)
+	public AttachmentEntity(string fileName, long size, Guid messageId)
 	{
-		Name = name;
+		FileName = fileName;
 		Size = size;
-		Link = link;
 		MessageId = messageId;
 		
 		new AttachmentEntityValidator().ValidateAndThrow(this);

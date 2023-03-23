@@ -1,4 +1,5 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Enum;
@@ -10,10 +11,14 @@ namespace Messenger.BusinessLogic.ApiQueries.Chats;
 public class GetChatListBySearchQueryHandler : IRequestHandler<GetChatListBySearchQuery, Result<List<ChatDto>>>
 {
     private readonly DatabaseContext _context;
+    private readonly IBlobServiceSettings _blobServiceSettings;
 
-    public GetChatListBySearchQueryHandler(DatabaseContext context)
+    public GetChatListBySearchQueryHandler(
+        DatabaseContext context,
+        IBlobServiceSettings blobServiceSettings)
     {
         _context = context;
+        _blobServiceSettings = blobServiceSettings;
     }
 
     public async Task<Result<List<ChatDto>>> Handle(GetChatListBySearchQuery request, CancellationToken cancellationToken)
@@ -39,7 +44,8 @@ public class GetChatListBySearchQueryHandler : IRequestHandler<GetChatListBySear
                         Name = chat.Name,
                         Title = chat.Title,
                         Type = chat.Type,
-                        AvatarLink = chat.AvatarLink,
+                        AvatarLink = chat.AvatarFileName != null ? 
+                            $"{_blobServiceSettings.MessengerBlobAccess}/{chat.AvatarFileName}" : null,
                         LastMessageId = chat.LastMessageId,
                         LastMessageText = chat.LastMessage != null ? chat.LastMessage.Text : null,
                         LastMessageAuthorDisplayName = chat.LastMessage != null && chat.LastMessage.Owner != null ? 

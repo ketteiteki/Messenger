@@ -1,4 +1,5 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Enum;
@@ -10,10 +11,14 @@ namespace Messenger.BusinessLogic.ApiCommands.Chats;
 public class UpdateChatDataCommandHandler : IRequestHandler<UpdateChatDataCommand, Result<ChatDto>>
 {
 	private readonly DatabaseContext _context;
+	private readonly IBlobServiceSettings _blobServiceSettings;
 
-	public UpdateChatDataCommandHandler(DatabaseContext context)
+	public UpdateChatDataCommandHandler(
+		DatabaseContext context,
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
+		_blobServiceSettings = blobServiceSettings;
 	}
 	
 	public async Task<Result<ChatDto>> Handle(UpdateChatDataCommand request, CancellationToken cancellationToken)
@@ -59,6 +64,10 @@ public class UpdateChatDataCommandHandler : IRequestHandler<UpdateChatDataComman
 		_context.Chats.Update(chatUserByRequester.Chat);
 		await _context.SaveChangesAsync(cancellationToken);
 			
+		var avatarLink = chatUserByRequester.Chat.AvatarFileName != null ?
+			$"{_blobServiceSettings.MessengerBlobAccess}/{chatUserByRequester.Chat.AvatarFileName}"
+			: null;
+		
 		return new Result<ChatDto>(
 			new ChatDto
 			{
@@ -66,7 +75,7 @@ public class UpdateChatDataCommandHandler : IRequestHandler<UpdateChatDataComman
 				Name =  chatUserByRequester.Chat.Name,
 				Title =  chatUserByRequester.Chat.Title,
 				Type =  chatUserByRequester.Chat.Type,
-				AvatarLink =  chatUserByRequester.Chat.AvatarLink,
+				AvatarLink =  avatarLink,
 				LastMessageId = chatUserByRequester.Chat.LastMessageId,
 				LastMessageText = chatUserByRequester.Chat.LastMessage?.Text,
 				LastMessageAuthorDisplayName = 

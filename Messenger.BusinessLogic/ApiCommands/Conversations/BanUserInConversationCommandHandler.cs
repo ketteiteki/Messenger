@@ -1,4 +1,5 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
@@ -13,11 +14,16 @@ public class BanUserInConversationCommandHandler : IRequestHandler<BanUserInConv
 {
 	private readonly DatabaseContext _context;
 	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
+	private readonly IBlobServiceSettings _blobServiceSettings;
 
-	public BanUserInConversationCommandHandler(DatabaseContext context, IHubContext<ChatHub, IChatHub> hubContext)
+	public BanUserInConversationCommandHandler(
+		DatabaseContext context,
+		IHubContext<ChatHub, IChatHub> hubContext,
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
 		_hubContext = hubContext;
+		_blobServiceSettings = blobServiceSettings;
 	}
 	
 	public async Task<Result<UserDto>> Handle(BanUserInConversationCommand request, CancellationToken cancellationToken)
@@ -66,9 +72,18 @@ public class BanUserInConversationCommandHandler : IRequestHandler<BanUserInConv
 		var notifyBanUserDto = new NotifyBanUserDto(request.ChatId, banDateOfExpire);
 			
 		await _hubContext.Clients.User(request.UserId.ToString()).NotifyBanUser(notifyBanUserDto);
-			
-		return new Result<UserDto>(new UserDto(chatUser.User));
 
+		var avatarLink = chatUser.User.AvatarFileName != null
+			? $"{_blobServiceSettings.MessengerBlobAccess}/{chatUser.User.AvatarFileName}"
+			: null;
 		
+		var userDto = new UserDto(
+			chatUser.User.Id,
+			chatUser.User.DisplayName,
+			chatUser.User.Nickname,
+			chatUser.User.Bio,
+			avatarLink);
+			
+		return new Result<UserDto>(userDto);
 	}
 }

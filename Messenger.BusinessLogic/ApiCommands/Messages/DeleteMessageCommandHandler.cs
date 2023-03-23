@@ -15,15 +15,18 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 	private readonly DatabaseContext _context;
 	private readonly IBlobService _blobService;
+	private readonly IBlobServiceSettings _blobServiceServiceSettings;
 
 	public DeleteMessageCommandHandler(
 		DatabaseContext context, 
 		IHubContext<ChatHub, IChatHub> hubContext,
-		IBlobService blobService)
+		IBlobService blobService, 
+		IBlobServiceSettings blobServiceServiceSettings)
 	{
 		_context = context;
 		_hubContext = hubContext;
 		_blobService = blobService;
+		_blobServiceServiceSettings = blobServiceServiceSettings;
 	}
 	
 	public async Task<Result<MessageDto>> Handle(DeleteMessageCommand request, CancellationToken cancellationToken)
@@ -48,9 +51,7 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 		{
 			foreach (var attachment in message.Attachments)
 			{
-				var fileName = attachment.Link.Split("/")[^1];
-
-				await _blobService.DeleteBlobAsync(fileName);
+				await _blobService.DeleteBlobAsync(attachment.FileName);
 			}
 			
 			_context.Messages.Remove(message);
@@ -65,7 +66,9 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 				IsEdit = message.IsEdit,
 				OwnerId = message.OwnerId,
 				OwnerDisplayName = message.Owner?.DisplayName,
-				OwnerAvatarLink = message.Owner?.AvatarLink,
+				OwnerAvatarLink = message.Owner?.AvatarFileName != null ? 
+					$"{_blobServiceServiceSettings.MessengerBlobAccess}/{message.Owner.AvatarFileName}" 
+					: null,
 				ReplyToMessageId = message.ReplyToMessageId,
 				ReplyToMessageText = message.ReplyToMessage?.Text,
 				ReplyToMessageAuthorDisplayName = message.ReplyToMessage?.Owner?.DisplayName,
@@ -108,11 +111,20 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 			IsEdit = message.IsEdit,
 			OwnerId = message.OwnerId,
 			OwnerDisplayName = message.Owner?.DisplayName,
-			OwnerAvatarLink = message.Owner?.AvatarLink,
+			OwnerAvatarLink = message.Owner?.AvatarFileName != null ? 
+				$"{_blobServiceServiceSettings.MessengerBlobAccess}/{message.Owner.AvatarFileName}" 
+				: null,
 			ReplyToMessageId = message.ReplyToMessageId,
 			ReplyToMessageText = message.ReplyToMessage?.Text,
 			ReplyToMessageAuthorDisplayName = message.ReplyToMessage?.Owner?.DisplayName,
-			Attachments = message.Attachments.Select(a => new AttachmentDto(a)).ToList(),
+			Attachments = message.Attachments
+				.Select(a => new AttachmentDto(
+					a.Id,
+					a.FileName != null ? 
+						$"{_blobServiceServiceSettings.MessengerBlobAccess}/{a.FileName}" 
+						: null,
+					a.Size))
+				.ToList(),
 			ChatId = message.ChatId,
 			DateOfCreate = message.DateOfCreate
 		};
