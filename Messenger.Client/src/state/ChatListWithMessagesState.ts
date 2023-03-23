@@ -35,8 +35,11 @@ class ChatListWithMessagesState {
   };
 
   public addMessageInData = (message: IMessageDto) => {
+    console.log(message);
     const item = this.data.find((c) => c.chat.id === message.chatId);
+    console.log(item);
     const itemInSearchData = this.dataForSearchChats.find((c) => c.chat.id === message.chatId);
+    console.log(itemInSearchData);
 
     item?.messages.push(message);
     itemInSearchData?.messages.push(message);
@@ -64,7 +67,17 @@ class ChatListWithMessagesState {
     }
   };
 
-  public deleteMessageInData = (
+  public deleteMessageInData = (chatId: string, messageId: string) => {
+    const dataItem = this.data.find(x => x.chat.id === chatId);
+
+    const messageItemIndex = dataItem?.messages.findIndex(x => x.id === messageId);
+
+    if (!messageItemIndex) return;
+
+    dataItem?.messages.splice(messageItemIndex, 1);
+  };
+
+  public deleteMessageInDataByMessageDeleteNotification = (
     messageDeleteNotification: IMessageDeleteNotificationDto
   ) => {
     const item = this.data.find(
@@ -76,23 +89,6 @@ class ChatListWithMessagesState {
     item.messages = item.messages.filter(
       (x) => x.id !== messageDeleteNotification.messageId
     );
-  };
-
-  public updateMessageAfterCreating = (
-    lastMessageId: string,
-    message: IMessageDto
-  ) => {
-    const dataItem = this.data.find((d) => d.chat.id === message.chatId);
-
-    if (!dataItem) return;
-
-    const indexMessageById = dataItem.messages.findIndex(
-      (m) => m.id === lastMessageId
-    );
-
-    if (indexMessageById) {
-      dataItem.messages[indexMessageById] = message;
-    }
   };
 
   public addChatInData = (chat: IChatDto, messages: IMessageDto[]) => {
@@ -214,12 +210,6 @@ class ChatListWithMessagesState {
     messageEntity: IMessageDto,
     files: File[]
   ) => {
-    const item = this.data.find((c) => c.chat.id === messageEntity.chatId);
-
-    if (item === undefined) return;
-
-    item.messages.push(messageEntity);
-
     const response = await MessagesApi.postCreateMessageAsync(
       messageEntity.text,
       messageEntity.chatId,
@@ -229,6 +219,12 @@ class ChatListWithMessagesState {
 
     if (response.status === 200) {
       runInAction(() => {
+        const dataItem = this.data.find(x => x.chat.id === messageEntity.chatId);
+        const messageItem = dataItem?.messages.find(x => x.id === messageEntity.id);
+        
+        if (!messageItem) return;
+
+        messageItem.id = response.data.id;
         chatListWithMessagesState.setLastMessage(response.data);
       });
     }

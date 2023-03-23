@@ -3,6 +3,9 @@ import { observer } from "mobx-react-lite";
 import styles from "./CreateChat.module.scss";
 import { ChatType } from "../../models/enum/ChatType";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
+import nonAvatar from "../../assets/images/non_avatar.jpg";
+import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
+import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
 
 const CreateChat = observer(() => {
   const [inputName, setInputName] = useState<string>("");
@@ -10,29 +13,64 @@ const CreateChat = observer(() => {
 
   const [selectChatTypeValue, setSelectChatTypeValue] = useState<number>(1);
 
-  const [file, setFile] = useState<File>();
+  const [file, setFile] = useState<File | null>();
+  const [blobUrlFile, setBlobUrlFile] = useState<string | ArrayBuffer | null>();
 
   const setFileHandler = (event: React.FormEvent<HTMLInputElement>) => {
     const files = event.currentTarget.files;
 
     if (files && files.length > 0) {
       setFile(files[0]);
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        setBlobUrlFile(reader.result);
+      };
+
+      reader.readAsDataURL(files[0]);
     }
   };
 
-  const createChatHandler = async () => {
-    await chatListWithMessagesState.postCreateChatAsync(
-      inputName,
-      inputTitle,
-      selectChatTypeValue,
-      file ?? null
+  const onChangeCreateChatHandler = async () => {
+
+    const inputNameConst = inputName;
+    const inputTitleConst = inputTitle;
+    const selectChatTypeValueConst = selectChatTypeValue;
+    const fileConst = file;
+
+    setInputName("");
+    setInputTitle("");
+    setFile(null);
+    setBlobUrlFile(null);
+
+    const response = await chatListWithMessagesState.postCreateChatAsync(
+      inputNameConst,
+      inputTitleConst,
+      selectChatTypeValueConst,
+      fileConst ?? null
+    );
+
+    await signalRConfiguration.connection?.invoke(
+      SignalRMethodsName.JoinChat,
+      response.data.id
     );
   };
 
   return (
     <div className={styles.createChat}>
+      <div className={styles.avatarContainer}>
+        <label htmlFor="avatar" className={styles.avatarBlackCover} />
+        <input
+          className={styles.avatarInput}
+          onChange={setFileHandler}
+          type="file"
+          id="avatar"
+          name="avatar"
+          accept="image/jpeg"
+        />
+        <img className={styles.avatar} src={blobUrlFile?.toString() || nonAvatar} />
+      </div>
       <div className={styles.createChatContainer}>
-        <input type="file" onChange={setFileHandler} />
         <input
           className={styles.inputTitle}
           type="text"
@@ -53,10 +91,10 @@ const CreateChat = observer(() => {
             setSelectChatTypeValue(Number(e.currentTarget.value))
           }
         >
-          <option value={ChatType.Channel}>Channel</option>
           <option value={ChatType.Conversation}>Conversation</option>
+          <option value={ChatType.Channel}>Channel</option>
         </select>
-        <button className={styles.CreateChatButton} onClick={createChatHandler}>
+        <button className={styles.CreateChatButton} onClick={onChangeCreateChatHandler}>
           Create Chat
         </button>
       </div>

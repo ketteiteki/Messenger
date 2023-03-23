@@ -11,6 +11,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
 import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
 import { currentChatState } from "../../state/CurrentChatState";
+import { currentProfileState } from "../../state/CurrentProfileState";
 
 const ChatList = observer(() => {
   const [inputSearch, setInputSearch] = useState<string>("");
@@ -45,6 +46,8 @@ const ChatList = observer(() => {
 
   useEffect(() => {
     if (inputSearch === "") {
+      currentProfileState.setProfileNull();
+
       const dataChats = chatListWithMessagesState.data;
       const dataForSearchChats = chatListWithMessagesState.dataForSearchChats;
 

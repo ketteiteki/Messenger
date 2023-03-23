@@ -41,6 +41,21 @@ const Chat = observer(() => {
   const currentChatId = currentChatState.chat?.id;
 
   const sendMessageHandler = async () => {
+    await sendMessage();
+  };
+
+  const sendMessageEnterHandler = async (
+    e: React.KeyboardEvent<HTMLTextAreaElement>
+  ) => {
+    if (currentChatState.chat === null) return;
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      await sendMessage();
+    }
+  };
+
+  const sendMessage = async () => {
     if (
       currentChatState.chat === null ||
       authorizationOwnerDisplayName === undefined ||
@@ -60,50 +75,15 @@ const Chat = observer(() => {
       currentChatId
     );
 
+    chatListWithMessagesState.addMessageInData(messageEntity);
+    chatListWithMessagesState.setLastMessage(messageEntity);
+
     await chatListWithMessagesState.postCreateMessageAsync(messageEntity, []);
 
+    messageListScrollBottomHandler();
     setInputMessage("");
     editMessageState.setEditMessageNull();
     replyState.setReplyNull();
-    messageListScrollBottomHandler();
-  };
-
-  const sendMessageEnterHandler = async (
-    e: React.KeyboardEvent<HTMLTextAreaElement>
-  ) => {
-    if (currentChatState.chat === null) return;
-    if (e.key === "Enter") {
-      e.preventDefault();
-
-      if (
-        currentChatState.chat === null ||
-        authorizationOwnerDisplayName === undefined ||
-        currentChatId === undefined ||
-        authorizationId === undefined
-      )
-        return;
-
-      const messageEntity = new MessageEntity(
-        inputMessage,
-        authorizationId,
-        authorizationOwnerDisplayName,
-        authorizationAvatarLink,
-        replyState.data?.messageId ?? null,
-        replyState.data?.text ?? null,
-        replyState.data?.displayName ?? null,
-        currentChatId
-      );
-
-      const response = await chatListWithMessagesState.postCreateMessageAsync(
-        messageEntity,
-        []
-      );
-
-      messageListScrollBottomHandler();
-      setInputMessage("");
-      editMessageState.setEditMessageNull();
-      replyState.setReplyNull();
-    }
   };
 
   const editMessageHandler = async () => {

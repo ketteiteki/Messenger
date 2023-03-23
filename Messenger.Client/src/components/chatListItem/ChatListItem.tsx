@@ -16,6 +16,10 @@ import TextService from "../../services/messenger/TextService";
 
 const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
 
+  const avatarLink = props.chat.type !== ChatType.Dialog ?
+    props.chat.avatarLink || nonAvatar :
+    props.chat.members.find(x => x.id !== authorizationState.data?.id)?.avatarLink || nonAvatar;
+
   const navigate = useNavigate();
 
   const onClickChatItem = async () => {
@@ -23,7 +27,7 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
       replyState.setReplyNull();
       editMessageState.setEditMessageNull();
     }
-    
+
     if (props.messages.length === 0) {
       await chatListWithMessagesState.getMessageListAsync(props.chat.id, null);
     }
@@ -33,25 +37,25 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
     if (props.chat.type === ChatType.Dialog) {
       const interlocutorId = currentChatState.chat?.members.find(m => m.id !== authorizationState.data?.id)?.id;
       interlocutorId && await currentProfileState.getUserAsync(interlocutorId);
-      return navigate("/", {replace: true});
+      return navigate("/", { replace: true });
     }
 
-    return navigate("/chatInfo", {replace: true});
+    return navigate("/chatInfo", { replace: true });
   };
 
   return (
     <div className={styles.chatListItem} onClick={onClickChatItem}>
       <img
         className={styles.avatar}
-        src={props.chat.avatarLink ?? nonAvatar}
+        src={avatarLink}
         alt=""
       />
       <div className={styles.container}>
         <p className={styles.displayName}>
           {props.chat.type === ChatType.Dialog
             ? props.chat.members.find(
-                (m) => m.id !== authorizationState.data?.id
-              )?.displayName
+              (m) => m.id !== authorizationState.data?.id
+            )?.displayName
             : props.chat.title}
         </p>
         <p className={styles.lastMessage}>{TextService.trimTextWithThirdDot(props.chat.lastMessageText ?? "", 20)}</p>

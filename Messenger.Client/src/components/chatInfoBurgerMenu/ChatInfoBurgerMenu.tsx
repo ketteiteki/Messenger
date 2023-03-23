@@ -21,7 +21,7 @@ const ChatInfoBurgerMenu = observer(
 
     const navigate = useNavigate();
 
-    const deleteChatHandler = async () => {
+    const onClickDeleteChatHandler = async () => {
       await chatListWithMessagesState.delDeleteChatAsync(
         currentChatState.chat?.id ?? ""
       );
@@ -43,7 +43,7 @@ const ChatInfoBurgerMenu = observer(
           <EditSvg width={20} />
           <p>Edit</p>
         </button>
-        <button className={styles.deleteChatButton} onClick={deleteChatHandler}>
+        <button className={styles.deleteChatButton} onClick={onClickDeleteChatHandler}>
           <TrashBinSvg width={20} />
           <p>Delete</p>
         </button>

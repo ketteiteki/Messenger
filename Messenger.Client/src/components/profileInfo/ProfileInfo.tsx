@@ -85,7 +85,7 @@ const ProfileInfo = observer(() => {
     );
     setInputNickname(
       currentProfileState.date?.nickname ||
-        authorizationState.data?.nickName ||
+        authorizationState.data?.nickname ||
         ""
     );
     setInputAdditionalData(
@@ -142,7 +142,7 @@ const ProfileInfo = observer(() => {
         <img
           className={styles.avatar}
           src={
-            currentProfileState.date?.avatarLink
+            currentProfileState.date
               ? currentProfileState.date.avatarLink || nonAvatar
               : authorizationState.data?.avatarLink || nonAvatar
           }

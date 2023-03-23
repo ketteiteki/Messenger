@@ -65,7 +65,7 @@ const Layout = observer(() => {
       signalRConfiguration.connection.on(SignalRMethodsName.DeleteMessageAsync, (message: IMessageDeleteNotificationDto) => {
         if (message.ownerId === authorizationResponse.data.id) return;
 
-        chatListWithMessagesState.deleteMessageInData(message);
+        chatListWithMessagesState.deleteMessageInDataByMessageDeleteNotification(message);
       });
 
       signalRConfiguration.connection.on("CreateDialogForInterlocutor", (message: string) => {
