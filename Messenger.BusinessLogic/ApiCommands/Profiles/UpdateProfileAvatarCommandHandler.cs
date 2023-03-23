@@ -2,48 +2,55 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.BusinessLogic.Services;
-using Messenger.Domain.Constants;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Messenger.BusinessLogic.ApiCommands.Profiles;
 
 public class UpdateProfileAvatarCommandHandler : IRequestHandler<UpdateProfileAvatarCommand, Result<UserDto>>
 {
 	private readonly DatabaseContext _context;
-	private readonly IFileService _fileService;
-	private readonly IConfiguration _configuration;
+	private readonly IBlobService _blobService;
 
-	public UpdateProfileAvatarCommandHandler(DatabaseContext context, IFileService fileService, IConfiguration configuration)
+	public UpdateProfileAvatarCommandHandler(
+		DatabaseContext context, 
+		IBlobService blobService)
 	{
 		_context = context;
-		_fileService = fileService;
-		_configuration = configuration;
+		_blobService = blobService;
 	}
 	
 	public async Task<Result<UserDto>> Handle(UpdateProfileAvatarCommand request, CancellationToken cancellationToken)
 	{
-		var requester = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, CancellationToken.None);
+		var requester = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, cancellationToken);
 
-		if (requester.AvatarLink != null)
+		if (requester.AvatarLink == null && request.AvatarFile == null)
 		{
-			_fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), requester.AvatarLink.Split("/")[^1]));
-			requester.AvatarLink = null;
+			return new Result<UserDto>(new ConflictError("Avatar not exists"));
 		}
 
-		if (request.AvatarFile != null)
+		if (requester.AvatarLink != null && request.AvatarFile == null)
 		{
-			var avatarLink = await _fileService.CreateFileAsync(BaseDirService.GetPathWwwRoot(), request.AvatarFile,
-				_configuration[AppSettingConstants.MessengerDomainName]);
+			var avatarFileName = requester.AvatarLink.Split("/")[^1];
 
-			requester.AvatarLink = avatarLink;
+			await _blobService.DeleteBlobAsync(avatarFileName);
+			
+			requester.UpdateAvatarLink(null);
+			
+			_context.Users.Update(requester);
+			await _context.SaveChangesAsync(cancellationToken);
+
+			return new Result<UserDto>(new UserDto(requester));
 		}
 
+		var avatarLink = await _blobService.UploadFileBlobAsync(request.AvatarFile);
+
+		requester.UpdateAvatarLink(avatarLink);
+			
 		_context.Users.Update(requester);
 		await _context.SaveChangesAsync(cancellationToken);
 
 		return new Result<UserDto>(new UserDto(requester));
+
 	}
 }

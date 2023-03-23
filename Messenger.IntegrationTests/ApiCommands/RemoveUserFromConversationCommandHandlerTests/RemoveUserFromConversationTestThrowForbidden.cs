@@ -19,34 +19,34 @@ public class RemoveUserFromConversationTestThrowForbidden : IntegrationTestBase,
 		var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateChatCommand(
-			RequesterId: user21Th.Value.Id,
+			user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
-			Type: ChatType.Conversation,
+			ChatType.Conversation,
 			AvatarFile: null);
 
-		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 		
 		var addAliceInConversationCommand = new AddUserToConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: alice.Value.Id);
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id);
 		
 		var addBobInConversationCommand = new AddUserToConversationCommand(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: bob.Value.Id);
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			bob.Value.Id);
 
 		await MessengerModule.RequestAsync(addAliceInConversationCommand, CancellationToken.None);
 		await MessengerModule.RequestAsync(addBobInConversationCommand, CancellationToken.None);
 
-		var removeUserAliceFromConversationByBobCommand = new RemoveUserFromConversationCommand(
-			RequesterId: bob.Value.Id,
-			ChatId: conversation.Value.Id,
-			UserId: alice.Value.Id);
+		var removeAliceFromConversationByBobCommand = new RemoveUserFromConversationCommand(
+			bob.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id);
 
 		var removeUserAlexFromConversationByBobResult = 
-			await MessengerModule.RequestAsync(removeUserAliceFromConversationByBobCommand, CancellationToken.None);
+			await MessengerModule.RequestAsync(removeAliceFromConversationByBobCommand, CancellationToken.None);
 
 		removeUserAlexFromConversationByBobResult.Error.Should().BeOfType<ForbiddenError>();
     }

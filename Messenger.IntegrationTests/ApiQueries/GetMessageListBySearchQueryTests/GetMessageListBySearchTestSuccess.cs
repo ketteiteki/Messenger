@@ -19,107 +19,127 @@ public class GetMessageListBySearchTestSuccess : IntegrationTestBase, IIntegrati
         var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 
-        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
-        
-        await MessengerModule.RequestAsync(new JoinToChatCommand(
-            RequesterId: alice.Value.Id,
-            ChatId: conversation.Value.Id), CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-        var createMessageForSearchCheckBy21ThCommand = new CreateMessageCommand(
-            RequesterId: user21Th.Value.Id,
+        var aliceJoinConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
+        
+        await MessengerModule.RequestAsync(aliceJoinConversationCommand, CancellationToken.None);
+
+        var createMessageBy21ThCommand = new CreateMessageCommand(
+            user21Th.Value.Id,
             Text: "text1",
             ReplyToId: null,
-            ChatId: conversation.Value.Id,
+            createConversationResult.Value.Id,
             Files: null);
         
-        var createMessageForSearchCheckBy21ThResult = 
-            await MessengerModule.RequestAsync(createMessageForSearchCheckBy21ThCommand, CancellationToken.None);
-        
-        var createMessageForSearchByAliceResult = await MessengerModule.RequestAsync(new CreateMessageCommand(
-            RequesterId: alice.Value.Id,
+        var createMessageBy21ThResult = 
+            await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
+
+        var createMessageByAliceCommand = new CreateMessageCommand(
+            alice.Value.Id,
             Text: "text2",
             ReplyToId: null,
-            ChatId: conversation.Value.Id,
-            Files: null), CancellationToken.None);
+            createConversationResult.Value.Id,
+            Files: null);
+        
+        var createMessageByAliceResult =
+            await MessengerModule.RequestAsync(createMessageByAliceCommand, CancellationToken.None);
 
-        var firstGetMessageListBySearchByAliceResult = await MessengerModule.RequestAsync(new GetMessageListBySearchQuery(
-            RequesterId: alice.Value.Id,
-            ChatId: conversation.Value.Id,
+        var getMessageListByAliceQuery = new GetMessageListBySearchQuery(
+            alice.Value.Id,
+            createConversationResult.Value.Id,
             Limit: 10,
             FromMessageDateTime: null,
-            SearchText: createMessageForSearchCheckBy21ThCommand.Text
-        ), CancellationToken.None);
+            createMessageBy21ThCommand.Text
+        );
         
-        var getMessageListBySearchByBobResult = await MessengerModule.RequestAsync(new GetMessageListBySearchQuery(
-            RequesterId: bob.Value.Id,
-            ChatId: conversation.Value.Id,
+        var getMessageListByAliceResult = 
+            await MessengerModule.RequestAsync(getMessageListByAliceQuery, CancellationToken.None);
+
+        var getMessageListByBobQuery = new GetMessageListBySearchQuery(
+            bob.Value.Id,
+            createConversationResult.Value.Id,
             Limit: 10,
             FromMessageDateTime: null,
-            SearchText: createMessageForSearchCheckBy21ThCommand.Text
-        ), CancellationToken.None);
+            createMessageBy21ThCommand.Text);
+        
+        var getMessageListByBobResult = 
+            await MessengerModule.RequestAsync(getMessageListByBobQuery, CancellationToken.None);
 
-        firstGetMessageListBySearchByAliceResult.Value.Count.Should().Be(1);
-        firstGetMessageListBySearchByAliceResult.Value[0].Id.Should().Be(createMessageForSearchCheckBy21ThResult.Value.Id);
-        firstGetMessageListBySearchByAliceResult.Value[0].Text.Should().Be(createMessageForSearchCheckBy21ThResult.Value.Text);
-        firstGetMessageListBySearchByAliceResult.Value[0].OwnerId.Should().Be(createMessageForSearchCheckBy21ThResult.Value.OwnerId);
+        getMessageListByAliceResult.Value.Count.Should().Be(1);
+        getMessageListByAliceResult.Value[0].Id.Should().Be(createMessageBy21ThResult.Value.Id);
+        getMessageListByAliceResult.Value[0].Text.Should().Be(createMessageBy21ThResult.Value.Text);
+        getMessageListByAliceResult.Value[0].OwnerId.Should().Be(createMessageBy21ThResult.Value.OwnerId);
 
-        getMessageListBySearchByBobResult.Value.Count.Should().Be(1);
-        getMessageListBySearchByBobResult.Value[0].Id.Should().Be(createMessageForSearchCheckBy21ThResult.Value.Id);
-        getMessageListBySearchByBobResult.Value[0].Text.Should().Be(createMessageForSearchCheckBy21ThResult.Value.Text);
-        getMessageListBySearchByBobResult.Value[0].OwnerId.Should().Be(createMessageForSearchCheckBy21ThResult.Value.OwnerId);
+        getMessageListByBobResult.Value.Count.Should().Be(1);
+        getMessageListByBobResult.Value[0].Id.Should().Be(createMessageBy21ThResult.Value.Id);
+        getMessageListByBobResult.Value[0].Text.Should().Be(createMessageBy21ThResult.Value.Text);
+        getMessageListByBobResult.Value[0].OwnerId.Should().Be(createMessageBy21ThResult.Value.OwnerId);
+
+        var delete21ThMessageBy21ThCommand = new DeleteMessageCommand(
+            user21Th.Value.Id,
+            createMessageBy21ThResult.Value.Id,
+            IsDeleteForAll: false); 
         
-        await MessengerModule.RequestAsync(new DeleteMessageCommand(
-            RequesterId: user21Th.Value.Id,
-            MessageId: createMessageForSearchCheckBy21ThResult.Value.Id,
-            IsDeleteForAll: false), CancellationToken.None);
-        
-        var firstGetMessageListBy21ThResult = await MessengerModule.RequestAsync(new GetMessageListQuery(
-            RequesterId: user21Th.Value.Id,
-            ChatId: conversation.Value.Id,
+        await MessengerModule.RequestAsync(delete21ThMessageBy21ThCommand, CancellationToken.None);
+
+        var firstGetMessageListBy21ThQuery = new GetMessageListQuery(
+            user21Th.Value.Id,
+            createConversationResult.Value.Id,
             Limit: 10,
-            FromMessageDateTime: null 
-        ), CancellationToken.None);
+            FromMessageDateTime: null);
         
-        var secondGetMessageListByAliceResult = await MessengerModule.RequestAsync(new GetMessageListQuery(
-            RequesterId: alice.Value.Id,
-            ChatId: conversation.Value.Id,
+        var firstGetMessageListBy21ThResult = 
+            await MessengerModule.RequestAsync(firstGetMessageListBy21ThQuery, CancellationToken.None);
+
+        var secondGetMessageListByAliceQuery = new GetMessageListQuery(
+            alice.Value.Id,
+            createConversationResult.Value.Id,
             Limit: 10,
-            FromMessageDateTime: null 
-        ), CancellationToken.None);
+            FromMessageDateTime: null);
+        
+        var secondGetMessageListByAliceResult = 
+            await MessengerModule.RequestAsync(secondGetMessageListByAliceQuery, CancellationToken.None);
         
         firstGetMessageListBy21ThResult.Value
-            .FirstOrDefault(m => m.Id == createMessageForSearchCheckBy21ThResult.Value.Id).Should().BeNull();
+            .FirstOrDefault(m => m.Id == createMessageBy21ThResult.Value.Id).Should().BeNull();
         secondGetMessageListByAliceResult.Value
-            .FirstOrDefault(m => m.Id == createMessageForSearchCheckBy21ThResult.Value.Id).Should().NotBeNull();
+            .FirstOrDefault(m => m.Id == createMessageBy21ThResult.Value.Id).Should().NotBeNull();
+
+        var deleteAliceMessageByAliceCommand = new DeleteMessageCommand(
+            alice.Value.Id,
+            createMessageByAliceResult.Value.Id,
+            IsDeleteForAll: true);
         
-        await MessengerModule.RequestAsync(new DeleteMessageCommand(
-            RequesterId: alice.Value.Id,
-            MessageId: createMessageForSearchByAliceResult.Value.Id,
-            IsDeleteForAll: true), CancellationToken.None);
-        
-        var secondGetMessageListBy21ThResult = await MessengerModule.RequestAsync(new GetMessageListQuery(
-            RequesterId: user21Th.Value.Id,
-            ChatId: conversation.Value.Id,
+        await MessengerModule.RequestAsync(deleteAliceMessageByAliceCommand, CancellationToken.None);
+
+        var secondGetMessageListBy21ThQuery = new GetMessageListQuery(
+            user21Th.Value.Id,
+            createConversationResult.Value.Id,
             Limit: 10,
-            FromMessageDateTime: null 
-        ), CancellationToken.None);
+            FromMessageDateTime: null);
         
-        var thirdGetMessageListByAliceResult = await MessengerModule.RequestAsync(new GetMessageListQuery(
-            RequesterId: alice.Value.Id,
-            ChatId: conversation.Value.Id,
+        var secondGetMessageListBy21ThResult = 
+            await MessengerModule.RequestAsync(secondGetMessageListBy21ThQuery, CancellationToken.None);
+
+        var thirdGetMessageListByAliceQuery = new GetMessageListQuery(
+            alice.Value.Id,
+            createConversationResult.Value.Id,
             Limit: 10,
-            FromMessageDateTime: null 
-        ), CancellationToken.None);
+            FromMessageDateTime: null);
+        
+        var thirdGetMessageListByAliceResult = 
+            await MessengerModule.RequestAsync(thirdGetMessageListByAliceQuery, CancellationToken.None);
         
         secondGetMessageListBy21ThResult.Value
-            .FirstOrDefault(m => m.Id == createMessageForSearchByAliceResult.Value.Id).Should().BeNull();
+            .FirstOrDefault(m => m.Id == createMessageByAliceResult.Value.Id).Should().BeNull();
         thirdGetMessageListByAliceResult.Value
-            .FirstOrDefault(m => m.Id == createMessageForSearchByAliceResult.Value.Id).Should().BeNull();
+            .FirstOrDefault(m => m.Id == createMessageByAliceResult.Value.Id).Should().BeNull();
     }
 }

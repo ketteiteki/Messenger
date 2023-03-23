@@ -18,17 +18,15 @@ public class GetChannelTestThrowEntityNotFound : IntegrationTestBase, IIntegrati
         var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
         var createChannelCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Channel,
+            ChatType.Channel,
             AvatarFile: null);
 
         await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
 
-        var getChannelByBobQuery = new GetChatQuery(
-            RequesterId: bob.Value.Id,
-            ChatId: new Guid());
+        var getChannelByBobQuery = new GetChatQuery(bob.Value.Id, new Guid());
 
         var getChannelByBobResult = await MessengerModule.RequestAsync(getChannelByBobQuery, CancellationToken.None);
 

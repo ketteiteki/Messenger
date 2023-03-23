@@ -11,8 +11,9 @@ public class GetUserTestThrowEntityNotFound : IntegrationTestBase, IIntegrationT
     [Fact]
     public async Task Test()
     {
-        var getUserResult = await MessengerModule.RequestAsync(new GetUserQuery(
-            UserId: Guid.NewGuid()), CancellationToken.None);
+        var getUserQuery = new GetUserQuery(Guid.NewGuid());
+        
+        var getUserResult = await MessengerModule.RequestAsync(getUserQuery, CancellationToken.None);
 
         getUserResult.Error.Should().BeOfType<DbEntityNotFoundError>();
     }

@@ -1,4 +1,5 @@
-using Messenger.BusinessLogic.Services;
+using Messenger.Application.Interfaces;
+using Messenger.Application.Services;
 using Messenger.Domain.Constants;
 using Messenger.Infrastructure;
 using Messenger.Infrastructure.Configuration;
@@ -19,9 +20,13 @@ public class IntegrationTestBase : IAsyncLifetime
 	
 	private IServiceProvider ServiceProvider { get; }
 
+	protected readonly IBaseDirService BaseDirService = new BaseDirService();
+
+	protected readonly IBlobService BlobService;
+	
 	protected IntegrationTestBase()
 	{
-		var pathAppSettingsDevelopment = BaseDirService.GetPathAppSettingsJson(true);
+		var pathAppSettingsDevelopment = BaseDirService.GetPathAppSettingsJson(isDevelopment: true);
 
 		var configuration = new ConfigurationBuilder()
 			.AddJsonFile(pathAppSettingsDevelopment)
@@ -29,11 +34,18 @@ public class IntegrationTestBase : IAsyncLifetime
 
 		var databaseConnectionString = configuration[AppSettingConstants.DatabaseConnectionStringForIntegrationTests];
 		var signKey = configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
+		
+		var messengerBlobContainerName = configuration[AppSettingConstants.BlobContainer];
+		var messengerBlobAccess = configuration[AppSettingConstants.BlobAccess];
+		var messengerBlobUrl = configuration[AppSettingConstants.BlobUrl];
 
 		MessengerStartup.Initialize(
 			configuration,
 			databaseConnectionString,
-			signKey);
+			signKey,
+			messengerBlobContainerName,
+			messengerBlobAccess,
+			messengerBlobUrl);
 
 		ServiceProvider = MessengerCompositionRoot.Provider;
 
@@ -41,6 +53,9 @@ public class IntegrationTestBase : IAsyncLifetime
 		
 		DatabaseContextFixture = ServiceProvider.GetRequiredService<DatabaseContext>() ??
 		                         throw new InvalidOperationException("DatabaseContext service is not registered in the DI.");
+
+		BlobService = ServiceProvider.GetRequiredService<IBlobService>() ??
+		              throw new InvalidOperationException("BlobService is not registered in the DI.");;
 	}
 
 	public async Task InitializeAsync()

@@ -17,17 +17,17 @@ public class GetChatListBySearchTestSuccess : IntegrationTestBase, IIntegrationT
         var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
         var firstCreateConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
         
         var secondCreateConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty2",
             Title: "qwerty2",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 
         var firstCreateConversationResult =
@@ -35,23 +35,29 @@ public class GetChatListBySearchTestSuccess : IntegrationTestBase, IIntegrationT
         var secondCreateConversationResult = 
             await MessengerModule.RequestAsync(secondCreateConversationCommand, CancellationToken.None);
 
-        var firstGetUserListBySearchByAliceResult = await MessengerModule.RequestAsync(new GetChatListBySearchQuery(
-            RequesterId: alice.Value.Id,
-            SearchText: firstCreateConversationCommand.Name), CancellationToken.None);
+        var firstGetUserListBySearchByAliceQuery =
+            new GetChatListBySearchQuery(alice.Value.Id, firstCreateConversationCommand.Name); 
+        var secondGetUserListBySearchByAliceQuery = 
+            new GetChatListBySearchQuery(alice.Value.Id, secondCreateConversationCommand.Name);
         
-        var secondGetUserListBySearchByAliceResult = await MessengerModule.RequestAsync(new GetChatListBySearchQuery(
-            RequesterId: alice.Value.Id,
-            SearchText: secondCreateConversationCommand.Name), CancellationToken.None);
+        var firstGetUserListBySearchByAliceResult = 
+            await MessengerModule.RequestAsync(firstGetUserListBySearchByAliceQuery, CancellationToken.None);
+        var secondGetUserListBySearchByAliceResult = 
+            await MessengerModule.RequestAsync(secondGetUserListBySearchByAliceQuery, CancellationToken.None);
 
         firstGetUserListBySearchByAliceResult.Value.Count.Should().Be(2);
+        
         firstGetUserListBySearchByAliceResult.Value
             .FirstOrDefault(u => u.Id == firstCreateConversationResult.Value.Id).Should().NotBeNull();
+        
         firstGetUserListBySearchByAliceResult.Value
             .FirstOrDefault(u => u.Id == secondCreateConversationResult.Value.Id).Should().NotBeNull();
         
         secondGetUserListBySearchByAliceResult.Value.Count.Should().Be(1);
+        
         secondGetUserListBySearchByAliceResult.Value
             .FirstOrDefault(u => u.Id == firstCreateConversationResult.Value.Id).Should().BeNull();
+        
         secondGetUserListBySearchByAliceResult.Value
             .FirstOrDefault(u => u.Id == secondCreateConversationResult.Value.Id).Should().NotBeNull();
     }

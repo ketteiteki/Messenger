@@ -1,9 +1,9 @@
 using FluentValidation;
-using Messenger.BusinessLogic.ApiCommands.Conversations;
+using Messenger.BusinessLogic.ApiCommands.Chats;
 
 namespace Messenger.BusinessLogic.Pipelines;
 
-public class UpdateConversationAvatarCommandValidator : AbstractValidator<UpdateConversationAvatarCommand>
+public class UpdateConversationAvatarCommandValidator : AbstractValidator<UpdateChatAvatarCommand>
 {
     public UpdateConversationAvatarCommandValidator()
     {

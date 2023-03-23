@@ -14,15 +14,15 @@ public class UpdateProfileDataTestSuccess : IntegrationTestBase, IIntegrationTes
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var updateProfileCommand = new UpdateProfileDataCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             DisplayName: "qwerty",
             Nickname: "liza",
             Bio: "i love your mom");
         
-        var updatedProfile = await MessengerModule.RequestAsync(updateProfileCommand, CancellationToken.None);
+        var updatedProfileResult = await MessengerModule.RequestAsync(updateProfileCommand, CancellationToken.None);
 
-        updatedProfile.Value.DisplayName.Should().Be(updateProfileCommand.DisplayName);
-        updatedProfile.Value.Nickname.Should().Be(updateProfileCommand.Nickname);
-        updatedProfile.Value.Bio.Should().Be(updateProfileCommand.Bio);
+        updatedProfileResult.Value.DisplayName.Should().Be(updateProfileCommand.DisplayName);
+        updatedProfileResult.Value.Nickname.Should().Be(updateProfileCommand.Nickname);
+        updatedProfileResult.Value.Bio.Should().Be(updateProfileCommand.Bio);
     }
 }

@@ -1,7 +1,6 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Messages;
-using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
@@ -17,47 +16,35 @@ public class CreateMessageWithAttachmentTestSuccess : IntegrationTestBase, IInte
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-        await using var fileStream = new FileStream(Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
-        
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 		
-        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
         var createMessageBy21ThCommand = new CreateMessageCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Text: "qwerty1",
             ReplyToId: null,
-            ChatId: conversation.Value.Id,
-            Files: new FormFileCollection
+            createConversationResult.Value.Id,
+            new FormFileCollection
             {
-                new FormFile(
-                    baseStream: fileStream,
-                    baseStreamOffset: 0,
-                    length: fileStream.Length,
-                    name: "qwerty",
-                    fileName: "qwerty.jpg"),
-                new FormFile(
-                    baseStream: fileStream,
-                    baseStreamOffset: 0,
-                    length: fileStream.Length,
-                    name: "qwerty",
-                    fileName: "qwerty.jpg")
+                FilesHelper.GetFile(),
+                FilesHelper.GetFile()
             });
 
         var createMessageBy21ThResult = await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
 
+        createMessageBy21ThResult.Value.Attachments.Count.Should().Be(2);
+
         foreach (var attachment in createMessageBy21ThResult.Value.Attachments)
         {
-            var pathAvatar = Path.Combine(BaseDirService.GetPathWwwRoot(), attachment.Link.Split("/")[^1]);
+            var avatarFileName = attachment.Link.Split("/")[^1];
         
-            File.Exists(pathAvatar).Should().BeTrue();
-        
-            File.Delete(pathAvatar);
+            await BlobService.DeleteBlobAsync(avatarFileName);
         }
     }
 }

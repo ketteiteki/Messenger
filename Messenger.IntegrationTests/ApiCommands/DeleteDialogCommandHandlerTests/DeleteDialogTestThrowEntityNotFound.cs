@@ -15,16 +15,20 @@ public class DeleteDialogTestThrowEntityNotFound : IntegrationTestBase, IIntegra
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
         var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
         var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
-        
-        var dialog21ThAliceResult = await MessengerModule.RequestAsync(new CreateDialogCommand(
-            RequesterId: user21Th.Value.Id,
-            UserId: alice.Value.Id), CancellationToken.None);
-        
-        var deletedDialog21ThAliceByBobResult = await MessengerModule.RequestAsync(new DeleteDialogCommand(
-            RequesterId: bob.Value.Id,
-            ChatId: dialog21ThAliceResult.Value.Id,
-            IsDeleteForAll: true), CancellationToken.None);
 
-        deletedDialog21ThAliceByBobResult.Error.Should().BeOfType<DbEntityNotFoundError>();
+        var createDialogWithAliceBy21ThCommand = new CreateDialogCommand(user21Th.Value.Id, alice.Value.Id);
+        
+        var createDialogWithAliceBy21ThResult = 
+            await MessengerModule.RequestAsync(createDialogWithAliceBy21ThCommand, CancellationToken.None);
+
+        var deleteDialogWithAliceAnd21ThByBobCommand = new DeleteDialogCommand(
+            bob.Value.Id,
+            createDialogWithAliceBy21ThResult.Value.Id,
+            IsDeleteForAll: true);
+        
+        var deleteDialogWithAliceAnd21ThByBobResult = 
+            await MessengerModule.RequestAsync(deleteDialogWithAliceAnd21ThByBobCommand, CancellationToken.None);
+
+        deleteDialogWithAliceAnd21ThByBobResult.Error.Should().BeOfType<DbEntityNotFoundError>();
     }
 }

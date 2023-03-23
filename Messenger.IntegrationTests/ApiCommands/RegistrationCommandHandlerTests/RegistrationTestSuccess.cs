@@ -11,14 +11,14 @@ public class RegistrationTestSuccess : IntegrationTestBase
 	public async Task Test()
 	{
 		var registrationCommand = new RegistrationCommand(
-			DisplayName: CommandHelper.Registration21ThCommand().DisplayName,
-			Nickname: CommandHelper.Registration21ThCommand().Nickname,
-			Password: CommandHelper.Registration21ThCommand().Password,
+			CommandHelper.Registration21ThCommand().DisplayName,
+			CommandHelper.Registration21ThCommand().Nickname,
+			CommandHelper.Registration21ThCommand().Password,
 			UserAgent: "Mozilla",
 			Ip: "323.432.21.542");
 
-		var registrationHandler = await MessengerModule.RequestAsync(registrationCommand, CancellationToken.None);
+		var registrationResult = await MessengerModule.RequestAsync(registrationCommand, CancellationToken.None);
 
-		registrationHandler.IsSuccess.Should().BeTrue();
+		registrationResult.IsSuccess.Should().BeTrue();
 	}
 }

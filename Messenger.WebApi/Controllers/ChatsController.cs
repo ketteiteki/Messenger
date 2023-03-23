@@ -3,6 +3,7 @@ using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiQueries.Chats;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Models.Requests;
+using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
 using Messenger.Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
@@ -10,16 +11,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Messenger.WebApi.Controllers;
 
-[Route("[controller]")]
+[Route("api/[controller]")]
 [Authorize]
 [ApiController]
 public class ChatsController : ApiControllerBase
 {
 	public ChatsController(IMediator mediator) : base(mediator) {}
 	
-	[ProducesResponseType(typeof(ErrorModel), 404)]
-	[ProducesResponseType(typeof(ChatDto), 200)]
-	[HttpGet("{chatId}")]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
+	[HttpGet("{chatId:guid}")]
 	public async Task<IActionResult> GetChat(Guid chatId, CancellationToken cancellationToken)
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
@@ -31,7 +33,7 @@ public class ChatsController : ApiControllerBase
 		return await RequestAsync(query, cancellationToken);
 	}
 	
-	[ProducesResponseType(typeof(List<ChatDto>), 200)]
+	[ProducesResponseType(typeof(List<ChatDto>), StatusCodes.Status200OK)]
 	[HttpGet]
 	public async Task<IActionResult> GetChatList(CancellationToken cancellationToken)
 	{
@@ -43,7 +45,7 @@ public class ChatsController : ApiControllerBase
 		return await RequestAsync(query, cancellationToken);
 	}
 	
-	[ProducesResponseType(typeof(List<ChatDto>), 200)]
+	[ProducesResponseType(typeof(List<ChatDto>), StatusCodes.Status200OK)]
 	[HttpGet("search")]
 	public async Task<IActionResult> GetChatListBySearch(
 		[FromQuery] string searchText,
@@ -58,10 +60,11 @@ public class ChatsController : ApiControllerBase
 		return await RequestAsync(query, cancellationToken);
 	}
 	
-	[ProducesResponseType(typeof(ErrorModel), 409)]
-	[ProducesResponseType(typeof(ErrorModel), 404)]
-	[ProducesResponseType(typeof(ErrorModel), 403)]
-	[ProducesResponseType(typeof(List<ChatDto>), 200)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
 	[HttpPost("joinToChat")]
 	public async Task<IActionResult> JoinToChat([FromQuery] Guid chatId, CancellationToken cancellationToken)
 	{
@@ -74,10 +77,11 @@ public class ChatsController : ApiControllerBase
 		return await RequestAsync(command, cancellationToken);
 	}
 	
-	[ProducesResponseType(typeof(ErrorModel), 409)]
-	[ProducesResponseType(typeof(ErrorModel), 404)]
-	[ProducesResponseType(typeof(ErrorModel), 403)]
-	[ProducesResponseType(typeof(List<ChatDto>), 200)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
 	[HttpPost("leave")]
 	public async Task<IActionResult> LeaveFromChat([FromQuery] Guid chatId, CancellationToken cancellationToken)
 	{
@@ -90,8 +94,9 @@ public class ChatsController : ApiControllerBase
 		return await RequestAsync(command, cancellationToken);
 	}
 	
-	[ProducesResponseType(typeof(ErrorModel), 409)]
-	[ProducesResponseType(typeof(ChatDto), 200)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
 	[HttpPost("createChat")]
 	public async Task<IActionResult> CreateChat([FromForm] CreateChatRequest request, CancellationToken cancellationToken)
 	{
@@ -107,9 +112,46 @@ public class ChatsController : ApiControllerBase
 		return await RequestAsync(command, cancellationToken);
 	}
 	
-	[ProducesResponseType(typeof(ErrorModel), 404)]
-	[ProducesResponseType(typeof(ErrorModel), 401)]
-	[ProducesResponseType(typeof(ChatDto), 200)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
+	[HttpPut("updateChatData")]
+	public async Task<IActionResult> UpdateChatData([FromBody] UpdateChatDataRequest request, CancellationToken cancellationToken)
+	{
+		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
+		
+		var command = new UpdateChatDataCommand(
+			RequesterId: requesterId,
+			ChatId: request.ChatId,
+			Name: request.Name,
+			Title: request.Title);
+
+		return await RequestAsync(command, cancellationToken);
+	}
+	
+	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
+	[HttpPut("updateChatAvatar")]
+	public async Task<IActionResult> UpdateChatAvatar([FromForm] UpdateChatAvatarRequest request, CancellationToken cancellationToken)
+	{
+		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
+		
+		var command = new UpdateChatAvatarCommand(
+			RequesterId: requesterId,
+			ChatId: request.ChatId,
+			AvatarFile: request.AvatarFile);
+
+		return await RequestAsync(command, cancellationToken);
+	}
+	
+	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
+	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
 	[HttpDelete("deleteChat")]
 	public async Task<IActionResult> DeleteChat([FromQuery] Guid chatId, CancellationToken cancellationToken)
 	{

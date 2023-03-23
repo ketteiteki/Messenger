@@ -17,26 +17,22 @@ public class JoinToChatTestThrowDbEntityExists : IntegrationTestBase, IIntegrati
         var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 
-        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 		
-        var firstJoinToConversationCommand = new JoinToChatCommand(
-            RequesterId: alice.Value.Id,
-            ChatId: conversation.Value.Id);
+        var firstAliceJoinToConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
 
-        await MessengerModule.RequestAsync(firstJoinToConversationCommand, CancellationToken.None);
+        await MessengerModule.RequestAsync(firstAliceJoinToConversationCommand, CancellationToken.None);
 
-        var secondJoinToConversationCommand = new JoinToChatCommand(
-            RequesterId: alice.Value.Id,
-            ChatId: conversation.Value.Id);
+        var secondAliceJoinToConversationCommand = new JoinToChatCommand(alice.Value.Id,createConversationResult.Value.Id);
 
         var secondJoinToConversationResult = 
-            await MessengerModule.RequestAsync(secondJoinToConversationCommand, CancellationToken.None);
+            await MessengerModule.RequestAsync(secondAliceJoinToConversationCommand, CancellationToken.None);
 
         secondJoinToConversationResult.Error.Should().BeOfType<DbEntityExistsError>();
     }

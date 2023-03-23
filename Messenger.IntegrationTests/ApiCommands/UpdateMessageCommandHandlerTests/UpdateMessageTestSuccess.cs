@@ -17,33 +17,35 @@ public class UpdateMessageTestSuccess : IntegrationTestBase, IIntegrationTest
         var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
         
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 
-        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+
+        var aliceJoinConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
         
-        await MessengerModule.RequestAsync(new JoinToChatCommand(
-            RequesterId: alice.Value.Id,
-            ChatId: conversation.Value.Id), CancellationToken.None);
-        
-        var createdMessageBy21ThResult = await MessengerModule.RequestAsync(new CreateMessageCommand(
-            RequesterId: user21Th.Value.Id,
+        await MessengerModule.RequestAsync(aliceJoinConversationCommand, CancellationToken.None);
+
+        var createMessageBy21ThCommand = new CreateMessageCommand(
+            user21Th.Value.Id,
             Text: "qwerty2",
             ReplyToId: null,
-            ChatId: conversation.Value.Id,
-            Files: null), CancellationToken.None);
+            createConversationResult.Value.Id,
+            Files: null);
+        
+        var createdMessageBy21ThResult = await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
 
         var updateMessageBy21ThCommand = new UpdateMessageCommand(
-            RequesterId: user21Th.Value.Id,
-            MessageId: createdMessageBy21ThResult.Value.Id,
+            user21Th.Value.Id,
+            createdMessageBy21ThResult.Value.Id,
             Text: "hello bro");
         
         var updateMessageByAliceCommand = new UpdateMessageCommand(
-            RequesterId: alice.Value.Id,
-            MessageId: createdMessageBy21ThResult.Value.Id,
+            alice.Value.Id,
+            createdMessageBy21ThResult.Value.Id,
             Text: "hello bro2232");
         
         var updateMessageBy21ThResult =
@@ -53,7 +55,6 @@ public class UpdateMessageTestSuccess : IntegrationTestBase, IIntegrationTest
             await MessengerModule.RequestAsync(updateMessageByAliceCommand, CancellationToken.None);
 
         updateMessageBy21ThResult.Value.Text.Should().Be(updateMessageBy21ThCommand.Text);
-
         updateMessageByAliceResult.IsSuccess.Should().BeFalse();
     }
 }

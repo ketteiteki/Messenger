@@ -20,39 +20,34 @@ public class BanUserInConversationTestThrowForbidden : IntegrationTestBase, IInt
         var alex = await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 		
-        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+
+        var userAliceJoinToConversation = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
+        var userAlexJoinToConversation = new JoinToChatCommand(alex.Value.Id, createConversationResult.Value.Id);
         
-        await MessengerModule.RequestAsync(
-            new JoinToChatCommand(
-                RequesterId: alice.Value.Id,
-                ChatId: conversation.Value.Id), CancellationToken.None);
-        
-        await MessengerModule.RequestAsync(
-            new JoinToChatCommand(
-                RequesterId: alex.Value.Id,
-                ChatId: conversation.Value.Id), CancellationToken.None);
+        await MessengerModule.RequestAsync(userAliceJoinToConversation, CancellationToken.None);
+        await MessengerModule.RequestAsync(userAlexJoinToConversation, CancellationToken.None);
 
         var banUserAliceInConversationByBobCommand = new BanUserInConversationCommand(
-            RequesterId: bob.Value.Id,
-            ChatId: conversation.Value.Id,
-            UserId: alice.Value.Id,
-            BanDateOfExpire: DateTime.UtcNow.AddDays(2));
-
-        var banUserAliceInConversationByBobResult =
-            await MessengerModule.RequestAsync(banUserAliceInConversationByBobCommand, CancellationToken.None);
+            bob.Value.Id,
+            createConversationResult.Value.Id,
+            alice.Value.Id,
+            BanMinutes: 15);
         
         var banUserAlexInConversationByAliceCommand = new BanUserInConversationCommand(
-            RequesterId: bob.Value.Id,
-            ChatId: conversation.Value.Id,
-            UserId: alice.Value.Id,
-            BanDateOfExpire: DateTime.UtcNow.AddDays(2));
-
+            bob.Value.Id,
+            createConversationResult.Value.Id,
+            alice.Value.Id,
+            BanMinutes: 15);
+        
+        var banUserAliceInConversationByBobResult =
+            await MessengerModule.RequestAsync(banUserAliceInConversationByBobCommand, CancellationToken.None);
         var banUserAlexInConversationByAliceResult =
             await MessengerModule.RequestAsync(banUserAlexInConversationByAliceCommand, CancellationToken.None);
 

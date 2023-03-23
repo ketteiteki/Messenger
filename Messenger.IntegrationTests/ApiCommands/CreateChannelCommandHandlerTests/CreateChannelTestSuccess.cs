@@ -15,16 +15,16 @@ public class CreateChannelTestSuccess : IntegrationTestBase, IIntegrationTest
 		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		
 		var createChannelCommand = new CreateChatCommand(
-			RequesterId: user21Th.Value.Id,
+			user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
-			Type: ChatType.Channel,
+			ChatType.Channel,
 			AvatarFile: null);
 		
-		var channel = await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
+		var createChannelResult = await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
 
-		channel.IsSuccess.Should().BeTrue();
-		channel.Value.IsOwner.Should().BeTrue();
-		channel.Value.IsMember.Should().BeTrue();
+		createChannelResult.IsSuccess.Should().BeTrue();
+		createChannelResult.Value.IsOwner.Should().BeTrue();
+		createChannelResult.Value.IsMember.Should().BeTrue();
 	}
 }

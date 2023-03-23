@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Chats;
-using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
@@ -32,17 +31,10 @@ public class UpdateConversationAvatarTestThrowForbidden : IntegrationTestBase, I
 			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id), CancellationToken.None);
 		
-		await using var fileStream = new FileStream(Path.Combine(AppContext.BaseDirectory, "../../../Files/img1.jpg"), FileMode.Open);
-		
-		var updateAvatarConversationByAliceCommand =new UpdateConversationAvatarCommand(
+		var updateAvatarConversationByAliceCommand =new UpdateChatAvatarCommand(
 			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id,
-			AvatarFile: new FormFile(
-				baseStream: fileStream,
-				baseStreamOffset: 0,
-				length: fileStream.Length,
-				name: "qwerty",
-				fileName: "qwerty.jpg"));
+			AvatarFile: FilesHelper.GetFile());
 
 		var updateAvatarConversationByAliceResult = 
 			await MessengerModule.RequestAsync(updateAvatarConversationByAliceCommand, CancellationToken.None);

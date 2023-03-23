@@ -1,0 +1,102 @@
+@import "../../App.scss";
+
+.registration {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.background {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background-color: #0984f9;
+  z-index: 1;
+}
+
+.registrationContainer {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  width: calc(100% - 25px);
+  height: calc(100vh - 25px);
+  border-radius: 20px;
+  z-index: 2;
+  background-color: white;
+}
+
+.registrationData {
+  display: flex;
+  width: 250px;
+  flex-direction: column;
+  margin: auto;
+
+  p {
+    text-align: center;
+    color: $grey-font-page;
+    font-size: 18px;
+    margin-bottom: 5px;
+  }
+}
+
+.inputDisplayName {
+  width: 100%;
+  text-align: center;
+  border: none;
+  font-size: 18px;
+  outline: none;
+  border-bottom: 1px solid $grey-font-page;
+  margin-bottom: 15px;
+}
+
+.inputNickname {
+  width: 100%;
+  text-align: center;
+  border: none;
+  font-size: 18px;
+  outline: none;
+  border-bottom: 1px solid $grey-font-page;
+  margin-bottom: 15px;
+}
+
+.inputPassword {
+  width: 100%;
+  border: none;
+  text-align: center;
+  font-size: 18px;
+  outline: none;
+  border-bottom: 1px solid $grey-font-page;
+  margin-bottom: 15px;
+}
+
+.registrationButton {
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: $blue;
+  border-radius: 3px;
+  background-color: inherit;
+  transition: .1s;
+  margin-bottom: 10px;
+
+  &:hover {
+    color: $blueHover;
+  }
+}
+
+
+.loginPage {
+  text-align: center;
+  color: $grey-font-page;
+  font-size: 14px;
+}
+
+.loginPageLink {
+  color: $blue;
+  text-decoration: none;
+  transition: .1s;
+
+  &:hover {
+    color: $blueHover;
+  }
+}

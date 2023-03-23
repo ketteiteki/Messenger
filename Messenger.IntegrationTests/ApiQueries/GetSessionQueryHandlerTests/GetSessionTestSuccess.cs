@@ -14,19 +14,22 @@ public class GetSessionTestSuccess : IntegrationTestBase, IIntegrationTest
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-        var loginResult = await MessengerModule.RequestAsync(new LoginCommand(
-            Nickname: CommandHelper.Registration21ThCommand().Nickname,
-            Password: CommandHelper.Registration21ThCommand().Password,
-            Ip: CommandHelper.Registration21ThCommand().Ip,
-            UserAgent: CommandHelper.Registration21ThCommand().UserAgent), CancellationToken.None);
+        var loginCommand = new LoginCommand(
+            CommandHelper.Registration21ThCommand().Nickname,
+            CommandHelper.Registration21ThCommand().Password,
+            CommandHelper.Registration21ThCommand().Ip,
+            CommandHelper.Registration21ThCommand().UserAgent);
 
-        var getSessionByRegistrationResult = await MessengerModule.RequestAsync(new GetSessionQuery(
-            RequesterId: user21Th.Value.Id,
-            AccessToken: user21Th.Value.AccessToken), CancellationToken.None);
+        var loginResult = await MessengerModule.RequestAsync(loginCommand, CancellationToken.None);
+
+        var getSessionByRegistrationQuery = new GetSessionQuery(user21Th.Value.Id, user21Th.Value.AccessToken);
         
-        var getSessionByLoginResult = await MessengerModule.RequestAsync(new GetSessionQuery(
-            RequesterId: user21Th.Value.Id,
-            AccessToken: loginResult.Value.AccessToken), CancellationToken.None);
+        var getSessionByRegistrationResult = 
+            await MessengerModule.RequestAsync(getSessionByRegistrationQuery, CancellationToken.None);
+
+        var getSessionByLoginQuery = new GetSessionQuery(user21Th.Value.Id, loginResult.Value.AccessToken);
+        
+        var getSessionByLoginResult = await MessengerModule.RequestAsync(getSessionByLoginQuery, CancellationToken.None);
 
         getSessionByRegistrationResult.Value.Id.Should().NotBe(getSessionByLoginResult.Value.Id);
     }

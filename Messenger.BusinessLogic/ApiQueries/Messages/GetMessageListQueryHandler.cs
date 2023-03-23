@@ -23,9 +23,9 @@ public class GetMessageListQueryHandler : IRequestHandler<GetMessageListQuery, R
 		}
 		
 		var banUserByChat = await _context.BanUserByChats
-			.FirstOrDefaultAsync(b => b.UserId == request.RequesterId && b.ChatId == request.ChatId, cancellationToken);
+			.AnyAsync(b => b.UserId == request.RequesterId && b.ChatId == request.ChatId, cancellationToken);
 
-		if (banUserByChat != null)
+		if (banUserByChat)
 		{
 			return new Result<List<MessageDto>>(new ForbiddenError("You are banned"));
 		}
@@ -39,7 +39,7 @@ public class GetMessageListQueryHandler : IRequestHandler<GetMessageListQuery, R
 							equals new { x1 = deletedMessageByUsers.UserId, x2 = deletedMessageByUsers.MessageId }
 							into deletedMessageByUsersEnumerable
 						from deletedMessageByUsersItem in deletedMessageByUsersEnumerable.DefaultIfEmpty()
-						orderby message.DateOfCreate
+						orderby message.DateOfCreate descending
 						where deletedMessageByUsersItem == null
 						where message.ChatId == request.ChatId
 						where message.DateOfCreate < request.FromMessageDateTime
@@ -72,7 +72,7 @@ public class GetMessageListQueryHandler : IRequestHandler<GetMessageListQuery, R
 						equals new { x1 = deletedMessageByUsers.UserId, x2 = deletedMessageByUsers.MessageId }
 						into deletedMessageByUsersEnumerable
 					from deletedMessageByUsersItem in deletedMessageByUsersEnumerable.DefaultIfEmpty()
-					orderby message.DateOfCreate
+					orderby message.DateOfCreate descending
 					where deletedMessageByUsersItem == null
 					where message.ChatId == request.ChatId
 					select new MessageDto

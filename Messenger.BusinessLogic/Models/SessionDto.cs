@@ -12,7 +12,7 @@ public class SessionDto
     
     public DateTime CreateAt { get; set; }
 
-    public SessionDto(Session session)
+    public SessionDto(SessionEntity session)
     {
         Id = session.Id;
         Ip = session.Ip;

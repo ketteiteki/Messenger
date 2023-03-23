@@ -18,28 +18,30 @@ public class UpdateMessageTestSuccessThrowForbidden : IntegrationTestBase, IInte
         var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
         
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 
-        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+
+        var bobJoinChatCommand = new JoinToChatCommand(bob.Value.Id, createConversationResult.Value.Id);
         
-        await MessengerModule.RequestAsync(new JoinToChatCommand(
-            RequesterId: bob.Value.Id,
-            ChatId: conversation.Value.Id), CancellationToken.None);
-        
-        var createdMessageBy21ThResult = await MessengerModule.RequestAsync(new CreateMessageCommand(
-            RequesterId: user21Th.Value.Id,
+        await MessengerModule.RequestAsync(bobJoinChatCommand, CancellationToken.None);
+
+        var createMessageBy21ThCommand = new CreateMessageCommand(
+            user21Th.Value.Id,
             Text: "qwerty2",
             ReplyToId: null,
-            ChatId: conversation.Value.Id,
-            Files: null), CancellationToken.None);
+            createConversationResult.Value.Id,
+            Files: null);
+        
+        var createdMessageBy21ThResult = await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
 
         var updateMessage21ThByBobCommand = new UpdateMessageCommand(
-            RequesterId: bob.Value.Id,
-            MessageId: createdMessageBy21ThResult.Value.Id,
+            bob.Value.Id,
+            createdMessageBy21ThResult.Value.Id,
             Text: "hello bro23");
         
         var updateMessageByBobResult = 

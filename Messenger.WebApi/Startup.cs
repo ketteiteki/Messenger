@@ -1,6 +1,9 @@
+using Messenger.BusinessLogic.Hubs;
 using Messenger.Domain.Constants;
 using Messenger.Infrastructure.DependencyInjection;
 using Messenger.Infrastructure.Middlewares;
+using Messenger.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.WebApi;
 
@@ -21,16 +24,24 @@ public class Startup
         var databaseConnectionString = _configuration[AppSettingConstants.DatabaseConnectionString];
         var signKey = _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
         var allowOrigins = _configuration[AppSettingConstants.AllowedHosts];
+        
+        var messengerBlobContainerName = _configuration[AppSettingConstants.BlobContainer];
+        var messengerBlobAccess = _configuration[AppSettingConstants.BlobAccess];
+        var messengerBlobUrl = _configuration[AppSettingConstants.BlobUrl];
 
         serviceCollection.AddDatabaseServices(databaseConnectionString);
 
         serviceCollection.AddInfrastructureServices(signKey);
 
-        serviceCollection.AddMessengerServices();
+        serviceCollection.AddMessengerServices(messengerBlobContainerName, messengerBlobAccess, messengerBlobUrl);
         
         serviceCollection.ConfigureCors(CorsPolicyName, allowOrigins);
 
         serviceCollection.AddSwagger();
+
+        var databaseContext = serviceCollection.BuildServiceProvider().GetService<DatabaseContext>();
+        
+        databaseContext?.Database.Migrate();
     }
 
     public void Configure(IApplicationBuilder applicationBuilder, IHostEnvironment environment)
@@ -57,7 +68,11 @@ public class Startup
         applicationBuilder.UseAuthorization();
         
         applicationBuilder.UseMiddleware<ValidationMiddleware>();
-
-        applicationBuilder.UseEndpoints(options => { options.MapControllers(); });
+        
+        applicationBuilder.UseEndpoints(options =>
+        {
+            options.MapHub<ChatHub>("/notification").RequireCors(CorsPolicyName);
+            options.MapControllers();
+        });
     }
 }

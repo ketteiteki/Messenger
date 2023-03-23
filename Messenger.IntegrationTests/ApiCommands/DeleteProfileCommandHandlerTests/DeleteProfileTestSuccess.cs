@@ -15,15 +15,18 @@ public class DeleteProfileTestSuccess : IntegrationTestBase, IIntegrationTest
     {
         var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-        await MessengerModule.RequestAsync(new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+        var createConversationCommand = new CreateChatCommand(
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
-            AvatarFile: null), CancellationToken.None);
+            ChatType.Conversation,
+            AvatarFile: null);
         
-        var deletedProfile = await MessengerModule.RequestAsync(new DeleteProfileCommand(
-            RequesterId: user21Th.Value.Id), CancellationToken.None);
+        await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+
+        var deleteProfileCommand = new DeleteProfileCommand(user21Th.Value.Id);
+        
+        var deletedProfile = await MessengerModule.RequestAsync(deleteProfileCommand, CancellationToken.None);
 
         deletedProfile.IsSuccess.Should().BeTrue();
     }

@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Chats;
+using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.BusinessLogic.ApiQueries.Chats;
 using Messenger.Domain.Enum;
 using Messenger.IntegrationTests.Abstraction;
@@ -18,30 +19,34 @@ public class GetConversationTestSuccess : IntegrationTestBase, IIntegrationTest
 		var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 		
 		var createConversationCommand = new CreateChatCommand(
-			RequesterId: user21Th.Value.Id,
+			user21Th.Value.Id,
 			Name: "qwerty",
 			Title: "qwerty",
-			Type: ChatType.Conversation,
+			ChatType.Conversation,
 			AvatarFile: null);
 
-		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
-		
-		await MessengerModule.RequestAsync(
-			new JoinToChatCommand(
-				RequesterId: alice.Value.Id,
-				ChatId: conversation.Value.Id), CancellationToken.None);
+		var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-		var getChatBy21ThQuery = new GetChatQuery(
-			RequesterId: user21Th.Value.Id,
-			ChatId: conversation.Value.Id);
-
-		var getChatByAliceQuery = new GetChatQuery(
-			RequesterId: alice.Value.Id,
-			ChatId: conversation.Value.Id);
+		var aliceJoinConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
 		
-		var getChatByBobQuery =new GetChatQuery(
-			RequesterId: bob.Value.Id,
-			ChatId: conversation.Value.Id);
+		await MessengerModule.RequestAsync(aliceJoinConversationCommand, CancellationToken.None);
+
+		var createAliceRoleBy21ThCommand = new CreateOrUpdateRoleUserInConversationCommand(
+			user21Th.Value.Id,
+			createConversationResult.Value.Id,
+			alice.Value.Id,
+			RoleTitle: "aliceRole",
+			RoleColor.Blue,
+			CanBanUser: false,
+			CanChangeChatData: false,
+			CanAddAndRemoveUserToConversation: false,
+			CanGivePermissionToUser: false);
+
+		await MessengerModule.RequestAsync(createAliceRoleBy21ThCommand, CancellationToken.None);
+		
+		var getChatBy21ThQuery = new GetChatQuery(user21Th.Value.Id, createConversationResult.Value.Id);
+		var getChatByAliceQuery = new GetChatQuery(alice.Value.Id, createConversationResult.Value.Id);
+		var getChatByBobQuery =new GetChatQuery(bob.Value.Id, createConversationResult.Value.Id);
 		
 		var getChatBy21ThResult = await MessengerModule.RequestAsync(getChatBy21ThQuery, CancellationToken.None);
 		var getChatByAliceResult = await MessengerModule.RequestAsync(getChatByAliceQuery, CancellationToken.None);
@@ -51,6 +56,19 @@ public class GetConversationTestSuccess : IntegrationTestBase, IIntegrationTest
 		getChatBy21ThResult.Value.IsMember.Should().BeTrue();
 		getChatBy21ThResult.Value.MembersCount.Should().Be(2);
 		
+		getChatBy21ThResult.Value.UsersWithRole[0].UserId.Should().Be(alice.Value.Id);
+		getChatBy21ThResult.Value.UsersWithRole[0].ChatId.Should().Be(createConversationResult.Value.Id);
+		getChatBy21ThResult.Value.UsersWithRole[0].RoleTitle.Should().Be(createAliceRoleBy21ThCommand.RoleTitle);
+		getChatBy21ThResult.Value.UsersWithRole[0].RoleColor.Should().Be(createAliceRoleBy21ThCommand.RoleColor);
+		getChatBy21ThResult.Value.UsersWithRole[0].CanBanUser.Should().Be(createAliceRoleBy21ThCommand.CanBanUser);
+		
+		getChatBy21ThResult.Value.UsersWithRole[0].CanChangeChatData.Should()
+			.Be(createAliceRoleBy21ThCommand.CanChangeChatData);
+		getChatBy21ThResult.Value.UsersWithRole[0].CanGivePermissionToUser.Should()
+			.Be(createAliceRoleBy21ThCommand.CanGivePermissionToUser);
+		getChatBy21ThResult.Value.UsersWithRole[0].CanAddAndRemoveUserToConversation.Should()
+			.Be(createAliceRoleBy21ThCommand.CanAddAndRemoveUserToConversation);
+
 		getChatByAliceResult.Value.IsOwner.Should().BeFalse();
 		getChatByAliceResult.Value.IsMember.Should().BeTrue();
 		

@@ -17,32 +17,33 @@ public class CreateMessageTestSuccess : IntegrationTestBase, IIntegrationTest
         var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Name: "qwerty",
             Title: "qwerty",
-            Type: ChatType.Conversation,
+            ChatType.Conversation,
             AvatarFile: null);
 		
-        var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
 
-        await MessengerModule.RequestAsync(new JoinToChatCommand(
-            RequesterId: alice.Value.Id,
-            ChatId: conversation.Value.Id), CancellationToken.None);
+        var userAliceJoinToConversationCommand =
+            new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
+        
+        await MessengerModule.RequestAsync(userAliceJoinToConversationCommand, CancellationToken.None);
 
         var createMessageBy21ThCommand = new CreateMessageCommand(
-            RequesterId: user21Th.Value.Id,
+            user21Th.Value.Id,
             Text: "qwerty1",
             ReplyToId: null,
-            ChatId: conversation.Value.Id,
+            createConversationResult.Value.Id,
             Files: null);
 
         var createMessageBy21ThResult = await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
         
         var createMessageByAliceCommand = new CreateMessageCommand(
-            RequesterId: alice.Value.Id,
+            alice.Value.Id,
             Text: "qwerty2",
-            ReplyToId: createMessageBy21ThResult.Value.Id,
-            ChatId: conversation.Value.Id,
+            createMessageBy21ThResult.Value.Id,
+            createConversationResult.Value.Id,
             Files: null);
 
         var createMessageByAliceResult = await MessengerModule.RequestAsync(createMessageByAliceCommand , CancellationToken.None);

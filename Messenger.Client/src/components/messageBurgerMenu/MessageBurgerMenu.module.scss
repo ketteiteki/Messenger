@@ -1,0 +1,70 @@
+@import "../../App.scss";
+
+
+.messageBurgerMenu {
+  display: flex;
+  width: 110px;
+  flex-direction: column;
+  position: absolute;
+  z-index: 2;
+  border-radius: 5px;
+
+  box-shadow: 0px 0px 5px $grey;
+}
+
+.deleteMessageButton {
+  display: flex;
+  border: none;
+  width: 100%;
+  height: 32px;
+  font-size: 15px;
+  background-color: white;
+  transition: .1s;
+  cursor: pointer;
+
+  p {
+    margin: auto;
+  }
+
+  &:hover {
+    background-color: $light-grey;
+  }
+}
+
+.updateMessageButton {
+  display: flex;
+  border: none;
+  width: 100%;
+  height: 32px;
+  font-size: 15px;
+  background-color: white;
+  transition: .1s;
+  cursor: pointer;
+
+  p {
+    margin: auto;
+  }
+
+  &:hover {
+    background-color: $light-grey;
+  }
+}
+
+.replyMessageButton {
+  display: flex;
+  border: none;
+  width: 100%;
+  height: 32px;
+  font-size: 15px;
+  background-color: white;
+  transition: .1s;
+  cursor: pointer;
+
+  p {
+    margin: auto;
+  }
+
+  &:hover {
+    background-color: $light-grey;
+  }
+}

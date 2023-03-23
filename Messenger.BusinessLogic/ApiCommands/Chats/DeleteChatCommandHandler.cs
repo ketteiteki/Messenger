@@ -2,7 +2,6 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Enum;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
@@ -12,17 +11,21 @@ namespace Messenger.BusinessLogic.ApiCommands.Chats;
 public class DeleteChatCommandHandler : IRequestHandler<DeleteChatCommand, Result<ChatDto>>
 {
     private readonly DatabaseContext _context;
-    private readonly IFileService _fileService;
+    private readonly IBlobService _blobService; 
 	
-    public DeleteChatCommandHandler(DatabaseContext context, IFileService fileService)
+    public DeleteChatCommandHandler(
+        DatabaseContext context,
+        IBlobService blobService)
     {
         _context = context;
-        _fileService = fileService;
+        _blobService = blobService;
     }
 	
     public async Task<Result<ChatDto>> Handle(DeleteChatCommand request, CancellationToken cancellationToken)
     {
-        var chat = await _context.Chats.FirstOrDefaultAsync(c => c.Id == request.ChatId, CancellationToken.None);
+        var chat = await _context.Chats
+            .Include(c => c.LastMessage)
+            .FirstOrDefaultAsync(c => c.Id == request.ChatId, CancellationToken.None);
 
         if (chat == null)
         {
@@ -41,19 +44,28 @@ public class DeleteChatCommandHandler : IRequestHandler<DeleteChatCommand, Resul
 
         if (chat.AvatarLink != null)
         {
-            _fileService.DeleteFile(Path.Combine(BaseDirService.GetPathWwwRoot(), chat.AvatarLink.Split("/")[^1]));
+            var avatarFileName = chat.AvatarLink.Split("/")[^1];
+
+            await _blobService.DeleteBlobAsync(avatarFileName);
         }
 		
         _context.Chats.Remove(chat);
+        
         await _context.SaveChangesAsync(cancellationToken);
 
-        return new Result<ChatDto>(
-            new ChatDto
-            {
-                Id = chat.Id,
-                Name = chat.Name,
-                Title = chat.Title,
-                Type = chat.Type
-            });
+        var chatDto = new ChatDto
+        {
+            Id = chat.Id,
+            Name = chat.Name,
+            Title = chat.Title,
+            Type = chat.Type,
+            LastMessageId = chat.LastMessageId,
+            LastMessageText = chat.LastMessage?.Text,
+            LastMessageAuthorDisplayName =
+                chat.LastMessage is { Owner: { } } ? chat.LastMessage.Owner.DisplayName : null,
+            LastMessageDateOfCreate = chat.LastMessage?.DateOfCreate,
+        };
+        
+        return new Result<ChatDto>(chatDto);
     }
 }
