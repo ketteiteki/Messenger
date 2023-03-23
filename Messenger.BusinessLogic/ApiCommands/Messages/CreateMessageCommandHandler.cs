@@ -16,15 +16,18 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 	private readonly DatabaseContext _context;
 	private readonly IBlobService _blobService;
+	private readonly IBlobServiceSettings _blobServiceSettings;
 
 	public CreateMessageCommandHandler(
 		DatabaseContext context,
 		IHubContext<ChatHub, IChatHub> hubContext, 
-		IBlobService blobService)
+		IBlobService blobService,
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
 		_hubContext = hubContext;
 		_blobService = blobService;
+		_blobServiceSettings = blobServiceSettings;
 	}
 	
 	public async Task<Result<MessageDto>> Handle(CreateMessageCommand request, CancellationToken cancellationToken)
@@ -91,14 +94,13 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
         			
 			foreach (var file in request.Files)
 			{
-				var fileLink =await _blobService.UploadFileBlobAsync(file);
-			
+				var attachmentFileName = await _blobService.UploadFileBlobAsync(file);
+
 				var attachment = new AttachmentEntity(
-					file.FileName,
-					size: file.Length,
-					fileLink,
+					attachmentFileName,
+					file.Length,
 					newMessage.Id);
-        				
+				
 				attachments.Add(attachment);
 			}
         			
@@ -120,7 +122,7 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 		{
 			await _context.Entry(newMessage.ReplyToMessage).Reference(r => r.Owner).LoadAsync(cancellationToken);
 		}
-        
+		
 		var messageDto = new MessageDto
 		{
 			Id = newMessage.Id,
@@ -128,13 +130,20 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 			IsEdit = false,
 			OwnerId = newMessage.OwnerId,
 			OwnerDisplayName = newMessage.Owner?.DisplayName,
-			OwnerAvatarLink = newMessage.Owner?.AvatarLink,
+			OwnerAvatarLink = newMessage.Owner?.AvatarFileName != null ? 
+				$"{_blobServiceSettings.MessengerBlobAccess}/{newMessage.Owner.AvatarFileName}" 
+				: null,
 			ReplyToMessageId = newMessage.ReplyToMessageId,
 			ReplyToMessageText = newMessage.ReplyToMessage?.Text,
 			ReplyToMessageAuthorDisplayName = newMessage.ReplyToMessage?.Owner?.DisplayName,
 			ChatId = newMessage.ChatId,
 			DateOfCreate = newMessage.DateOfCreate,
-			Attachments = newMessage.Attachments.Select(a => new AttachmentDto(a)).ToList()
+			Attachments = newMessage.Attachments
+				.Select(a => new AttachmentDto(
+					a.Id, 
+					$"{_blobServiceSettings.MessengerBlobAccess}/{a.FileName}", 
+					a.Size))
+				.ToList()
 		};
         			
 		await _hubContext.Clients.Group(request.ChatId.ToString()).BroadcastMessageAsync(messageDto);

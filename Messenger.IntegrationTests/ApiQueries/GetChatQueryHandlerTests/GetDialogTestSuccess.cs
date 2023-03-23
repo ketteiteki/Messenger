@@ -25,7 +25,7 @@ public class GetDialogTestSuccess : IntegrationTestBase, IIntegrationTest
 
         getDialogResult.Value.MembersCount.Should().Be(2);
         getDialogResult.Value.Members.Count.Should().Be(2);
-        getDialogResult.Value.Members.First(m => m.Id == user21Th.Value.Id).Nickname.Should().Be(user21Th.Value.NickName);
-        getDialogResult.Value.Members.First(m => m.Id == alice.Value.Id).Nickname.Should().Be(alice.Value.NickName);
+        getDialogResult.Value.Members.First(m => m.Id == user21Th.Value.Id).Nickname.Should().Be(user21Th.Value.Nickname);
+        getDialogResult.Value.Members.First(m => m.Id == alice.Value.Id).Nickname.Should().Be(alice.Value.Nickname);
     }
 }

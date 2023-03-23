@@ -14,7 +14,7 @@ public class UserEntity : IBaseEntity
 	
 	public string Bio { get; set; }
 
-	public string AvatarLink { get; set; }
+	public string AvatarFileName { get; set; }
 	
 	public string PasswordHash { get; set; }
 
@@ -34,12 +34,12 @@ public class UserEntity : IBaseEntity
 
 	public List<SessionEntity> Sessions { get; set; } = new();
 
-	public UserEntity(string displayName, string nickname, string bio, string avatarLink, string passwordHash, string passwordSalt)
+	public UserEntity(string displayName, string nickname, string bio, string avatarFileName, string passwordHash, string passwordSalt)
 	{
 		DisplayName = displayName;
 		Nickname = nickname;
 		Bio = bio;
-		AvatarLink = avatarLink;
+		AvatarFileName = avatarFileName;
 		PasswordHash = passwordHash;
 		PasswordSalt = passwordSalt;
 		
@@ -64,9 +64,9 @@ public class UserEntity : IBaseEntity
 		new UserEntityValidator().ValidateAndThrow(this);
 	}
 	
-	public void UpdateAvatarLink(string avatarLink)
+	public void UpdateAvatarFileName(string avatarFileName)
 	{
-		AvatarLink = avatarLink;
+		AvatarFileName = avatarFileName;
 		new UserEntityValidator().ValidateAndThrow(this);
 	}
 }

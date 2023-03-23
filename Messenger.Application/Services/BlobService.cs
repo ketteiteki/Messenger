@@ -36,7 +36,7 @@ public class BlobService : IBlobService
             var headers = new BlobHttpHeaders { ContentType = file.ContentType };
             await client.UploadAsync(stream, headers);
 
-            return client.Uri.AbsoluteUri;
+            return client.Name;
         }
     }
 

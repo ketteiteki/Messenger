@@ -1,4 +1,3 @@
-using Messenger.Domain.Entities;
 
 namespace Messenger.BusinessLogic.Models.Responses;
 
@@ -12,20 +11,27 @@ public class AuthorizationResponse
 	
 	public string DisplayName { get; set; }
 	
-	public string NickName { get; set; } 
+	public string Nickname { get; set; } 
 	
 	public string Bio { get; set; }
 
 	public string AvatarLink { get; set; }
 	
-	public AuthorizationResponse(UserEntity user, string accessToken, Guid refreshToken)
+	public AuthorizationResponse(
+		string accessToken,
+		Guid refreshToken,
+		Guid id,
+		string displayName,
+		string nickname, 
+		string bio,
+		string avatarLink)
 	{
 		AccessToken = accessToken;
 		RefreshToken = refreshToken;
-		Id = user.Id;
-		DisplayName = user.DisplayName;
-		NickName = user.Nickname;
-		Bio = user.Bio;
-		AvatarLink = user.AvatarLink;
+		Id = id;
+		DisplayName = displayName;
+		Nickname = nickname;
+		Bio = bio;
+		AvatarLink = avatarLink;
 	}
 }

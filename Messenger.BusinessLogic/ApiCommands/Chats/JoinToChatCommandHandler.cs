@@ -1,4 +1,5 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Entities;
@@ -11,10 +12,14 @@ namespace Messenger.BusinessLogic.ApiCommands.Chats;
 public class JoinToChatCommandHandler : IRequestHandler<JoinToChatCommand, Result<ChatDto>>
 {
 	private readonly DatabaseContext _context;
+	private readonly IBlobServiceSettings _blobServiceSettings;
 
-	public JoinToChatCommandHandler(DatabaseContext context)
+	public JoinToChatCommandHandler(
+		DatabaseContext context, 
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
+		_blobServiceSettings = blobServiceSettings;
 	}
 
 	public async Task<Result<ChatDto>> Handle(JoinToChatCommand request, CancellationToken cancellationToken)
@@ -56,13 +61,17 @@ public class JoinToChatCommandHandler : IRequestHandler<JoinToChatCommand, Resul
 
 		var memberCount = await _context.ChatUsers.Where(c => c.ChatId == request.ChatId).CountAsync(cancellationToken);
 
+		var avatarLink = chat.AvatarFileName != null ?
+			$"{_blobServiceSettings.MessengerBlobAccess}/{chat.AvatarFileName}"
+			: null;
+		
 		var chatDto = new ChatDto
 		{
 			Id = chat.Id,
 			Name = chat.Name,
 			Title = chat.Title,
 			Type = chat.Type,
-			AvatarLink = chat.AvatarLink,
+			AvatarLink = avatarLink,
 			LastMessageId = chat.LastMessageId,
 			LastMessageText = chat.LastMessage?.Text,
 			LastMessageAuthorDisplayName = 

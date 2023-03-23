@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Services;
@@ -10,10 +11,14 @@ namespace Messenger.BusinessLogic.ApiQueries.Messages;
 public class GetMessageListBySearchQueryHandler : IRequestHandler<GetMessageListBySearchQuery, Result<List<MessageDto>>>
 {
 	private readonly DatabaseContext _context;
+	private readonly IBlobServiceSettings _blobServiceSettings;
 
-	public GetMessageListBySearchQueryHandler(DatabaseContext context)
+	public GetMessageListBySearchQueryHandler(
+		DatabaseContext context,
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
+		_blobServiceSettings = blobServiceSettings;
 	}
 	
 	public async Task<Result<List<MessageDto>>> Handle(GetMessageListBySearchQuery request, CancellationToken cancellationToken)
@@ -51,12 +56,18 @@ public class GetMessageListBySearchQueryHandler : IRequestHandler<GetMessageList
 							IsEdit = message.IsEdit,
 							OwnerId = message.OwnerId,
 							OwnerDisplayName = message.Owner != null ? message.Owner.DisplayName : null,
-							OwnerAvatarLink = message.Owner != null ? message.Owner.AvatarLink : null,
+							OwnerAvatarLink = message.Owner != null ? message.Owner.AvatarFileName != null ?
+								$"{_blobServiceSettings.MessengerBlobAccess}/{message.Owner.AvatarFileName}"
+								: null : null,
 							ReplyToMessageId = message.ReplyToMessageId,
 							ReplyToMessageText = message.ReplyToMessage != null ? message.ReplyToMessage.Text : null,
 							ReplyToMessageAuthorDisplayName = message.ReplyToMessage != null && message.ReplyToMessage.Owner != null ? 
 								message.ReplyToMessage.Owner.DisplayName : null,
-							Attachments = message.Attachments.Select(a => new AttachmentDto(a)).ToList(),
+							Attachments = message.Attachments
+								.Select(a => new AttachmentDto(
+									a.Id,
+									$"{_blobServiceSettings.MessengerBlobAccess}/{a.FileName}",
+									a.Size)).ToList(),
 							ChatId = message.ChatId,
 							DateOfCreate = message.DateOfCreate
 						}
@@ -83,12 +94,17 @@ public class GetMessageListBySearchQueryHandler : IRequestHandler<GetMessageList
 						IsEdit = message.IsEdit,
 						OwnerId = message.OwnerId,
 						OwnerDisplayName = message.Owner != null ? message.Owner.DisplayName : null,
-						OwnerAvatarLink = message.Owner != null ? message.Owner.AvatarLink : null,
+						OwnerAvatarLink = message.Owner != null ? message.Owner.AvatarFileName != null ?
+							$"{_blobServiceSettings.MessengerBlobAccess}/{message.Owner.AvatarFileName}"
+							: null : null,
 						ReplyToMessageId = message.ReplyToMessageId,
 						ReplyToMessageText = message.ReplyToMessage != null ? message.ReplyToMessage.Text : null,
 						ReplyToMessageAuthorDisplayName = message.ReplyToMessage != null && message.ReplyToMessage.Owner != null ? 
 							message.ReplyToMessage.Owner.DisplayName : null,
-						Attachments = message.Attachments.Select(a => new AttachmentDto(a)).ToList(),
+						Attachments = message.Attachments.Select(a => new AttachmentDto(
+							a.Id,
+							$"{_blobServiceSettings.MessengerBlobAccess}/{a.FileName}",
+							a.Size)).ToList(),
 						ChatId = message.ChatId,
 						DateOfCreate = message.DateOfCreate
 					}

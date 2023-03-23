@@ -1,4 +1,5 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
@@ -14,11 +15,16 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 {
 	private readonly DatabaseContext _context;
 	private readonly IHubContext<ChatHub, IChatHub> _hubContext;
+	private readonly IBlobServiceSettings _blobServiceSettings;
 
-	public CreateDialogCommandHandler(DatabaseContext context, IHubContext<ChatHub, IChatHub> hubContext)
+	public CreateDialogCommandHandler(
+		DatabaseContext context,
+		IHubContext<ChatHub, IChatHub> hubContext,
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
 		_hubContext = hubContext;
+		_blobServiceSettings = blobServiceSettings;
 	}
 	
 	public async Task<Result<ChatDto>> Handle(CreateDialogCommand request, CancellationToken cancellationToken)
@@ -50,7 +56,7 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 			title: null,
 			ChatType.Dialog,
 			ownerId: null,
-			avatarLink: null,
+			avatarFileName: null,
 			lastMessageId: null);
 
 		var chatUserForRequester = new ChatUserEntity(
@@ -77,6 +83,12 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 		{
 			await _context.Entry(chatUser).Reference(c => c.User).LoadAsync(cancellationToken);
 		}
+
+		var requester = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.RequesterId, cancellationToken);
+
+		var avatarLink = requester.AvatarFileName != null
+			? $"{_blobServiceSettings.MessengerBlobAccess}/{requester.AvatarFileName}"
+			: null;
 		
 		var chatDto = new ChatDto
 		{
@@ -84,10 +96,19 @@ public class CreateDialogCommandHandler : IRequestHandler<CreateDialogCommand, R
 			Name = newDialog.Name,
 			Title = newDialog.Title,
 			Type = newDialog.Type,
-			AvatarLink = user.AvatarLink,
+			AvatarLink = avatarLink,
 			MembersCount = 2,
 			IsMember = true,
-			Members = newDialog.ChatUsers.Select(c => new UserDto(c.User)).ToList()
+			Members = newDialog.ChatUsers
+				.Select(c => new UserDto(
+					c.User.Id,
+					c.User.DisplayName,
+					c.User.Nickname,
+					c.User.Bio,
+					c.User.AvatarFileName != null ? 
+						$"{_blobServiceSettings.MessengerBlobAccess}/{c.User.AvatarFileName}" 
+						: null))
+				.ToList()
 		};
 		
 		await _hubContext.Clients.User(request.UserId.ToString()).CreateDialogForInterlocutor(chatDto);

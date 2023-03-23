@@ -1,4 +1,5 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Services;
@@ -9,10 +10,14 @@ namespace Messenger.BusinessLogic.ApiQueries.Users;
 public class GetUserListByChatQueryHandler : IRequestHandler<GetUserListByChatQuery, Result<List<UserDto>>>
 {
     private readonly DatabaseContext _context;
+    private readonly IBlobServiceSettings _blobServiceSettings;
 
-    public GetUserListByChatQueryHandler(DatabaseContext context)
+    public GetUserListByChatQueryHandler(
+        DatabaseContext context,
+        IBlobServiceSettings blobServiceSettings)
     {
         _context = context;
+        _blobServiceSettings = blobServiceSettings;
     }
 
     public async Task<Result<List<UserDto>>> Handle(GetUserListByChatQuery request, CancellationToken cancellationToken)
@@ -44,7 +49,13 @@ public class GetUserListByChatQueryHandler : IRequestHandler<GetUserListByChatQu
             .Where(c => c.ChatId == request.ChatId)
             .Skip(request.Limit * (request.Page - 1))
             .Take(request.Limit)
-            .Select(u => new UserDto(u.User))
+            .Select(u => new UserDto(
+                u.User.Id,
+                u.User.DisplayName,
+                u.User.Nickname,
+                u.User.Bio,
+                u.User.AvatarFileName != null ? 
+                    $"{_blobServiceSettings.MessengerBlobAccess}/{u.User.AvatarFileName}" : null))
             .ToListAsync(cancellationToken);
 
         return new Result<List<UserDto>>(userList);

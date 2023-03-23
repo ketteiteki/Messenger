@@ -12,13 +12,16 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Resul
 {
     private readonly DatabaseContext _context;
     private readonly IBlobService _blobService;
+    private readonly IBlobServiceSettings _blobServiceSettings;
 	
     public CreateChatCommandHandler(
         DatabaseContext context, 
-        IBlobService blobService)
+        IBlobService blobService,
+        IBlobServiceSettings blobServiceSettings)
     {
         _context = context;
         _blobService = blobService;
+        _blobServiceSettings = blobServiceSettings;
     }
     
     public async Task<Result<ChatDto>> Handle(CreateChatCommand request, CancellationToken cancellationToken)
@@ -37,15 +40,15 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Resul
             request.Title,
             request.Type,
             request.RequesterId,
-            avatarLink: null,
+            avatarFileName: null,
             lastMessageId: null
         );
 
         if (request.AvatarFile != null)
         {
-            var avatarLink = await _blobService.UploadFileBlobAsync(request.AvatarFile);
+            var avatarFileName = await _blobService.UploadFileBlobAsync(request.AvatarFile);
             
-            newChat.UpdateAvatarLink(avatarLink);
+            newChat.UpdateAvatarFileName(avatarFileName);
         }
 
         var newChatUser = new ChatUserEntity(
@@ -59,13 +62,17 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Resul
         
         await _context.SaveChangesAsync(cancellationToken);
 
+        var avatarLink = newChat.AvatarFileName != null
+            ? $"{_blobServiceSettings.MessengerBlobAccess}/{newChat.AvatarFileName}"
+            : null;
+        
         var chatDto = new ChatDto
         {
             Id = newChat.Id,
             Name = newChat.Name,
             Title = newChat.Title,
             Type = newChat.Type,
-            AvatarLink = newChat.AvatarLink,
+            AvatarLink = avatarLink,
             MembersCount = 1,
             CanSendMedia = true,
             IsOwner = true,

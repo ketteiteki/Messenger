@@ -1,4 +1,5 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Enum;
@@ -10,10 +11,14 @@ namespace Messenger.BusinessLogic.ApiCommands.Chats;
 public class LeaveFromChatCommandHandler : IRequestHandler<LeaveFromChatCommand, Result<ChatDto>>
 {
     private readonly DatabaseContext _context;
+    private readonly IBlobServiceSettings _blobServiceSettings;
 
-    public LeaveFromChatCommandHandler(DatabaseContext context)
+    public LeaveFromChatCommandHandler(
+        DatabaseContext context,
+        IBlobServiceSettings blobServiceSettings)
     {
         _context = context;
+        _blobServiceSettings = blobServiceSettings;
     }
 
     public async Task<Result<ChatDto>> Handle(LeaveFromChatCommand request, CancellationToken cancellationToken)
@@ -34,13 +39,17 @@ public class LeaveFromChatCommandHandler : IRequestHandler<LeaveFromChatCommand,
         _context.ChatUsers.Remove(chatUser);
         await _context.SaveChangesAsync(cancellationToken);
 
+        var avatarLink = chatUser.Chat.AvatarFileName != null ?
+            $"{_blobServiceSettings.MessengerBlobAccess}/{chatUser.Chat.AvatarFileName}"
+            : null;
+        
         var chatDto = new ChatDto
         {
             Id = chatUser.ChatId,
             Name = chatUser.Chat.Name,
             Title = chatUser.Chat.Title,
             Type = chatUser.Chat.Type,
-            AvatarLink = chatUser.Chat.AvatarLink,
+            AvatarLink = avatarLink,
             LastMessageId = chatUser.Chat.LastMessageId,
             LastMessageText = chatUser.Chat.LastMessage?.Text,
             LastMessageAuthorDisplayName = 

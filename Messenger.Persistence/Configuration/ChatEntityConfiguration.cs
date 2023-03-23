@@ -33,7 +33,7 @@ public class ChatEntityConfiguration : IEntityTypeConfiguration<ChatEntity>
 			name: "DotNetRuChat",
 			type: ChatType.Conversation,
 			ownerId: SeedDataConstants.KaminomeUserId,
-			avatarLink: null,
+			avatarFileName: null,
 			lastMessageId: null)
 		{
 			Id = SeedDataConstants.DotnetChatId
@@ -44,7 +44,7 @@ public class ChatEntityConfiguration : IEntityTypeConfiguration<ChatEntity>
 			name: "dotnettalks",
 			type: ChatType.Conversation,
 			ownerId: SeedDataConstants.AliceUserId,
-			avatarLink: null,
+			avatarFileName: null,
 			lastMessageId: null)
 		{
 			Id = SeedDataConstants.DotnetFloodChatId
@@ -55,7 +55,7 @@ public class ChatEntityConfiguration : IEntityTypeConfiguration<ChatEntity>
 			title: null,
 			type: ChatType.Dialog,
 			ownerId: null,
-			avatarLink: null,
+			avatarFileName: null,
 			lastMessageId: null)
 		{
 			Id = SeedDataConstants.DialogKaminomeAliceChatId

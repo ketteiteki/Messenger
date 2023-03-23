@@ -32,7 +32,7 @@ public class GetDialogTestSuccess : IntegrationTestBase, IIntegrationTest
         getDialogBetween21ThAndAliceBy21ThResult.Value.Members
             .First(m => m.Id != user21Th.Value.Id).Id.Should().Be(alice.Value.Id);
         getDialogBetween21ThAndAliceBy21ThResult.Value.Members
-            .First(m => m.Id != user21Th.Value.Id).Nickname.Should().Be(alice.Value.NickName);
+            .First(m => m.Id != user21Th.Value.Id).Nickname.Should().Be(alice.Value.Nickname);
         getDialogBetween21ThAndAliceBy21ThResult.Value.Members
             .First(m => m.Id != user21Th.Value.Id).DisplayName.Should().Be(alice.Value.DisplayName);
         getDialogBetween21ThAndAliceBy21ThResult.Value.Members
@@ -42,7 +42,7 @@ public class GetDialogTestSuccess : IntegrationTestBase, IIntegrationTest
         getDialogBetween21ThAndAliceByAliceResult.Value.Members
             .First(m => m.Id != alice.Value.Id).Id.Should().Be(user21Th.Value.Id);
         getDialogBetween21ThAndAliceByAliceResult.Value.Members
-            .First(m => m.Id != alice.Value.Id).Nickname.Should().Be(user21Th.Value.NickName);
+            .First(m => m.Id != alice.Value.Id).Nickname.Should().Be(user21Th.Value.Nickname);
         getDialogBetween21ThAndAliceByAliceResult.Value.Members
             .First(m => m.Id != alice.Value.Id).DisplayName.Should().Be(user21Th.Value.DisplayName);
         getDialogBetween21ThAndAliceByAliceResult.Value.Members
