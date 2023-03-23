@@ -1,4 +1,5 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Services;
@@ -9,10 +10,14 @@ namespace Messenger.BusinessLogic.ApiCommands.Profiles;
 public class UpdateProfileDataCommandHandler : IRequestHandler<UpdateProfileDataCommand, Result<UserDto>>
 {
 	private readonly DatabaseContext _context;
+	private readonly IBlobServiceSettings _blobServiceSettings;
 
-	public UpdateProfileDataCommandHandler(DatabaseContext context)
+	public UpdateProfileDataCommandHandler(
+		DatabaseContext context,
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
+		_blobServiceSettings = blobServiceSettings;
 	}
 	
 	public async Task<Result<UserDto>> Handle(UpdateProfileDataCommand request, CancellationToken cancellationToken)
@@ -53,6 +58,16 @@ public class UpdateProfileDataCommandHandler : IRequestHandler<UpdateProfileData
 		_context.Users.Update(requester);
 		await _context.SaveChangesAsync(cancellationToken);
 
-		return new Result<UserDto>(new UserDto(requester));
+		var avatarLink = requester.AvatarFileName != null ? 
+			$"{_blobServiceSettings.MessengerBlobAccess}/{requester.AvatarFileName}" : null;
+		
+		var userDto = new UserDto(
+			requester.Id,
+			requester.DisplayName,
+			requester.Nickname,
+			requester.Bio,
+			avatarLink);
+		
+		return new Result<UserDto>(userDto);
 	}
 }

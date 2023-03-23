@@ -19,7 +19,7 @@ public class ChatEntity : IBaseEntity
 	
 	public UserEntity Owner { get; set; }
 
-	public string AvatarLink { get; set; }
+	public string AvatarFileName { get; set; }
 	
 	public Guid? LastMessageId { get; set; }
 	
@@ -33,13 +33,13 @@ public class ChatEntity : IBaseEntity
 
 	public List<BanUserByChatEntity> BanUserByChats { get; set; } = new();
 	
-	public ChatEntity(string name, string title, ChatType type, Guid? ownerId, string avatarLink, Guid? lastMessageId)
+	public ChatEntity(string name, string title, ChatType type, Guid? ownerId, string avatarFileName, Guid? lastMessageId)
 	{
 		Name = name;
 		Title = title;
 		Type = type;
 		OwnerId = ownerId;
-		AvatarLink = avatarLink;
+		AvatarFileName = avatarFileName;
 		LastMessageId = lastMessageId;
 		
 		new ChatEntityValidator().ValidateAndThrow(this);
@@ -57,9 +57,9 @@ public class ChatEntity : IBaseEntity
 		new ChatEntityValidator().ValidateAndThrow(this);
 	}
 	
-	public void UpdateAvatarLink(string avatarLink)
+	public void UpdateAvatarFileName(string avatarFileName)
 	{
-		AvatarLink = avatarLink;
+		AvatarFileName = avatarFileName;
 		new ChatEntityValidator().ValidateAndThrow(this);
 	}
 

@@ -16,16 +16,19 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<Authoriz
 	private readonly IHashService _hashService;
 	private readonly ITokenService _tokenService;
 	private readonly IConfiguration _configuration;
+	private readonly IBlobServiceSettings _blobServiceSettings;
 
 	public LoginCommandHandler(DatabaseContext context,
 		IHashService hashService,
 		ITokenService tokenService,
-		IConfiguration configuration)
+		IConfiguration configuration,
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
 		_hashService = hashService;
 		_tokenService = tokenService;
 		_configuration = configuration;
+		_blobServiceSettings = blobServiceSettings;
 	}
 	
 	public async Task<Result<AuthorizationResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -72,6 +75,19 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<Authoriz
 		
 		await _context.SaveChangesAsync(cancellationToken);
 		
-		return new Result<AuthorizationResponse>(new AuthorizationResponse(requester, accessToken, session.RefreshToken));
+		var avatarLink = requester.AvatarFileName != null
+			? $"{_blobServiceSettings.MessengerBlobAccess}/{requester.AvatarFileName}"
+			: null;
+		
+		var authorizationResponse = new AuthorizationResponse(
+			accessToken,
+			session.RefreshToken,
+			requester.Id,
+			requester.DisplayName,
+			requester.Nickname,
+			requester.Bio,
+			avatarLink);
+		
+		return new Result<AuthorizationResponse>(authorizationResponse);
 	}
 }

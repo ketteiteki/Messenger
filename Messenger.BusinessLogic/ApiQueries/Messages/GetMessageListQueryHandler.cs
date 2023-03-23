@@ -1,4 +1,5 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Services;
@@ -9,10 +10,14 @@ namespace Messenger.BusinessLogic.ApiQueries.Messages;
 public class GetMessageListQueryHandler : IRequestHandler<GetMessageListQuery, Result<List<MessageDto>>>
 {
 	private readonly DatabaseContext _context;
+	private readonly IBlobServiceSettings _blobServiceSettings;
 
-	public GetMessageListQueryHandler(DatabaseContext context)
+	public GetMessageListQueryHandler(
+		DatabaseContext context, 
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
+		_blobServiceSettings = blobServiceSettings;
 	}
 	
 	public async Task<Result<List<MessageDto>>> Handle(GetMessageListQuery request, CancellationToken cancellationToken)
@@ -50,12 +55,17 @@ public class GetMessageListQueryHandler : IRequestHandler<GetMessageListQuery, R
 							IsEdit = message.IsEdit,
 							OwnerId = message.OwnerId,
 							OwnerDisplayName = message.Owner != null ? message.Owner.DisplayName : null,
-							OwnerAvatarLink = message.Owner != null ? message.Owner.AvatarLink : null,
+							OwnerAvatarLink = message.Owner != null ? message.Owner.AvatarFileName != null ?
+								$"{_blobServiceSettings.MessengerBlobAccess}/{message.Owner.AvatarFileName}"
+								: null : null,
 							ReplyToMessageId = message.ReplyToMessageId,
 							ReplyToMessageText = message.ReplyToMessage != null ? message.ReplyToMessage.Text : null,
 							ReplyToMessageAuthorDisplayName = message.ReplyToMessage != null && message.ReplyToMessage.Owner != null ? 
 								message.ReplyToMessage.Owner.DisplayName : null,
-							Attachments = message.Attachments.Select(a => new AttachmentDto(a)).ToList(),
+							Attachments = message.Attachments.Select(a => new AttachmentDto(
+								a.Id,
+								$"{_blobServiceSettings.MessengerBlobAccess}/{a.FileName}",
+								a.Size)).ToList(),
 							ChatId = message.ChatId,
 							DateOfCreate = message.DateOfCreate
 						})
@@ -82,12 +92,17 @@ public class GetMessageListQueryHandler : IRequestHandler<GetMessageListQuery, R
 						IsEdit = message.IsEdit,
 						OwnerId = message.OwnerId,
 						OwnerDisplayName = message.Owner != null ? message.Owner.DisplayName : null,
-						OwnerAvatarLink = message.Owner != null ? message.Owner.AvatarLink : null,
+						OwnerAvatarLink = message.Owner != null ? message.Owner.AvatarFileName != null ?
+							$"{_blobServiceSettings.MessengerBlobAccess}/{message.Owner.AvatarFileName}"
+							: null : null,
 						ReplyToMessageId = message.ReplyToMessageId,
 						ReplyToMessageText = message.ReplyToMessage != null ? message.ReplyToMessage.Text : null,
 						ReplyToMessageAuthorDisplayName = message.ReplyToMessage != null && message.ReplyToMessage.Owner != null ? 
 							message.ReplyToMessage.Owner.DisplayName : null,
-						Attachments = message.Attachments.Select(a => new AttachmentDto(a)).ToList(),
+						Attachments = message.Attachments.Select(a => new AttachmentDto(
+							a.Id,
+							$"{_blobServiceSettings.MessengerBlobAccess}/{a.FileName}",
+							a.Size)).ToList(),
 						ChatId = message.ChatId,
 						DateOfCreate = message.DateOfCreate
 					})

@@ -1,4 +1,5 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Enum;
@@ -10,10 +11,14 @@ namespace Messenger.BusinessLogic.ApiQueries.Chats;
 public class GetChatQueryHandler : IRequestHandler<GetChatQuery, Result<ChatDto>>
 {
 	private readonly DatabaseContext _context;
+	private readonly IBlobServiceSettings _blobServiceSettings;
 
-	public GetChatQueryHandler(DatabaseContext context)
+	public GetChatQueryHandler(
+		DatabaseContext context,
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
+		_blobServiceSettings = blobServiceSettings;
 	}
 
 	public async Task<Result<ChatDto>> Handle(GetChatQuery request, CancellationToken cancellationToken)
@@ -39,7 +44,8 @@ public class GetChatQueryHandler : IRequestHandler<GetChatQuery, Result<ChatDto>
 						Name = chat.Type != ChatType.Dialog ? chat.Name : null,
 						Title = chat.Title,
 						Type = chat.Type,
-						AvatarLink = chat.Type != ChatType.Dialog ? chat.AvatarLink : null,
+						AvatarLink = chat.Type != ChatType.Dialog ? chat.AvatarFileName != null ? 
+							$"{_blobServiceSettings.MessengerBlobAccess}/{chat.AvatarFileName}" : null : null,
 						LastMessageId = chat.LastMessageId,
 						LastMessageText = chat.LastMessage != null ? chat.LastMessage.Text : null,
 						LastMessageAuthorDisplayName = chat.LastMessage != null && chat.LastMessage.Owner != null ? 
@@ -54,7 +60,15 @@ public class GetChatQueryHandler : IRequestHandler<GetChatQuery, Result<ChatDto>
 						RoleUser = chatUsersItem != null && chatUsersItem.Role != null ?
 							new RoleUserByChatDto(chatUsersItem.Role) : null,
 						Members = chat.Type == ChatType.Dialog ? 
-							chat.ChatUsers.Select(c => new UserDto(c.User)).ToList() : new List<UserDto>(),
+							chat.ChatUsers
+								.Select(c => new UserDto(
+									c.User.Id,
+									c.User.DisplayName,
+									c.User.Nickname,
+									c.User.Bio,
+									c.User.AvatarFileName != null ?
+										$"{_blobServiceSettings.MessengerBlobAccess}/{c.User.AvatarFileName}" : null))
+								.ToList() : new List<UserDto>(),
 						UsersWithRole = chat.ChatUsers.Where(c => c.Role != null)
 							.Select(cu => new RoleUserByChatDto(cu.Role)).ToList()
 					})

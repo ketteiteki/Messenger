@@ -1,4 +1,3 @@
-using Messenger.Domain.Entities;
 
 namespace Messenger.BusinessLogic.Models;
 
@@ -14,12 +13,12 @@ public class UserDto
 
 	public string AvatarLink { get; init; }
 
-	public UserDto(UserEntity user)
+	public UserDto(Guid id, string displayName, string nickname, string bio, string avatarLink)
 	{
-		Id = user.Id;
-		DisplayName = user.DisplayName;
-		Nickname = user.Nickname;
-		Bio = user.Bio;
-		AvatarLink = user.AvatarLink;
+		Id = id;
+		DisplayName = displayName;
+		Nickname = nickname;
+		Bio = bio;
+		AvatarLink = avatarLink;
 	}
 }

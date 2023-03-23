@@ -26,7 +26,7 @@ public class GetUserListBySearchTestSuccess : IntegrationTestBase, IIntegrationT
 
         var getUserListBySearchBobNicknameQuery = new GetUserListBySearchQuery(
             user21Th.Value.Id,
-            bob.Value.NickName,
+            bob.Value.Nickname,
             Limit: 10,
             Page: 1);
         

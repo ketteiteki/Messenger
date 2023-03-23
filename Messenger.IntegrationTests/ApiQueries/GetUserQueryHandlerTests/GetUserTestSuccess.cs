@@ -18,7 +18,7 @@ public class GetUserTestSuccess : IntegrationTestBase, IIntegrationTest
         var getUserResult = await MessengerModule.RequestAsync(getUserQuery, CancellationToken.None);
 
         getUserResult.Value.Id.Should().Be(user21Th.Value.Id);
-        getUserResult.Value.Nickname.Should().Be(user21Th.Value.NickName);
+        getUserResult.Value.Nickname.Should().Be(user21Th.Value.Nickname);
         getUserResult.Value.DisplayName.Should().Be(user21Th.Value.DisplayName);
         getUserResult.Value.Bio.Should().Be(user21Th.Value.Bio);
     }

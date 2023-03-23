@@ -24,7 +24,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
             displayName: "kami no me",
             nickname: "kaminome",
             bio: "the best account",
-            avatarLink: null,
+            avatarFileName: null,
             passwordHash: "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==",
             passwordSalt: "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI="
         )
@@ -36,7 +36,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
             displayName: "alice1",
             nickname: "alice1234",
             bio: "cool status",
-            avatarLink: null,
+            avatarFileName: null,
             passwordHash: "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==",
             passwordSalt: "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI="
         )
@@ -48,7 +48,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
             displayName: "bob1",
             nickname: "bob1234",
             bio: "I'm Bob",
-            avatarLink: null,
+            avatarFileName: null,
             passwordHash: "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==",
             passwordSalt: "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI="
         )
@@ -60,7 +60,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
             displayName: "alex1",
             nickname: "alex1234",
             bio: "why alex?",
-            avatarLink: null,
+            avatarFileName: null,
             passwordHash: "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==",
             passwordSalt: "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI="
         )

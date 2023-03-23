@@ -42,11 +42,9 @@ public class DeleteChatCommandHandler : IRequestHandler<DeleteChatCommand, Resul
             return new Result<ChatDto>(new ForbiddenError("It is forbidden to delete someone else's chat"));
         }
 
-        if (chat.AvatarLink != null)
+        if (chat.AvatarFileName != null)
         {
-            var avatarFileName = chat.AvatarLink.Split("/")[^1];
-
-            await _blobService.DeleteBlobAsync(avatarFileName);
+            await _blobService.DeleteBlobAsync(chat.AvatarFileName);
         }
 		
         _context.Chats.Remove(chat);

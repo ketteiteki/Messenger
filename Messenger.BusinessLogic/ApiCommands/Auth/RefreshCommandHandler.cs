@@ -15,12 +15,18 @@ public class RefreshCommandHandler : IRequestHandler<RefreshCommand, Result<Auth
     private readonly DatabaseContext _context;
     private readonly ITokenService _tokenService;
     private readonly IConfiguration _configuration;
+    private readonly IBlobServiceSettings _blobServiceSettings;
 
-    public RefreshCommandHandler(DatabaseContext context, ITokenService tokenService, IConfiguration configuration)
+    public RefreshCommandHandler(
+        DatabaseContext context,
+        ITokenService tokenService,
+        IConfiguration configuration,
+        IBlobServiceSettings blobServiceSettings)
     {
         _context = context;
         _tokenService = tokenService;
         _configuration = configuration;
+        _blobServiceSettings = blobServiceSettings;
     }
 
     public async Task<Result<AuthorizationResponse>> Handle(RefreshCommand request, CancellationToken cancellationToken)
@@ -60,6 +66,19 @@ public class RefreshCommandHandler : IRequestHandler<RefreshCommand, Result<Auth
 
         await _context.Entry(newSession).Reference(s => s.User).LoadAsync(cancellationToken);
         
-        return new Result<AuthorizationResponse>(new AuthorizationResponse(newSession.User, accessToken, newSession.RefreshToken));
+        var avatarLink = newSession.User.AvatarFileName != null
+            ? $"{_blobServiceSettings.MessengerBlobAccess}/{newSession.User.AvatarFileName}"
+            : null;
+		
+        var authorizationResponse = new AuthorizationResponse(
+            accessToken,
+            newSession.RefreshToken,
+            newSession.User.Id,
+            newSession.User.DisplayName,
+            newSession.User.Nickname,
+            newSession.User.Bio,
+            avatarLink);
+        
+        return new Result<AuthorizationResponse>(authorizationResponse);
     }
 }

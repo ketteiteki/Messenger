@@ -28,15 +28,12 @@ namespace Messenger.Services.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Link")
+                    b.Property<string>("FileName")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid>("MessageId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
 
                     b.Property<long>("Size")
                         .HasColumnType("bigint");
@@ -72,7 +69,7 @@ namespace Messenger.Services.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AvatarLink")
+                    b.Property<string>("AvatarFileName")
                         .HasColumnType("text");
 
                     b.Property<Guid?>("LastMessageId")
@@ -269,56 +266,56 @@ namespace Messenger.Services.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("6f6d7947-488d-4e7c-be7e-bfbf04bfef6f"),
+                            Id = new Guid("90f0a695-e815-496a-857b-96759ed5db1a"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(4520),
+                            DateOfCreate = new DateTime(2023, 3, 23, 2, 50, 54, 480, DateTimeKind.Utc).AddTicks(9542),
                             IsEdit = false,
                             OwnerId = new Guid("a85825ba-f99b-4177-a858-96384303ea14"),
                             Text = "привет, какие книжки почитать?"
                         },
                         new
                         {
-                            Id = new Guid("d4b826c1-5f1c-4ae6-ac2a-8ee7b5b75e8a"),
+                            Id = new Guid("b6931a6c-9152-4b05-a96d-d6d68342450e"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(5787),
+                            DateOfCreate = new DateTime(2023, 3, 23, 2, 50, 54, 481, DateTimeKind.Utc).AddTicks(783),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
-                            ReplyToMessageId = new Guid("6f6d7947-488d-4e7c-be7e-bfbf04bfef6f"),
+                            ReplyToMessageId = new Guid("90f0a695-e815-496a-857b-96759ed5db1a"),
                             Text = "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться..."
                         },
                         new
                         {
-                            Id = new Guid("5e162143-381e-4b77-b4fd-f5f028844eb5"),
+                            Id = new Guid("1dbcc552-4e6b-46d4-9f57-b61f679783b3"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(6339),
+                            DateOfCreate = new DateTime(2023, 3, 23, 2, 50, 54, 481, DateTimeKind.Utc).AddTicks(1703),
                             IsEdit = false,
                             OwnerId = new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"),
-                            ReplyToMessageId = new Guid("d4b826c1-5f1c-4ae6-ac2a-8ee7b5b75e8a"),
+                            ReplyToMessageId = new Guid("b6931a6c-9152-4b05-a96d-d6d68342450e"),
                             Text = "ладно"
                         },
                         new
                         {
-                            Id = new Guid("ab52cc53-2afd-49df-b2c4-345851bcbee1"),
+                            Id = new Guid("f6109d43-7055-4b21-acff-c94d0633a7f7"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(6862),
+                            DateOfCreate = new DateTime(2023, 3, 23, 2, 50, 54, 481, DateTimeKind.Utc).AddTicks(2612),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "ага"
                         },
                         new
                         {
-                            Id = new Guid("b1f3e620-7d31-46f0-ab07-791829539bf8"),
+                            Id = new Guid("01efe31a-4813-401a-a879-6519c870997e"),
                             ChatId = new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"),
-                            DateOfCreate = new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(7512),
+                            DateOfCreate = new DateTime(2023, 3, 23, 2, 50, 54, 481, DateTimeKind.Utc).AddTicks(3502),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "привет"
                         },
                         new
                         {
-                            Id = new Guid("a1077a79-a662-4e44-8ece-c9ce64c5a2d0"),
+                            Id = new Guid("4fa4bf54-58cf-4626-9420-5c0f9cce16d8"),
                             ChatId = new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"),
-                            DateOfCreate = new DateTime(2023, 3, 16, 16, 41, 48, 727, DateTimeKind.Utc).AddTicks(8026),
+                            DateOfCreate = new DateTime(2023, 3, 23, 2, 50, 54, 481, DateTimeKind.Utc).AddTicks(4206),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "привет, как дела?"
@@ -405,7 +402,7 @@ namespace Messenger.Services.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AvatarLink")
+                    b.Property<string>("AvatarFileName")
                         .HasColumnType("text");
 
                     b.Property<string>("Bio")

@@ -1,4 +1,5 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Services;
@@ -9,10 +10,14 @@ namespace Messenger.BusinessLogic.ApiCommands.Conversations;
 public class UnbanUserInConversationCommandHandler : IRequestHandler<UnbanUserInConversationCommand, Result<UserDto>>
 {
 	private readonly DatabaseContext _context;
+	private readonly  IBlobServiceSettings _blobServiceSettings;
 
-	public UnbanUserInConversationCommandHandler(DatabaseContext context)
+	public UnbanUserInConversationCommandHandler(
+		DatabaseContext context,
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
+		_blobServiceSettings = blobServiceSettings;
 	}
 	
 	public async Task<Result<UserDto>> Handle(UnbanUserInConversationCommand request, CancellationToken cancellationToken)
@@ -48,7 +53,18 @@ public class UnbanUserInConversationCommandHandler : IRequestHandler<UnbanUserIn
 		
 		await _context.SaveChangesAsync(cancellationToken);
 			
-		return new Result<UserDto>(new UserDto(banUserByChat.User));
+		var avatarLink = banUserByChat.User.AvatarFileName != null
+			? $"{_blobServiceSettings.MessengerBlobAccess}/{banUserByChat.User.AvatarFileName}"
+			: null;
+		
+		var userDto = new UserDto(
+			banUserByChat.User.Id,
+			banUserByChat.User.DisplayName,
+			banUserByChat.User.Nickname,
+			banUserByChat.User.Bio,
+			avatarLink);
+		
+		return new Result<UserDto>(userDto);
 		
 	}
 }

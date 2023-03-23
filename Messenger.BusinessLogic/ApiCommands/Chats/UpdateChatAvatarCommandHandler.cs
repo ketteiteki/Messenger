@@ -12,13 +12,16 @@ public class UpdateChatAvatarCommandHandler : IRequestHandler<UpdateChatAvatarCo
 {
 	private readonly DatabaseContext _context;
 	private readonly IBlobService _blobService;
+	private readonly IBlobServiceSettings _blobServiceSettings;
 
 	public UpdateChatAvatarCommandHandler(
 		DatabaseContext context,
-		IBlobService blobService)
+		IBlobService blobService, 
+		IBlobServiceSettings blobServiceSettings)
 	{
 		_context = context;
 		_blobService = blobService;
+		_blobServiceSettings = blobServiceSettings;
 	}
 	
 	public async Task<Result<ChatDto>> Handle(UpdateChatAvatarCommand request, CancellationToken cancellationToken)
@@ -45,33 +48,34 @@ public class UpdateChatAvatarCommandHandler : IRequestHandler<UpdateChatAvatarCo
 			return new Result<ChatDto>(new ForbiddenError("It is forbidden to update someone else's chat"));
 		}
 
-		if (chatUserByRequester.Chat.AvatarLink != null)
+		if (chatUserByRequester.Chat.AvatarFileName != null)
 		{
-			var avatarFileName = chatUserByRequester.Chat.AvatarLink.Split("/")[^1];
-
-			await _blobService.DeleteBlobAsync(avatarFileName);
+			await _blobService.DeleteBlobAsync(chatUserByRequester.Chat.AvatarFileName);
 			
-			chatUserByRequester.Chat.UpdateAvatarLink(null);
+			chatUserByRequester.Chat.UpdateAvatarFileName(null);
 		}
 			
 		if (request.AvatarFile != null)
 		{
-			var avatarLink = await _blobService.UploadFileBlobAsync(request.AvatarFile);
+			var avatarFileName = await _blobService.UploadFileBlobAsync(request.AvatarFile);
 			
-			chatUserByRequester.Chat.UpdateAvatarLink(avatarLink);
+			chatUserByRequester.Chat.UpdateAvatarFileName(avatarFileName);
 		}
-			
-			
+		
 		_context.Chats.Update(chatUserByRequester.Chat);
 		await _context.SaveChangesAsync(cancellationToken);
 
+		var avatarLink = chatUserByRequester.Chat.AvatarFileName != null ?
+			$"{_blobServiceSettings.MessengerBlobAccess}/{chatUserByRequester.Chat.AvatarFileName}"
+			: null;
+		
 		var chatDto = new ChatDto
 		{
 			Id = chatUserByRequester.ChatId,
 			Name = chatUserByRequester.Chat.Name,
 			Title = chatUserByRequester.Chat.Title,
 			Type = chatUserByRequester.Chat.Type,
-			AvatarLink = chatUserByRequester.Chat.AvatarLink,
+			AvatarLink = avatarLink,
 			LastMessageId = chatUserByRequester.Chat.LastMessageId,
 			LastMessageText = chatUserByRequester.Chat.LastMessage?.Text,
 			LastMessageAuthorDisplayName =
