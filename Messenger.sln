@@ -28,7 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messenger.Infrastructure", "Messenger.Infrastructure\Messenger.Infrastructure.csproj", "{A523DA03-5478-4E7A-8040-4DB762FCDEEC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{4D1F3EA5-7DF4-4278-840A-73F1CD31A08C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{4D1F3EA5-7DF4-4278-840A-73F1CD31A08C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "seedImages", "seedImages", "{84416ED9-EC0C-4DBD-8E29-5CF104CABA07}"
 	ProjectSection(SolutionItems) = preProject

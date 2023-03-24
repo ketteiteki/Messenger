@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import { currentProfileState } from "../../state/CurrentProfileState";
 import DateService from "../../services/messenger/DateService";
 import { editMessageState } from "../../state/EditMessageState";
-import TextService from "../../services/messenger/TextService";
 
 const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
 
@@ -58,7 +57,7 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
             )?.displayName
             : props.chat.title}
         </p>
-        <p className={styles.lastMessage}>{TextService.trimTextWithThirdDot(props.chat.lastMessageText ?? "", 20)}</p>
+        <p className={styles.lastMessage}>{props.chat.lastMessageText ?? ""}</p>
         <p className={styles.date}>{props.chat.lastMessageDateOfCreate && DateService.getTime(props.chat.lastMessageDateOfCreate)}</p>
       </div>
     </div>

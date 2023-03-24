@@ -14,8 +14,6 @@ import { ChatType } from "../../models/enum/ChatType";
 import { authorizationState } from "../../state/AuthorizationState";
 import nonAvatar from "../../assets/images/non_avatar.jpg";
 import { replyState } from "../../state/ReplyState";
-import TextService from "../../services/messenger/TextService";
-import MessagesApi from "../../services/api/MessageApi";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
 import { editMessageState } from "../../state/EditMessageState";
 import MessageEntity from "../../models/entities/MessageEntity";
@@ -39,6 +37,8 @@ const Chat = observer(() => {
   const authorizationOwnerDisplayName = authorizationState.data?.displayName;
   const authorizationAvatarLink = authorizationState.data?.avatarLink ?? null;
   const currentChatId = currentChatState.chat?.id;
+  const isCurrentChatChannel = currentChatState.chat?.type === ChatType.Channel;
+  const isCurrentChatMine = currentChatState.chat?.isOwner;
 
   const sendMessageHandler = async () => {
     await sendMessage();
@@ -120,7 +120,7 @@ const Chat = observer(() => {
     }
   };
 
-  const gatewayHandler = () => {
+  const onClickGatewayHandler = () => {
     if (editMessageState.data === null) {
       sendMessageHandler();
     }
@@ -130,7 +130,7 @@ const Chat = observer(() => {
     }
   };
 
-  const gatewayEnterHandler = async (
+  const onEnterGatewayHandler = async (
     e: React.KeyboardEvent<HTMLTextAreaElement>
   ) => {
     if (editMessageState.data === null) {
@@ -142,7 +142,7 @@ const Chat = observer(() => {
     }
   };
 
-  const closeEditMessageHandler = () => {
+  const onClickCloseEditMessageHandler = () => {
     editMessageState.setEditMessageNull();
     setInputMessage("");
   };
@@ -173,7 +173,7 @@ const Chat = observer(() => {
   }, 800);
 
   const joinChatHandler = async () => {
-    
+
     if (currentChatId === undefined || currentChatState.chat === null) return;
 
     const response = await currentChatState.postJoinToChatAsync(currentChatId);
@@ -190,6 +190,7 @@ const Chat = observer(() => {
   }, [editMessageState.data]);
 
   useEffect(() => {
+    setInputMessage("");
     messageListScrollBottomHandler();
   }, [currentChatState.chat]);
 
@@ -240,7 +241,7 @@ const Chat = observer(() => {
               <Message {...i} key={i.id} />
             ))}
           </div>
-          <div className={styles.footer}>
+          {((isCurrentChatChannel && isCurrentChatMine) || !isCurrentChatChannel) && <div className={styles.footer}>
             {replyState.data !== null &&
               banDateOfExpire === null &&
               muteDateOfExpire === null &&
@@ -252,10 +253,7 @@ const Chat = observer(() => {
                       {replyState.data.displayName}
                     </p>
                     <p className={styles.replyMessageText}>
-                      {TextService.trimTextWithThirdDot(
-                        replyState.data.text,
-                        50
-                      )}
+                      {replyState.data.text}
                     </p>
                   </div>
                   <button
@@ -275,15 +273,12 @@ const Chat = observer(() => {
                   <div className={styles.editMessageConstainer}>
                     <p className={styles.editMessagePage}>Edit Message</p>
                     <p className={styles.editMessageText}>
-                      {TextService.trimTextWithThirdDot(
-                        editMessageState.data.text,
-                        50
-                      )}
+                      {editMessageState.data.text}
                     </p>
                   </div>
                   <button
                     className={styles.closeEditMessageButton}
-                    onClick={closeEditMessageHandler}
+                    onClick={onClickCloseEditMessageHandler}
                   >
                     <CrossSvg width={20} />
                   </button>
@@ -301,12 +296,12 @@ const Chat = observer(() => {
                     placeholder="Send Message"
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.currentTarget.value)}
-                    onKeyDown={gatewayEnterHandler}
+                    onKeyDown={onEnterGatewayHandler}
                   />
                   <SendMessageSvg
                     className={styles.sendMessageSvg}
                     width={30}
-                    onClick={gatewayHandler}
+                    onClick={onClickGatewayHandler}
                   />
                 </>
               )}
@@ -321,7 +316,7 @@ const Chat = observer(() => {
                 </p>
               </div>
             )}
-          </div>
+          </div>}
         </>
       )}
     </div>

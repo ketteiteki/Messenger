@@ -61,6 +61,7 @@ class ChatListWithMessagesState {
     if (message === undefined) return;
 
     message.text = messageUpdateNotification.updatedText;
+    message.isEdit = true;
 
     if (messageUpdateNotification.isLastMessage) {
       item.chat.lastMessageText = messageUpdateNotification.updatedText;
@@ -246,8 +247,7 @@ class ChatListWithMessagesState {
     );
 
     runInAction(() => {
-      console.log(response.data);
-      this.data.push({ chat: response.data, messages: [] });
+      this.data.unshift({ chat: response.data, messages: [] });
     });
 
     return response;

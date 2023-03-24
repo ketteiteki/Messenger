@@ -6,10 +6,9 @@ import { ReactComponent as TickSvg } from "../../assets/svg/tick_white.svg";
 import ChatInfoBurgerMenu from "../chatInfoBurgerMenu/ChatInfoBurgerMenu";
 import nonAvatar from "../../assets/images/non_avatar.jpg";
 import { currentChatState } from "../../state/CurrentChatState";
-import { ChatType } from "../../models/enum/ChatType";
-import { authorizationState } from "../../state/AuthorizationState";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
 import { useNavigate } from "react-router-dom";
+import { blackCoverState } from "../../state/BlackCoverState";
 
 const ChatInfo = observer(() => {
   const [updateMode, setUpdateMode] = useState<boolean>(false);
@@ -26,8 +25,9 @@ const ChatInfo = observer(() => {
   const navigate = useNavigate();
 
   const currentChatId = currentChatState.chat?.id;
+  const isMyChat = currentChatState.chat?.isOwner;
 
-  const MouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
+  const mouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
     const localX = event.clientX - event.currentTarget.offsetLeft;
     const localY = event.clientY - event.currentTarget.offsetTop;
 
@@ -35,7 +35,7 @@ const ChatInfo = observer(() => {
     setYMousePosition(localY);
   };
 
-  const LeaveChatHandler = async () => {
+  const onClickLeaveChatHandler = async () => {
     currentChatState.chat &&
       (await chatListWithMessagesState.postLeaveFromChatAsync(
         currentChatState.chat.id
@@ -45,7 +45,7 @@ const ChatInfo = observer(() => {
     return navigate("/", { replace: true });
   };
 
-  const UpdateChatHandler = async () => {
+  const updateChatHandler = async () => {
     const currentChatId = currentChatState.chat?.id;
 
     const response = await chatListWithMessagesState.putUpdateChatDataAsync(
@@ -61,7 +61,7 @@ const ChatInfo = observer(() => {
     setUpdateMode(false);
   };
 
-  const setShowMemberListHandler = async () => {
+  const onClickShowMemberListHandler = async () => {
     if (currentChatState.chat === null) return;
 
     setShowMemberList(!showMemberList);
@@ -75,7 +75,7 @@ const ChatInfo = observer(() => {
     }
   };
 
-  const changeAvatarHandler = async (
+  const onChangeAvatarHandler = async (
     event: React.FormEvent<HTMLInputElement>
   ) => {
     const files = event.currentTarget.files;
@@ -92,8 +92,8 @@ const ChatInfo = observer(() => {
     }
   };
 
-  const joinChatHandler = async () => {
-    
+  const onClickJoinChatHandler = async () => {
+
     if (currentChatId === undefined || currentChatState.chat === null) return;
 
     const response = await currentChatState.postJoinToChatAsync(currentChatId);
@@ -102,6 +102,10 @@ const ChatInfo = observer(() => {
     chatListWithMessagesState.resetDataForSearchChats();
     currentChatState.setChatAndMessages(currentChatState.chat, currentChatState.messages);
   }
+
+  const onClickOpenFullSizeAvatar = () => {
+    blackCoverState.setImage(currentChatState.chat?.avatarLink ?? nonAvatar);
+  };
 
   useEffect(() => {
     setInputTitle(currentChatState.chat?.title ?? "");
@@ -114,10 +118,10 @@ const ChatInfo = observer(() => {
   return (
     <div
       className={styles.chatInfo}
-      onMouseMove={(event) => MouseMoveHandler(event)}
+      onMouseMove={(event) => mouseMoveHandler(event)}
     >
       {updateMode && (
-        <button className={styles.okButton} onClick={UpdateChatHandler}>
+        <button className={styles.okButton} onClick={updateChatHandler}>
           <TickSvg width={15} height={23} />
         </button>
       )}
@@ -138,10 +142,10 @@ const ChatInfo = observer(() => {
         </button>
       )}
       <div className={styles.avatarContainer}>
-        <label htmlFor="avatar" className={styles.avatarBlackCover} />
+        {isMyChat && <label htmlFor="avatar" className={styles.avatarBlackCover} />}
         <input
           className={styles.avatarInput}
-          onChange={changeAvatarHandler}
+          onChange={onChangeAvatarHandler}
           type="file"
           id="avatar"
           name="avatar"
@@ -151,6 +155,7 @@ const ChatInfo = observer(() => {
           className={styles.avatar}
           src={currentChatState.chat?.avatarLink ?? nonAvatar}
           alt=""
+          onClick={onClickOpenFullSizeAvatar}
         />
       </div>
       {updateMode === false && <p className={styles.title}>{inputTitle}</p>}
@@ -174,11 +179,11 @@ const ChatInfo = observer(() => {
       {chatListWithMessagesState.data.find(
         (x) => x.chat.id === currentChatState.chat?.id
       ) === undefined ? (
-        <button className={styles.joinChattingButton} onClick={joinChatHandler}>Join</button>
+        <button className={styles.joinChattingButton} onClick={onClickJoinChatHandler}>Join</button>
       ) : (
         <button
           className={styles.leaveChattingButton}
-          onClick={LeaveChatHandler}
+          onClick={onClickLeaveChatHandler}
         >
           Leave
         </button>
@@ -186,7 +191,7 @@ const ChatInfo = observer(() => {
 
       <button
         className={styles.showMembersButton}
-        onClick={setShowMemberListHandler}
+        onClick={onClickShowMemberListHandler}
       >
         {showMemberList ? "Close" : "Show"} Members
       </button>

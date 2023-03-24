@@ -43,7 +43,7 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 
 		var isRequesterOwner = chatUser.Chat.OwnerId == request.RequesterId;
 
-		if (chatUser.Chat.Type == ChatType.Channel && isRequesterOwner)
+		if (chatUser.Chat.Type == ChatType.Channel && !isRequesterOwner)
 		{
 			return new Result<MessageDto>(new ForbiddenError("Only the owner can send messages to the channel"));
 		}

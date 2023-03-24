@@ -15,6 +15,7 @@ import IMessageUpdateNotificationDto from "../../models/interfaces/IMessageUpdat
 import IMessageDeleteNotificationDto from "../../models/interfaces/IMessageDeleteNotificationDto";
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
 import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
+import { blackCoverState } from "../../state/BlackCoverState";
 
 const Layout = observer(() => {
 
@@ -23,7 +24,7 @@ const Layout = observer(() => {
   useEffect(() => {
     if (authorizationState.countFailRefresh >= 2) {
       authorizationState.resetCountFailRefresh();
-      return navigate("/login", {replace: true});
+      return navigate("/login", { replace: true });
     }
 
   }, [authorizationState.countFailRefresh]);
@@ -74,7 +75,7 @@ const Layout = observer(() => {
 
       signalRConfiguration.connection
         .start()
-        .then(function () {  
+        .then(function () {
           response.data.forEach(async (c) => {
             await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, c.id);
           });
@@ -89,6 +90,11 @@ const Layout = observer(() => {
 
   return (
     <div className={styles.layout}>
+      {blackCoverState.isBlackCoverShown && <div className={styles.blackCover} onClick={() => blackCoverState.closeBlackCover()}>
+        <img
+          className={styles.blackCoverImage}
+          src={blackCoverState.imageLink ?? ""} onClick={(e) => e.stopPropagation()} />
+      </div>}
       <div className={styles.background} />
       <div className={styles.layoutContainer}>
         <ChatList />

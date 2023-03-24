@@ -33,6 +33,10 @@
 }
 
 .lastMessage {
+  width: 200px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   color: $light-grey-font-page;
 }
 
