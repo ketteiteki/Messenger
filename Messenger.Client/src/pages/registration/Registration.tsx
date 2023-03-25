@@ -67,7 +67,7 @@ const Registration = observer(() => {
           />
           <input
             className={styles.inputPassword}
-            type="text"
+            type="password"
             placeholder="Password"
             value={inputPassword}
             onKeyDown={onEnterRegisterHandler}
