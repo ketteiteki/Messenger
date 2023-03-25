@@ -50,10 +50,10 @@ jobs:
 
       - name: Run .NET Publish
         run: |
-          dotnet publish "Messenger.WebApi/Messenger.WebApi.csproj" -r "linux-x64" -o "messenger-linux-build/src" --self-contained
+          dotnet publish "Messenger.WebApi/Messenger.WebApi.csproj" --configuration "Release" --output "publish"
 
-#      - name: Drop Artifact
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: messenger-linux-build
-#          path: messenger-linux-build/src
+      - name: Drop Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'drop'
+          path: 'publish'

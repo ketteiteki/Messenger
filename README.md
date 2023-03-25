@@ -16,6 +16,8 @@
 - Check NodeJS installed properly: `node -v`
 - Check NPM installed properly (should be 9.4.1): `npm -v`
 - Install NPM v9.4.1 if necessary: `npm install -g npm@9.4.1`
+- Install TypeScript globally: `npm install -g typescript@4.9.5`
+- Validate TS files: `cd Messenger.Client && tsc -p tsconfig.json`
 - Restore packages: `npm ci`
 - Set execution policy: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
 - Run project: `npm start`

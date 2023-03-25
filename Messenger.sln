@@ -24,16 +24,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\run-build-and-test.yml = .github\workflows\run-build-and-test.yml
 		.github\workflows\wait_postgres_database.ps1 = .github\workflows\wait_postgres_database.ps1
+		.github\workflows\react-build.yml = .github\workflows\react-build.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messenger.Infrastructure", "Messenger.Infrastructure\Messenger.Infrastructure.csproj", "{A523DA03-5478-4E7A-8040-4DB762FCDEEC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{4D1F3EA5-7DF4-4278-840A-73F1CD31A08C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "seedImages", "seedImages", "{84416ED9-EC0C-4DBD-8E29-5CF104CABA07}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SeedImages", "SeedImages", "{0E482466-549C-4C48-8624-2464D965BE8E}"
 	ProjectSection(SolutionItems) = preProject
-		..\dotnetchat.jpg = ..\dotnetchat.jpg
-		..\dotnettalkschat.jpg = ..\dotnettalkschat.jpg
+		img\SeedImages\dotnetchat.jpg = img\SeedImages\dotnetchat.jpg
+		img\SeedImages\dotnettalkschat.jpg = img\SeedImages\dotnettalkschat.jpg
 	EndProjectSection
 EndProject
 Global
@@ -73,6 +74,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5C25C588-05D0-46A1-91CC-AED392804EAD} = {CD5D3173-E469-496C-ACAC-EF31C95D06E8}
-		{84416ED9-EC0C-4DBD-8E29-5CF104CABA07} = {4D1F3EA5-7DF4-4278-840A-73F1CD31A08C}
+		{0E482466-549C-4C48-8624-2464D965BE8E} = {4D1F3EA5-7DF4-4278-840A-73F1CD31A08C}
 	EndGlobalSection
 EndGlobal
