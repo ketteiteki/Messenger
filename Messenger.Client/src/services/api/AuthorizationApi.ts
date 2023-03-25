@@ -1,6 +1,6 @@
 import IAuthorizationResponse from "../../models/interfaces/IAuthorizationResponse";
 import ISessionDto from "../../models/interfaces/ISessionDto";
-import api from "./baseApi";
+import api from "./baseAPI";
 
 export default class AuthorizationApi {
     public static async getAuthorizationAsync(accessToken: string) {

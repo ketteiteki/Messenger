@@ -1,7 +1,7 @@
-import { action, makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import IAuthorizationResponse from "../models/interfaces/IAuthorizationResponse";
 import AuthorizationApi from "../services/api/AuthorizationApi";
-import ProfileApi from "../services/api/ProfileApi";
+import ProfileApi from "../services/api/ProfileAPI";
 import TokenService from "../services/messenger/TokenService";
 
 class AuthorizationState {
