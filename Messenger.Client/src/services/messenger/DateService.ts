@@ -6,6 +6,12 @@ export default class DateService {
   public static getTime(date: string): string {
     const dateDayJs = dayjs(date);
 
+    const datee = new Date(date);
+    const timeZone = new Date(date).getTimezoneOffset();
+
+    console.log("date: " + datee);
+    console.log("tz: " + timeZone);
+
     return `${
       dateDayJs.hour() >= 10 ? dateDayJs.hour() : `0${dateDayJs.hour()}`
     }:${

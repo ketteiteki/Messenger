@@ -2,6 +2,7 @@
 
 .createChat {
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
 }
@@ -10,8 +11,46 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 400px;
+  height: 470px;
   margin: auto;
+}
+
+.avatarContainer {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 100%;
+  margin: 0 auto;
+  margin-top: 75px;
+  margin-bottom: 5px;
+}
+
+.avatarBlackCover {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 100%;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $blackTransparent;
+  }
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 100%;
+  object-fit: cover;
+}
+
+.avatarInput {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
 }
 
 .inputTitle {

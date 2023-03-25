@@ -19,6 +19,7 @@
   border-radius: 100%;
   cursor: pointer;
   flex-shrink: 0;
+  object-fit: cover;
 }
 
 .messageData {
@@ -45,6 +46,8 @@
 .messageReplyText {
   margin-left: 5px;
   font-size: 14px;
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .nickname {
@@ -54,6 +57,7 @@
 
 .text {
   font-size: 16px;
+  word-wrap: break-word;
 }
 
 .metaData {
@@ -80,6 +84,7 @@
   height: 45px;
   border-radius: 100%;
   flex-shrink: 0;
+  cursor: pointer;
 }
 
 .myMessageData {
@@ -104,6 +109,10 @@
 }
 
 .myMessageReplyText {
+  max-width: 200px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   margin-left: 5px;
   font-size: 14px;
 }
@@ -114,10 +123,10 @@
 
 .myText {
   font-size: 16px;
+  word-wrap: break-word;
 }
 
 .myMetaData {
   font-size: 13px;
   text-align: right;
 }
-

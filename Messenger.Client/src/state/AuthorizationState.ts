@@ -96,7 +96,7 @@ class AuthorizationState {
       runInAction(() => {
         if (this.data !== null) {
           this.data.displayName = response.data.displayName;
-          this.data.nickName = response.data.nickname;
+          this.data.nickname = response.data.nickname;
           this.data.bio = response.data.bio;
         }
       });

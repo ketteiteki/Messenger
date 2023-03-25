@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Messenger.Services.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230323025055_CreateDatabase")]
+    [Migration("20230323160037_CreateDatabase")]
     partial class CreateDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -102,6 +102,7 @@ namespace Messenger.Services.Migrations
                         new
                         {
                             Id = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
+                            AvatarFileName = "dotnetchat.jpg",
                             Name = "DotNetRuChat",
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Title = "DotNetRuChat",
@@ -110,6 +111,7 @@ namespace Messenger.Services.Migrations
                         new
                         {
                             Id = new Guid("2b56ee19-fe9c-4fab-884b-ff7d85a9f337"),
+                            AvatarFileName = "dotnettalkschat.jpg",
                             Name = "dotnettalks",
                             OwnerId = new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"),
                             Title = ".NET Talks",
@@ -268,56 +270,56 @@ namespace Messenger.Services.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("90f0a695-e815-496a-857b-96759ed5db1a"),
+                            Id = new Guid("48a946e8-5c84-488d-b946-a68d480eb7ad"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 23, 2, 50, 54, 480, DateTimeKind.Utc).AddTicks(9542),
+                            DateOfCreate = new DateTime(2023, 3, 23, 16, 0, 36, 401, DateTimeKind.Utc).AddTicks(5464),
                             IsEdit = false,
                             OwnerId = new Guid("a85825ba-f99b-4177-a858-96384303ea14"),
                             Text = "привет, какие книжки почитать?"
                         },
                         new
                         {
-                            Id = new Guid("b6931a6c-9152-4b05-a96d-d6d68342450e"),
+                            Id = new Guid("479cb3a8-5e1f-4ea8-9287-eab106d6f5a6"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 23, 2, 50, 54, 481, DateTimeKind.Utc).AddTicks(783),
+                            DateOfCreate = new DateTime(2023, 3, 23, 16, 0, 36, 401, DateTimeKind.Utc).AddTicks(6153),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
-                            ReplyToMessageId = new Guid("90f0a695-e815-496a-857b-96759ed5db1a"),
+                            ReplyToMessageId = new Guid("48a946e8-5c84-488d-b946-a68d480eb7ad"),
                             Text = "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться..."
                         },
                         new
                         {
-                            Id = new Guid("1dbcc552-4e6b-46d4-9f57-b61f679783b3"),
+                            Id = new Guid("a5726363-8e24-49ff-bcb8-8477e5c23ec0"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 23, 2, 50, 54, 481, DateTimeKind.Utc).AddTicks(1703),
+                            DateOfCreate = new DateTime(2023, 3, 23, 16, 0, 36, 401, DateTimeKind.Utc).AddTicks(6681),
                             IsEdit = false,
                             OwnerId = new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"),
-                            ReplyToMessageId = new Guid("b6931a6c-9152-4b05-a96d-d6d68342450e"),
+                            ReplyToMessageId = new Guid("479cb3a8-5e1f-4ea8-9287-eab106d6f5a6"),
                             Text = "ладно"
                         },
                         new
                         {
-                            Id = new Guid("f6109d43-7055-4b21-acff-c94d0633a7f7"),
+                            Id = new Guid("e970fe7c-f5e4-4e49-901f-c2b77bf26af5"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 23, 2, 50, 54, 481, DateTimeKind.Utc).AddTicks(2612),
+                            DateOfCreate = new DateTime(2023, 3, 23, 16, 0, 36, 401, DateTimeKind.Utc).AddTicks(7199),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "ага"
                         },
                         new
                         {
-                            Id = new Guid("01efe31a-4813-401a-a879-6519c870997e"),
+                            Id = new Guid("cc58c074-34c5-43ea-a650-5bb05bf7c7e8"),
                             ChatId = new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"),
-                            DateOfCreate = new DateTime(2023, 3, 23, 2, 50, 54, 481, DateTimeKind.Utc).AddTicks(3502),
+                            DateOfCreate = new DateTime(2023, 3, 23, 16, 0, 36, 401, DateTimeKind.Utc).AddTicks(7879),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "привет"
                         },
                         new
                         {
-                            Id = new Guid("4fa4bf54-58cf-4626-9420-5c0f9cce16d8"),
+                            Id = new Guid("abe544f4-8f16-4f3d-8e5d-4712aa830092"),
                             ChatId = new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"),
-                            DateOfCreate = new DateTime(2023, 3, 23, 2, 50, 54, 481, DateTimeKind.Utc).AddTicks(4206),
+                            DateOfCreate = new DateTime(2023, 3, 23, 16, 0, 36, 401, DateTimeKind.Utc).AddTicks(8421),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "привет, как дела?"

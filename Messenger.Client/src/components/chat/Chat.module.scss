@@ -140,11 +140,13 @@
   margin-left: 20px;
 }
 
-.replyDisplayName {
-
-}
+.replyDisplayName {}
 
 .replyMessageText {
+  width: 350px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   color: $grey-font-page;
 }
 
@@ -176,11 +178,13 @@
   margin-left: 20px;
 }
 
-.editMessagePage {
-
-}
+.editMessagePage {}
 
 .editMessageText {
+  width: 350px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   color: $grey-font-page;
 }
 

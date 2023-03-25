@@ -5,7 +5,7 @@ export default interface IAuthorizationResponse {
     refreshToken: string;
     id: string;
     displayName: string;
-    nickName: string;
+    nickname: string;
     bio: string | null;
     avatarLink: string | null;
 }

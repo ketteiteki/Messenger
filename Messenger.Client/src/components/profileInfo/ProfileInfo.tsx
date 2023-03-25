@@ -13,6 +13,7 @@ import nonAvatar from "../../assets/images/non_avatar.jpg";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
 import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
+import { blackCoverState } from "../../state/BlackCoverState";
 
 const ProfileInfo = observer(() => {
   const [updateMode, setUpdateMode] = useState<boolean>(false);
@@ -32,6 +33,7 @@ const ProfileInfo = observer(() => {
     chatListWithMessagesState.data.find(
       (x) => x.chat.members.find(m => m.id !== authorizationState.data?.id)?.id === currentProfileId
     );
+  const isMyProfile = !currentProfileState.date;
 
   const MouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
     const localX = event.clientX - event.currentTarget.offsetLeft;
@@ -41,7 +43,7 @@ const ProfileInfo = observer(() => {
     setYMousePosition(localY);
   };
 
-  const updateProfileDateHandler = async () => {
+  const onClickUpdateProfileDateHandler = async () => {
     await authorizationState.putUpdateProfileAsync(
       inputDisplayName,
       inputNickname,
@@ -62,7 +64,7 @@ const ProfileInfo = observer(() => {
     await sessionsState.delDeleteSessionAsync(sessionId);
   };
 
-  const startChattingHandler = async () => {
+  const onClickStartChattingHandler = async () => {
     if (currentProfileId === undefined) return;
 
     const response = await chatListWithMessagesState.postCreateDialogAsync(
@@ -80,20 +82,20 @@ const ProfileInfo = observer(() => {
   useEffect(() => {
     setInputDisplayName(
       currentProfileState.date?.displayName ||
-        authorizationState.data?.displayName ||
-        ""
+      authorizationState.data?.displayName ||
+      ""
     );
     setInputNickname(
       currentProfileState.date?.nickname ||
-        authorizationState.data?.nickName ||
-        ""
+      authorizationState.data?.nickname ||
+      ""
     );
     setInputAdditionalData(
       currentProfileState.date?.bio || authorizationState.data?.bio || ""
     );
   }, [currentProfileState.date, authorizationState.data]);
 
-  const changeAvatarHandler = async (
+  const onChangeAvatarHandler = async (
     event: React.FormEvent<HTMLInputElement>
   ) => {
     const files = event.currentTarget.files;
@@ -103,13 +105,17 @@ const ProfileInfo = observer(() => {
     }
   };
 
+  const onClickOpenFullSizeAvatar = () => {
+    blackCoverState.setImage(currentProfileState.date?.avatarLink ?? nonAvatar);
+  };
+
   return (
     <div
       className={styles.profileInfo}
       onMouseMove={(event) => MouseMoveHandler(event)}
     >
       {updateMode && (
-        <button className={styles.okButton} onClick={updateProfileDateHandler}>
+        <button className={styles.okButton} onClick={onClickUpdateProfileDateHandler}>
           <TickSvg width={15} height={23} />
         </button>
       )}
@@ -130,10 +136,10 @@ const ProfileInfo = observer(() => {
         <SettingsSvg className={styles.settingsSvg} width={20} />
       </button>
       <div className={styles.avatarContainer}>
-        <label htmlFor="avatar" className={styles.avatarBlackCover} />
+        {isMyProfile && <label htmlFor="avatar" className={styles.avatarBlackCover} />}
         <input
           className={styles.avatarInput}
-          onChange={changeAvatarHandler}
+          onChange={onChangeAvatarHandler}
           type="file"
           id="avatar"
           name="avatar"
@@ -142,11 +148,11 @@ const ProfileInfo = observer(() => {
         <img
           className={styles.avatar}
           src={
-            currentProfileState.date?.avatarLink
+            currentProfileState.date
               ? currentProfileState.date.avatarLink || nonAvatar
               : authorizationState.data?.avatarLink || nonAvatar
           }
-          alt=""
+          onClick={onClickOpenFullSizeAvatar}
         />
       </div>
       {updateMode == false && (
@@ -187,20 +193,20 @@ const ProfileInfo = observer(() => {
         chatWithThisUser === undefined && (
           <button
             className={styles.startChattingButton}
-            onClick={startChattingHandler}
+            onClick={onClickStartChattingHandler}
           >
             Start Chatting
           </button>
         )}
       {(currentProfileState.date?.id === authorizationState.data?.id ||
         currentProfileState.date === null) && (
-        <button
-          className={styles.showMembersButton}
-          onClick={() => setShowSessionsHandler()}
-        >
-          {showSessions ? "Close" : "Show"} Sessions
-        </button>
-      )}
+          <button
+            className={styles.showMembersButton}
+            onClick={() => setShowSessionsHandler()}
+          >
+            {showSessions ? "Close" : "Show"} Sessions
+          </button>
+        )}
       {showSessions && (
         <div className={styles.sessionList}>
           {sessionsState.data.map((i) => (

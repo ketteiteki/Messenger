@@ -6,9 +6,10 @@ import IMessageDto from "../../models/interfaces/IMessageDto";
 import { authorizationState } from "../../state/AuthorizationState";
 import nonAvatar from "../../assets/images/non_avatar.jpg";
 import DateService from "../../services/messenger/DateService";
-import TextService from "../../services/messenger/TextService";
 import { useNavigate } from "react-router-dom";
-import {currentProfileState} from "../../state/CurrentProfileState"
+import { currentProfileState } from "../../state/CurrentProfileState"
+import { currentChatState } from "../../state/CurrentChatState";
+import { ChatType } from "../../models/enum/ChatType";
 
 const Message = observer((props: IMessageDto) => {
   const [xMousePosition, setXMousePosition] = useState<number>(0);
@@ -18,7 +19,9 @@ const Message = observer((props: IMessageDto) => {
 
   const navigate = useNavigate();
 
-  const isMyMessage = props.ownerId === authorizationState.data?.id;
+  const isMessageMine = props.ownerId === authorizationState.data?.id;
+  const isCurrentChatChannel = currentChatState.chat?.type === ChatType.Channel;
+  const isCurrentChatMine = currentChatState.chat?.isOwner;
 
   const showMenuHandler = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -28,9 +31,15 @@ const Message = observer((props: IMessageDto) => {
   const showProfileByMessage = async () => {
     if (props.ownerId === null) return;
 
+    if (isMessageMine) {
+      currentProfileState.setProfileNull();
+
+      return navigate("/", { replace: true });
+    }
+
     await currentProfileState.getUserAsync(props.ownerId);
 
-    return navigate("/", {replace: true});
+    return navigate("/", { replace: true });
   };
 
   const MouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -44,7 +53,7 @@ const Message = observer((props: IMessageDto) => {
 
   return (
     <>
-      {isMyMessage ? (
+      {isMessageMine ? (
         <>
           <div
             className={styles.myMessage}
@@ -52,17 +61,17 @@ const Message = observer((props: IMessageDto) => {
             onMouseMove={MouseMoveHandler}
           >
             {showMenu && (
-              <MessageBurgerMenu
-                x={xMousePosition}
-                y={yMousePosition}
-                messageId={props.id}
-                chatId={props.chatId}
-                displayName={props.ownerDisplayName || ""}
-                text={props.text}
-                isMyMessage={isMyMessage}
-                setShowMenu={setShowMenu}
-              />
-            )}
+                <MessageBurgerMenu
+                  x={xMousePosition}
+                  y={yMousePosition}
+                  messageId={props.id}
+                  chatId={props.chatId}
+                  displayName={props.ownerDisplayName || ""}
+                  text={props.text}
+                  isMyMessage={isMessageMine}
+                  setShowMenu={setShowMenu}
+                />
+              )}
             <img
               className={styles.myAvatar}
               src={
@@ -70,6 +79,7 @@ const Message = observer((props: IMessageDto) => {
                   ? `${props.ownerAvatarLink}`
                   : nonAvatar
               }
+              onClick={showProfileByMessage}
               alt="avatar"
             />
             <div className={styles.myMessageData}>
@@ -79,10 +89,7 @@ const Message = observer((props: IMessageDto) => {
                     {props.replyToMessageAuthorDisplayName}
                   </p>
                   <p className={styles.myMessageReplyText}>
-                    {TextService.trimTextWithThirdDot(
-                      props.replyToMessageText || "",
-                      35
-                    )}
+                    {props.replyToMessageText || ""}
                   </p>
                 </div>
               )}
@@ -100,7 +107,8 @@ const Message = observer((props: IMessageDto) => {
           onContextMenu={showMenuHandler}
           onMouseMove={MouseMoveHandler}
         >
-          {showMenu && (
+          {(showMenu && isCurrentChatChannel && isCurrentChatMine) ||
+              (showMenu && !isCurrentChatChannel) && (
             <MessageBurgerMenu
               x={xMousePosition}
               y={yMousePosition}
@@ -108,7 +116,7 @@ const Message = observer((props: IMessageDto) => {
               chatId={props.chatId}
               displayName={props.ownerDisplayName || ""}
               text={props.text}
-              isMyMessage={isMyMessage}
+              isMyMessage={isMessageMine}
               setShowMenu={setShowMenu}
             />
           )}
@@ -119,6 +127,7 @@ const Message = observer((props: IMessageDto) => {
                 ? `${props.ownerAvatarLink}`
                 : nonAvatar
             }
+            onClick={showProfileByMessage}
             alt="avatar"
           />
           <div className={styles.messageData}>
@@ -129,10 +138,7 @@ const Message = observer((props: IMessageDto) => {
                   {props.replyToMessageAuthorDisplayName}
                 </p>
                 <p className={styles.messageReplyText}>
-                  {TextService.trimTextWithThirdDot(
-                    props.replyToMessageText || "",
-                    35
-                  )}
+                  {props.replyToMessageText || ""}
                 </p>
               </div>
             )}

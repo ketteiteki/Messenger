@@ -19,6 +19,7 @@
   flex-shrink: 0;
   border-radius: 100%;
   margin: 7.5px 0 0 15px;
+  object-fit: cover;
 }
 
 .container {
@@ -32,6 +33,10 @@
 }
 
 .lastMessage {
+  width: 200px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   color: $light-grey-font-page;
 }
 
