@@ -1,5 +1,5 @@
 import IMessageDto from "../../models/interfaces/IMessageDto";
-import api from "./baseApi";
+import api from "./baseAPI";
 
 
 export default class MessagesApi {

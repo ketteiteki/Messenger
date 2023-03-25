@@ -1,6 +1,6 @@
 import { CreateChatEnum } from "../../models/enum/CreateChat";
 import IChatDto from "../../models/interfaces/IChatDto";
-import api from "./baseApi";
+import api from "./baseAPI";
 
 
 export default class ChatApi {

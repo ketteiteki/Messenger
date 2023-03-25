@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import IUserDto from "../models/interfaces/IUserDto";
-import ProfileApi from "../services/api/ProfileApi";
+import ProfileApi from "../services/api/ProfileAPI";
 import UsersApi from "../services/api/UserApi";
 
 class CurrentProfileState {
