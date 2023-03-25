@@ -1,6 +1,6 @@
 import { authorizationState } from "../../state/AuthorizationState";
 import axios from "axios";
-import AppConstants from "../../constants/appConstants";
+import AppConstants from "../../constants/AppConstants";
 import TokenService from "../messenger/TokenService";
 
 const api = axios.create({
