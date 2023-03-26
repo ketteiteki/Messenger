@@ -6,7 +6,6 @@ using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Entities;
 using Messenger.Domain.Enums;
 using Messenger.Persistence;
-using Messenger.Services;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 

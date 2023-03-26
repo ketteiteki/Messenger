@@ -4,7 +4,6 @@ using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Enums;
 using Messenger.Persistence;
-using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.BusinessLogic.ApiQueries.Chats;
