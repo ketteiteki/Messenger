@@ -3,19 +3,17 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <AnalysisMode>Recommended</AnalysisMode>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.8" />
-      <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Messenger.Application\Messenger.Application.csproj" />
-      <ProjectReference Include="..\Messenger.BusinessLogic\Messenger.BusinessLogic.csproj" />
-      <ProjectReference Include="..\Messenger.Domain\Messenger.Domain.csproj" />
-      <ProjectReference Include="..\Messenger.Infrastructure\Messenger.Infrastructure.csproj" />
-      <ProjectReference Include="..\Messenger.Persistence\Messenger.Persistence.csproj" />
+        <ProjectReference Include="..\Messenger.Application\Messenger.Application.csproj"/>
+        <ProjectReference Include="..\Messenger.BusinessLogic\Messenger.BusinessLogic.csproj"/>
+        <ProjectReference Include="..\Messenger.Domain\Messenger.Domain.csproj"/>
+        <ProjectReference Include="..\Messenger.Infrastructure\Messenger.Infrastructure.csproj"/>
+        <ProjectReference Include="..\Messenger.Persistence\Messenger.Persistence.csproj"/>
     </ItemGroup>
 
 </Project>

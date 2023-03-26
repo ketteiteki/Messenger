@@ -9,12 +9,14 @@ namespace Messenger.Infrastructure.DependencyInjection;
 
 public static class MediatorDependencyInjection
 {
-	public static IServiceCollection AddMediator(this IServiceCollection serviceCollection)
-	{
-		serviceCollection.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
-		serviceCollection.AddValidatorsFromAssembly(typeof(UpdateProfileDataCommandHandler).Assembly);
-		serviceCollection.AddMediatR(typeof(RegistrationCommandHandler).Assembly);
+    public static IServiceCollection AddMediator(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
+        serviceCollection.AddValidatorsFromAssembly(typeof(UpdateProfileDataCommandHandler).Assembly);
+        // serviceCollection.AddMediatR(typeof(RegistrationCommandHandler).Assembly);
+        serviceCollection.AddMediatR(cfg =>
+            cfg.RegisterServicesFromAssembly(typeof(RegistrationCommandHandler).Assembly));
 
-		return serviceCollection;
-	}
+        return serviceCollection;
+    }
 }

@@ -1,6 +1,7 @@
 using MediatR;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
+using Messenger.Persistence;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
 

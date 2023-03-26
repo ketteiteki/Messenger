@@ -1,7 +1,7 @@
 using FluentValidation;
 using Messenger.Domain.Entities.Abstraction;
 using Messenger.Domain.Entities.Validation;
-using Messenger.Domain.Enum;
+using Messenger.Domain.Enums;
 
 namespace Messenger.Domain.Entities;
 

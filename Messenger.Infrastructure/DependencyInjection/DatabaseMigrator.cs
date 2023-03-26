@@ -1,3 +1,4 @@
+using Messenger.Persistence;
 using Messenger.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,4 @@
-namespace Messenger.BusinessLogic.Models.Enum;
+namespace Messenger.BusinessLogic.Models.Enums;
 
 public enum CreateChatType
 {

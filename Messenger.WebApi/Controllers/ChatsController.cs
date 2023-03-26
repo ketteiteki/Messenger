@@ -5,7 +5,7 @@ using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Models.Requests;
 using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
-using Messenger.Domain.Enum;
+using Messenger.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

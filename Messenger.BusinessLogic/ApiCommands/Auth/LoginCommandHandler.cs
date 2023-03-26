@@ -4,6 +4,7 @@ using Messenger.BusinessLogic.Models.Responses;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
+using Messenger.Persistence;
 using Messenger.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
