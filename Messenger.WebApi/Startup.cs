@@ -2,8 +2,6 @@ using Messenger.BusinessLogic.Hubs;
 using Messenger.Domain.Constants;
 using Messenger.Infrastructure.DependencyInjection;
 using Messenger.Infrastructure.Middlewares;
-using Messenger.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.WebApi;
 
@@ -38,10 +36,6 @@ public class Startup
         serviceCollection.ConfigureCors(CorsPolicyName, allowOrigins);
 
         serviceCollection.AddSwagger();
-
-        var databaseContext = serviceCollection.BuildServiceProvider().GetService<DatabaseContext>();
-        
-        databaseContext?.Database.Migrate();
     }
 
     public void Configure(IApplicationBuilder applicationBuilder, IHostEnvironment environment)
@@ -74,5 +68,7 @@ public class Startup
             options.MapHub<ChatHub>("/notification").RequireCors(CorsPolicyName);
             options.MapControllers();
         });
+        
+        applicationBuilder.MigrateDatabase();
     }
 }
