@@ -13,7 +13,6 @@ public static class MediatorDependencyInjection
     {
         serviceCollection.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
         serviceCollection.AddValidatorsFromAssembly(typeof(UpdateProfileDataCommandHandler).Assembly);
-        // serviceCollection.AddMediatR(typeof(RegistrationCommandHandler).Assembly);
         serviceCollection.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssembly(typeof(RegistrationCommandHandler).Assembly));
 
