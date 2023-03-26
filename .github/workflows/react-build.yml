@@ -1,0 +1,60 @@
+﻿name: React Build
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches: [ develop ]
+  workflow_dispatch:
+    
+env:
+  CI: false
+
+jobs:
+  react-build:
+    name: React Build
+    runs-on: ${{ matrix.environment }}
+    strategy:
+      matrix:
+        environment:
+          - ubuntu-latest
+          - windows-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v3
+
+      - name: 'Setup Node.js 18.x'
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          cache-dependency-path: 'Messenger.Client/package-lock.json'
+
+      - name: 'Setup Typescript 4.9.5'
+        run: npm install -g typescript@4.9.5
+
+      - name: 'Print current node version'
+        run: node -v
+
+      - name: 'Print current npm version'
+        run: npm -v
+
+      - name: 'Npm ci'
+        working-directory: './Messenger.Client'
+        run: npm ci
+
+      - name: 'Compile TS files'
+        working-directory: './Messenger.Client'
+        run: tsc -p tsconfig.json
+
+      - name: 'Npm run build'
+        working-directory: './Messenger.Client'
+        run: npm run build
+
+      - name: 'Drop artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'messenger-build-${{ matrix.environment }}'
+          path: './Messenger.Client/build'
