@@ -35,11 +35,8 @@ class ChatListWithMessagesState {
   };
 
   public addMessageInData = (message: IMessageDto) => {
-    console.log(message);
     const item = this.data.find((c) => c.chat.id === message.chatId);
-    console.log(item);
     const itemInSearchData = this.dataForSearchChats.find((c) => c.chat.id === message.chatId);
-    console.log(itemInSearchData);
 
     item?.messages.push(message);
     itemInSearchData?.messages.push(message);
@@ -182,8 +179,6 @@ class ChatListWithMessagesState {
 
     if (item === undefined) return;
 
-    console.log(item.messages.findIndex((x) => x.id === "43"));
-
     const messageIndex = item.messages.findIndex((x) => x.id === messageId);
 
     if (messageIndex === -1) return;
@@ -211,6 +206,8 @@ class ChatListWithMessagesState {
     messageEntity: IMessageDto,
     files: File[]
   ) => {
+    console.log(files);
+
     const response = await MessagesApi.postCreateMessageAsync(
       messageEntity.text,
       messageEntity.chatId,
@@ -224,8 +221,9 @@ class ChatListWithMessagesState {
         const messageItem = dataItem?.messages.find(x => x.id === messageEntity.id);
         
         if (!messageItem) return;
-
+        
         messageItem.id = response.data.id;
+        messageEntity.attachments = response.data.attachments;
         chatListWithMessagesState.setLastMessage(response.data);
       });
     }

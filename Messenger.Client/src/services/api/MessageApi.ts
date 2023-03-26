@@ -39,19 +39,19 @@ export default class MessagesApi {
       replyToId: string | null,
       files: File[]
     ) {
-      const data = {
-        text,
-        chatId,
-        replyToId,
-        files,
-      };
-  
+      const formData = new FormData();
+
+      formData.append('text', text);
+      formData.append('chatId', chatId);
+      if (replyToId) formData.append('replyToId', replyToId);
+      files.forEach(x => formData.append("files", x))
+
       const headers = {
         "Content-Type": "multipart/form-data",
       };
   
-      return await api.post<IMessageDto>(`/Messages/createMessage`, data, {
-        headers,
+      return await api.post<IMessageDto>(`/Messages/createMessage`, formData, {
+        headers
       });
     }
   
