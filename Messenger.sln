@@ -28,6 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\run-build-and-test.yml = .github\workflows\run-build-and-test.yml
 		.github\workflows\wait_postgres_database.ps1 = .github\workflows\wait_postgres_database.ps1
 		.github\workflows\react-build.yml = .github\workflows\react-build.yml
+		.github\workflows\resharper-scan.yml = .github\workflows\resharper-scan.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messenger.Infrastructure", "Messenger.Infrastructure\Messenger.Infrastructure.csproj", "{A523DA03-5478-4E7A-8040-4DB762FCDEEC}"
