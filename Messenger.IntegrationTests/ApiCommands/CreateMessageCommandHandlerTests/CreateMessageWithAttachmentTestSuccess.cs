@@ -30,7 +30,7 @@ public class CreateMessageWithAttachmentTestSuccess : IntegrationTestBase, IInte
             Text: "qwerty1",
             ReplyToId: null,
             createConversationResult.Value.Id,
-            new FormFileCollection
+            new List<IFormFile>
             {
                 FilesHelper.GetFile(),
                 FilesHelper.GetFile()

@@ -31,7 +31,7 @@ public class CreateMessageWithAttachmentTestThrowForbidden : IntegrationTestBase
             Text: "qwerty1",
             ReplyToId: null,
             conversation.Value.Id,
-            Files: new FormFileCollection
+            Files: new List<IFormFile>
             {
                 FilesHelper.GetFile(),
                 FilesHelper.GetFile(),

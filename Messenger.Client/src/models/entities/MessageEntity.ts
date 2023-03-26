@@ -23,7 +23,8 @@ export default class MessageEntity implements IMessageDto {
     replyToMessageId: string | null,
     replyToMessageText: string | null,
     replyToMessageAuthorDisplayName: string | null,
-    chatId: string
+    chatId: string,
+    attachments: IAttachmentDto[]
   ) {
     this.text = text;
     this.ownerId = ownerId;
@@ -33,5 +34,6 @@ export default class MessageEntity implements IMessageDto {
     this.replyToMessageText = replyToMessageText;
     this.replyToMessageAuthorDisplayName = replyToMessageAuthorDisplayName;
     this.chatId = chatId;
+    this.attachments = attachments;
   }
 }

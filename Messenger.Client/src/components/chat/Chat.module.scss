@@ -74,6 +74,22 @@
   background-color: white;
 }
 
+.attachmentInput {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.attachmentLabel {
+  width: 30px;
+  height: 35px;
+  margin-top: 12px;
+  margin-left: 12px;
+}
+
 .textarea {
   width: 100%;
   padding: 17px;
@@ -91,8 +107,7 @@
   cursor: pointer;
 }
 
-.attachment {
-  margin-left: 10px;
+.attachmentSvg {
   cursor: pointer;
 }
 
@@ -190,6 +205,34 @@
 }
 
 .closeEditMessageButton {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: inherit;
+  border: none;
+  cursor: pointer;
+}
+
+.attachmentPanel {
+  display: flex;
+  position: absolute;
+  top: -100%;
+  width: 100%;
+  height: 52px;
+  background-color: white;
+}
+
+.attachmentPanelItem {
+  height: 100%;
+  margin-right: 2px;
+}
+
+.attachmentPanelConstainer {
+  margin-top: 7px;
+  margin-left: 20px;
+}
+
+.closeAttachmentButton {
   position: absolute;
   top: 15px;
   right: 15px;

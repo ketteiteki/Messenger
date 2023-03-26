@@ -9,8 +9,8 @@ export default class DateService {
     const datee = new Date(date);
     const timeZone = new Date(date).getTimezoneOffset();
 
-    console.log("date: " + datee);
-    console.log("tz: " + timeZone);
+    // console.log("date: " + datee);
+    // console.log("tz: " + timeZone);
 
     return `${
       dateDayJs.hour() >= 10 ? dateDayJs.hour() : `0${dateDayJs.hour()}`

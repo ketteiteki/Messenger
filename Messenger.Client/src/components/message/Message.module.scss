@@ -24,7 +24,7 @@
 
 .messageData {
   font-size: 17px;
-  max-width: 320px;
+  max-width: 400px;
   min-width: 120px;
   min-height: 30px;
   margin-left: 10px;
@@ -89,13 +89,87 @@
 
 .myMessageData {
   color: white;
-  max-width: 320px;
+  max-width: 400px;
   min-width: 120px;
   min-height: 30px;
   margin-left: 10px;
   background-color: $blue;
   border-radius: 5px;
   padding: 7px;
+}
+
+.messageAttachmentListOneAttachment {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 5px;
+  gap: 2px;
+  grid-template-columns: auto;
+  grid-template-rows: 420px;
+  grid-template-areas:
+    "block-1";
+}
+
+.messageAttachmentListTwoAttachment {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 5px;
+  gap: 2px;
+  grid-template-columns: auto;
+  grid-template-rows: 300px;
+  grid-template-areas:
+    "block-1 block-2";
+}
+
+.messageAttachmentListThreeAttachment {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 5px;
+  gap: 2px;
+  grid-template-columns: auto;
+  grid-template-rows: 220px 130px;
+  grid-template-areas:
+    "block-1 block-1"
+    "block-2 block-3";
+}
+
+.messageAttachmentListFourAttachment {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 5px;
+  gap: 2px;
+  grid-template-columns: 1fr 110px;
+  grid-template-rows: repeat(3, 130px);
+  grid-template-areas:
+    "block-1 block-2"
+    "block-1 block-3"
+    "block-1 block-4";
+}
+
+.messageAttachment {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.messageAttachment:nth-child(1) {
+  grid-area: block-1;
+}
+
+.messageAttachment:nth-child(2) {
+  grid-area: block-2;
+}
+
+.messageAttachment:nth-child(3) {
+  grid-area: block-3;
+}
+
+.messageAttachment:nth-child(4) {
+  grid-area: block-4;
 }
 
 .myMessageReply {

@@ -10,5 +10,5 @@ public class CreateMessageRequest
 	
 	public Guid ChatId { get; set; }
 	
-	public IFormFileCollection Files { get; set; }
+	public List<IFormFile> Files { get; set; }
 }

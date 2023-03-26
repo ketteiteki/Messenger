@@ -18,9 +18,12 @@ import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState
 import { editMessageState } from "../../state/EditMessageState";
 import MessageEntity from "../../models/entities/MessageEntity";
 import { useDebouncedCallback } from "use-debounce";
+import AttachmentEntity from "../../models/entities/AttachmentEntity";
 
 const Chat = observer(() => {
   const [inputMessage, setInputMessage] = useState<string>("");
+  const [attachmentList, setAttachmentList] = useState<File[]>([]);
+  const [attachmentListUrlBlob, setAttachmentListUrlBlob ] = useState<Array<string | ArrayBuffer | null>>([]);
 
   const refMessageList = document.getElementById("messageList");
 
@@ -72,14 +75,16 @@ const Chat = observer(() => {
       replyState.data?.messageId ?? null,
       replyState.data?.text ?? null,
       replyState.data?.displayName ?? null,
-      currentChatId
+      currentChatId,
+      attachmentList.map(x => new AttachmentEntity(Math.random().toString(), 1, nonAvatar))
     );
 
     chatListWithMessagesState.addMessageInData(messageEntity);
     chatListWithMessagesState.setLastMessage(messageEntity);
 
-    await chatListWithMessagesState.postCreateMessageAsync(messageEntity, []);
+    await chatListWithMessagesState.postCreateMessageAsync(messageEntity, attachmentList);
 
+    setAttachmentList([]);
     messageListScrollBottomHandler();
     setInputMessage("");
     editMessageState.setEditMessageNull();
@@ -147,6 +152,24 @@ const Chat = observer(() => {
     setInputMessage("");
   };
 
+  const onChangeAttachmentsHandler = (event: React.FormEvent<HTMLInputElement>) => {
+    const files = event.currentTarget.files;
+
+    if (!files || files.length > 4) return;
+
+    var fileArray = Array.from(files);
+
+    setAttachmentList(fileArray);
+
+    console.log(URL.createObjectURL(files[0]));
+
+    const arrayUrlBlob: Array<string | ArrayBuffer | null> = [];
+
+    fileArray.forEach(x => arrayUrlBlob.push(URL.createObjectURL(x)));
+
+    setAttachmentListUrlBlob(arrayUrlBlob);
+  }
+
   const messageListScrollBottomHandler = () => {
     if (refMessageList === null) return;
 
@@ -183,6 +206,11 @@ const Chat = observer(() => {
     currentChatState.setChatAndMessages(currentChatState.chat, currentChatState.messages);
   }
 
+  const onClickCloseAttachmentPanelHandler = () => {
+    setAttachmentList([])
+    setAttachmentListUrlBlob([]);
+  };
+
   useEffect(() => {
     if (editMessageState.data === null) return;
 
@@ -190,6 +218,8 @@ const Chat = observer(() => {
   }, [editMessageState.data]);
 
   useEffect(() => {
+    setAttachmentList([]);
+    setAttachmentListUrlBlob([]);
     setInputMessage("");
     messageListScrollBottomHandler();
   }, [currentChatState.chat]);
@@ -284,11 +314,38 @@ const Chat = observer(() => {
                   </button>
                 </div>
               )}
+            {attachmentList[0] &&
+              banDateOfExpire === null &&
+              muteDateOfExpire === null &&
+              isMember && (
+                <div className={styles.attachmentPanel}>
+                  <div className={styles.attachmentPanelConstainer}>
+                    {attachmentListUrlBlob.map(x => <img className={styles.attachmentPanelItem} src={x?.toString()}/>)}
+                  </div>
+                  <button
+                    className={styles.closeAttachmentButton}
+                    onClick={onClickCloseAttachmentPanelHandler}
+                  >
+                    <CrossSvg width={20} />
+                  </button>
+                </div>
+              )}
             {banDateOfExpire === null &&
               muteDateOfExpire === null &&
               isMember && (
                 <>
-                  <AttachmentSvg className={styles.attachment} width={25} />
+                  <input
+                    className={styles.attachmentInput}
+                    onChange={onChangeAttachmentsHandler}
+                    type="file"
+                    id="attachment"
+                    name="attachment"
+                    multiple
+                    accept="image/jpeg"
+                  />
+                  <label htmlFor="attachment" className={styles.attachmentLabel}>
+                    <AttachmentSvg className={styles.attachmentSvg} width={25} />
+                  </label>
                   <TextArea
                     id="sendMessageTextArea"
                     className={styles.textarea}

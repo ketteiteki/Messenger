@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { currentProfileState } from "../../state/CurrentProfileState"
 import { currentChatState } from "../../state/CurrentChatState";
 import { ChatType } from "../../models/enum/ChatType";
+import { blackCoverState } from "../../state/BlackCoverState";
 
 const Message = observer((props: IMessageDto) => {
   const [xMousePosition, setXMousePosition] = useState<number>(0);
@@ -18,6 +19,14 @@ const Message = observer((props: IMessageDto) => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
 
   const navigate = useNavigate();
+
+  const messageAttachmentListStyle = props.attachments[3] ?
+    styles.messageAttachmentListFourAttachment
+    : props.attachments[2]
+      ? styles.messageAttachmentListThreeAttachment
+      : props.attachments[1]
+        ? styles.messageAttachmentListTwoAttachment
+        : styles.messageAttachmentListOneAttachment;
 
   const isMessageMine = props.ownerId === authorizationState.data?.id;
   const isCurrentChatChannel = currentChatState.chat?.type === ChatType.Channel;
@@ -51,6 +60,10 @@ const Message = observer((props: IMessageDto) => {
     setYMousePosition(localY);
   };
 
+  const onClickOpenFullSizeAvatar = (imageLink: string) => {
+    blackCoverState.setImage(imageLink);
+  };
+
   return (
     <>
       {isMessageMine ? (
@@ -61,17 +74,17 @@ const Message = observer((props: IMessageDto) => {
             onMouseMove={MouseMoveHandler}
           >
             {showMenu && (
-                <MessageBurgerMenu
-                  x={xMousePosition}
-                  y={yMousePosition}
-                  messageId={props.id}
-                  chatId={props.chatId}
-                  displayName={props.ownerDisplayName || ""}
-                  text={props.text}
-                  isMyMessage={isMessageMine}
-                  setShowMenu={setShowMenu}
-                />
-              )}
+              <MessageBurgerMenu
+                x={xMousePosition}
+                y={yMousePosition}
+                messageId={props.id}
+                chatId={props.chatId}
+                displayName={props.ownerDisplayName || ""}
+                text={props.text}
+                isMyMessage={isMessageMine}
+                setShowMenu={setShowMenu}
+              />
+            )}
             <img
               className={styles.myAvatar}
               src={
@@ -93,6 +106,10 @@ const Message = observer((props: IMessageDto) => {
                   </p>
                 </div>
               )}
+              {props.attachments[0] && <div className={messageAttachmentListStyle}>
+                {props.attachments.map(x =>
+                  <img className={styles.messageAttachment} onClick={() => onClickOpenFullSizeAvatar(x.link)} src={x.link} alt="" />)}
+              </div>}
               <p className={styles.myText}>{props.text}</p>
               <p className={styles.myMetaData}>
                 {props.isEdit ? "edit" : ""}{" "}
@@ -108,18 +125,18 @@ const Message = observer((props: IMessageDto) => {
           onMouseMove={MouseMoveHandler}
         >
           {(showMenu && isCurrentChatChannel && isCurrentChatMine) ||
-              (showMenu && !isCurrentChatChannel) && (
-            <MessageBurgerMenu
-              x={xMousePosition}
-              y={yMousePosition}
-              messageId={props.id}
-              chatId={props.chatId}
-              displayName={props.ownerDisplayName || ""}
-              text={props.text}
-              isMyMessage={isMessageMine}
-              setShowMenu={setShowMenu}
-            />
-          )}
+            (showMenu && !isCurrentChatChannel) && (
+              <MessageBurgerMenu
+                x={xMousePosition}
+                y={yMousePosition}
+                messageId={props.id}
+                chatId={props.chatId}
+                displayName={props.ownerDisplayName || ""}
+                text={props.text}
+                isMyMessage={isMessageMine}
+                setShowMenu={setShowMenu}
+              />
+            )}
           <img
             className={styles.avatar}
             src={
@@ -131,7 +148,7 @@ const Message = observer((props: IMessageDto) => {
             alt="avatar"
           />
           <div className={styles.messageData}>
-            <p className={styles.nickname} onClick={showProfileByMessage}>{props.ownerDisplayName}</p>
+            {!props.attachments[0] && <p className={styles.nickname} onClick={showProfileByMessage}>{props.ownerDisplayName}</p>}
             {props.replyToMessageId && (
               <div className={styles.messageReply}>
                 <p className={styles.messageReplyDisplayName}>
@@ -142,6 +159,10 @@ const Message = observer((props: IMessageDto) => {
                 </p>
               </div>
             )}
+            {props.attachments[0] && <div className={messageAttachmentListStyle}>
+              {props.attachments.map(x =>
+                <img className={styles.messageAttachment} onClick={() => onClickOpenFullSizeAvatar(x.link)} src={x.link} alt="" />)}
+            </div>}
             <p className={styles.text}>{props.text}</p>
             <p className={styles.metaData}>
               {props.isEdit ? "edit" : ""}{" "}
