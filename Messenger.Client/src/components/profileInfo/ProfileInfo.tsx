@@ -155,7 +155,7 @@ const ProfileInfo = observer(() => {
           onClick={onClickOpenFullSizeAvatar}
         />
       </div>
-      {updateMode == false && (
+      {updateMode === false && (
         <p className={styles.displayName}>{inputDisplayName}</p>
       )}
       {updateMode && (
@@ -166,7 +166,7 @@ const ProfileInfo = observer(() => {
           onChange={(e) => setInputDisplayName(e.currentTarget.value)}
         />
       )}
-      {updateMode == false && (
+      {updateMode === false && (
         <p className={styles.nickname}>{inputNickname}</p>
       )}
       {updateMode && (
@@ -177,7 +177,7 @@ const ProfileInfo = observer(() => {
           onChange={(e) => setInputNickname(e.currentTarget.value)}
         />
       )}
-      {updateMode == false && (
+      {updateMode === false && (
         <p className={styles.additionalData}>{inputAdditionalData}</p>
       )}
       {updateMode && (

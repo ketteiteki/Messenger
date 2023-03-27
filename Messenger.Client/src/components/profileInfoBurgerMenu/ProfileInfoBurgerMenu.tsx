@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
 import styles from "./ProfileInfoBurgerMenu.module.scss";
 import { ReactComponent as EditSvg } from "../../assets/svg/edit_black.svg";
