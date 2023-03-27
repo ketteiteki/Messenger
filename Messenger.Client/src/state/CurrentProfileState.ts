@@ -34,7 +34,7 @@ class CurrentProfileState {
   };
 
   public delDeleteProfileAsync = async () => {
-    const response = await ProfileApi.delDeleteProfileAsync()
+    await ProfileApi.delDeleteProfileAsync()
   }
 }
 

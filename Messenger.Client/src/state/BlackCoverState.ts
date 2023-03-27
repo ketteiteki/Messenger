@@ -1,4 +1,4 @@
-import { action, makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable } from "mobx";
 
 class BlackCoverState {
   public isBlackCoverShown: boolean = false;

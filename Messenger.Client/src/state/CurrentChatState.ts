@@ -1,9 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import IChatDto from "../models/interfaces/IChatDto";
 import IMessageDto from "../models/interfaces/IMessageDto";
-import IUserDto from "../models/interfaces/IUserDto";
 import ChatApi from "../services/api/ChatApi";
-import MessagesApi from "../services/api/MessageApi";
 import UsersApi from "../services/api/UserApi";
 
 class CurrentChatState {
