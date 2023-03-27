@@ -19,6 +19,10 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
     props.chat.avatarLink || nonAvatar :
     props.chat.members.find(x => x.id !== authorizationState.data?.id)?.avatarLink || nonAvatar;
 
+  const isInChatOnlyRealTimeMessages = props.messages.length !== 0 &&
+    props.messages.filter(x => x.isMessageRealtime).length === props.messages.length;
+  const firstRealtimeMessage = props.messages.find(x => x.isMessageRealtime);
+
   const navigate = useNavigate();
 
   const onClickChatItem = async () => {
@@ -29,6 +33,10 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
 
     if (props.messages.length === 0) {
       await chatListWithMessagesState.getMessageListAsync(props.chat.id, null);
+    } else if (isInChatOnlyRealTimeMessages) {
+      if (!firstRealtimeMessage) return;
+
+      await chatListWithMessagesState.getMessageListAsync(props.chat.id, firstRealtimeMessage?.dateOfCreate);
     }
 
     currentChatState.setChatAndMessages(props.chat, props.messages);

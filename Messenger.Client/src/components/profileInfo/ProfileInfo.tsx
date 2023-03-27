@@ -16,6 +16,13 @@ import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
 import { blackCoverState } from "../../state/BlackCoverState";
 
 const ProfileInfo = observer(() => {
+
+  const isMyProfile = !currentProfileState.date;
+
+  const displayName = isMyProfile ? authorizationState.data?.displayName ?? "" : currentProfileState.date?.displayName ?? "";
+  const nickname = isMyProfile ? authorizationState.data?.nickname ?? "" : currentProfileState.date?.nickname ?? "";
+  const bio = isMyProfile ? authorizationState.data?.bio ?? "" : currentProfileState.date?.bio ?? "";
+
   const [updateMode, setUpdateMode] = useState<boolean>(false);
 
   const [inputDisplayName, setInputDisplayName] = useState<string>("");
@@ -33,7 +40,7 @@ const ProfileInfo = observer(() => {
     chatListWithMessagesState.data.find(
       (x) => x.chat.members.find(m => m.id !== authorizationState.data?.id)?.id === currentProfileId
     );
-  const isMyProfile = !currentProfileState.date;
+  // const isMyProfile = !currentProfileState.date;
 
   const MouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
     const localX = event.clientX - event.currentTarget.offsetLeft;
@@ -80,19 +87,9 @@ const ProfileInfo = observer(() => {
   };
 
   useEffect(() => {
-    setInputDisplayName(
-      currentProfileState.date?.displayName ||
-      authorizationState.data?.displayName ||
-      ""
-    );
-    setInputNickname(
-      currentProfileState.date?.nickname ||
-      authorizationState.data?.nickname ||
-      ""
-    );
-    setInputAdditionalData(
-      currentProfileState.date?.bio || authorizationState.data?.bio || ""
-    );
+    setInputDisplayName(displayName);
+    setInputNickname(nickname);
+    setInputAdditionalData(bio);
   }, [currentProfileState.date, authorizationState.data]);
 
   const onChangeAvatarHandler = async (
@@ -213,9 +210,8 @@ const ProfileInfo = observer(() => {
             <div
               className={styles.sessionItem}
               key={i.id}
-              onClick={() => deleteSessionHandler(i.id)}
             >
-              <button className={styles.sessionItemRemoveButton}>
+              <button className={styles.sessionItemRemoveButton} onClick={() => deleteSessionHandler(i.id)}>
                 <CrossSvg width={20} />
               </button>
               <div className={styles.sessionItemContainer}>

@@ -74,14 +74,14 @@ const CreateChat = observer(() => {
         <input
           className={styles.inputTitle}
           type="text"
-          placeholder="Title"
+          placeholder="Name"
           value={inputName}
           onChange={(e) => setInputName(e.currentTarget.value)}
         />
         <input
           className={styles.inputName}
           type="text"
-          placeholder="Name"
+          placeholder="Title"
           value={inputTitle}
           onChange={(e) => setInputTitle(e.currentTarget.value)}
         />

@@ -6,26 +6,19 @@ export default class DateService {
   public static getTime(date: string): string {
     const dateDayJs = dayjs(date);
 
-    const datee = new Date(date);
-    const timeZone = new Date(date).getTimezoneOffset();
+    const hour = dateDayJs.hour() >= 10 ? dateDayJs.hour() : `0${dateDayJs.hour()}`;
+    const minutes = dateDayJs.minute() >= 10 ? dateDayJs.minute() : `0${dateDayJs.minute()}`;
 
-    // console.log("date: " + datee);
-    // console.log("tz: " + timeZone);
-
-    return `${
-      dateDayJs.hour() >= 10 ? dateDayJs.hour() : `0${dateDayJs.hour()}`
-    }:${
-      dateDayJs.minute() >= 10 ? dateDayJs.minute() : `0${dateDayJs.minute()}`
-    }`;
+    return `${hour}:${minutes}`;
   }
 
   public static getDateAndTime(date: string): string {
     const dateDayJs = dayjs(date);
 
-    return `${
-      dateDayJs.hour() >= 10 ? dateDayJs.hour() : `0${dateDayJs.hour()}`
-    }:${
-      dateDayJs.minute() >= 10 ? dateDayJs.minute() : `0${dateDayJs.minute()}`
-    } ${dateDayJs.date()}/${dateDayJs.month()}/${dateDayJs.year()}`;
+    const hour = dateDayJs.hour() >= 10 ? dateDayJs.hour() : `0${dateDayJs.hour()}`;
+    const minutes = dateDayJs.minute() >= 10 ? dateDayJs.minute() : `0${dateDayJs.minute()}`;
+    const month = dateDayJs.month() >= 10 ? dateDayJs.month() : `0${dateDayJs.month()}`;
+
+    return `${hour}:${minutes} ${dateDayJs.date()}/${month}/${dateDayJs.year()}`;
   }
 }

@@ -49,7 +49,7 @@ const Layout = observer(() => {
       signalRConfiguration.connection.on(SignalRMethodsName.BroadcastMessageAsync, (message: IMessageDto) => {
         if (message.ownerId === authorizationResponse.data.id) return;
 
-        console.log("send message");
+        message.isMessageRealtime = true;
         chatListWithMessagesState.addMessageInData(message);
         chatListWithMessagesState.setLastMessage(message);
       });

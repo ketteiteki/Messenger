@@ -11,6 +11,7 @@ import { currentProfileState } from "../../state/CurrentProfileState"
 import { currentChatState } from "../../state/CurrentChatState";
 import { ChatType } from "../../models/enum/ChatType";
 import { blackCoverState } from "../../state/BlackCoverState";
+import { ReactComponent as ClockSvg } from "../../assets/svg/clock.svg";
 
 const Message = observer((props: IMessageDto) => {
   const [xMousePosition, setXMousePosition] = useState<number>(0);
@@ -112,6 +113,7 @@ const Message = observer((props: IMessageDto) => {
               </div>}
               <p className={styles.myText}>{props.text}</p>
               <p className={styles.myMetaData}>
+                {props.loading && <ClockSvg className={styles.clockSvg} width={10} fill={"#fff"} />}
                 {props.isEdit ? "edit" : ""}{" "}
                 {DateService.getTime(props.dateOfCreate)}
               </p>

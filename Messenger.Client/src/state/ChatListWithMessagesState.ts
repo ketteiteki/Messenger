@@ -90,7 +90,7 @@ class ChatListWithMessagesState {
   };
 
   public addChatInData = (chat: IChatDto, messages: IMessageDto[]) => {
-    this.data.push({chat, messages});
+    this.data.unshift({ chat, messages });
   };
 
   public resetDataForSearchChats = () => {
@@ -153,22 +153,30 @@ class ChatListWithMessagesState {
     messageId: string,
     text: string
   ) => {
-    const item = this.data.find((c) => c.chat.id === chatId);
+    const chatItem = this.data.find((c) => c.chat.id === chatId);
 
-    if (item === undefined) return;
+    if (chatItem === undefined) return;
 
-    const message = item.messages.find((x) => x.id === messageId);
+    const message = chatItem.messages.find((x) => x.id === messageId);
 
     if (message === undefined) return;
     message.text = text;
+    message.loading = true;
+    message.isEdit = true;
 
     const response = await MessagesApi.putUpdateMessageAsync(messageId, text);
 
-    if (
-      item.messages.length - 1 ===
-      item.messages.findIndex((x) => x.id === messageId)
-    ) {
-      item.chat.lastMessageText = text;
+    if (response.status === 200) {
+      runInAction(() => {
+        message.loading = false;
+
+        if (
+          chatItem.messages.length - 1 ===
+          chatItem.messages.findIndex((x) => x.id === messageId)
+        ) {
+          chatItem.chat.lastMessageText = text;
+        }
+      });
     }
 
     return response;
@@ -195,7 +203,7 @@ class ChatListWithMessagesState {
 
     if (response.status === 200) {
       runInAction(() => {
-        this.data.push({chat: response.data, messages: []});
+        this.data.push({ chat: response.data, messages: [] });
       });
     }
 
@@ -219,10 +227,11 @@ class ChatListWithMessagesState {
       runInAction(() => {
         const dataItem = this.data.find(x => x.chat.id === messageEntity.chatId);
         const messageItem = dataItem?.messages.find(x => x.id === messageEntity.id);
-        
+
         if (!messageItem) return;
-        
+
         messageItem.id = response.data.id;
+        messageItem.loading = false;
         messageEntity.attachments = response.data.attachments;
         chatListWithMessagesState.setLastMessage(response.data);
       });

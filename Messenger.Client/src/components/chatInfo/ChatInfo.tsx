@@ -9,6 +9,8 @@ import { currentChatState } from "../../state/CurrentChatState";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
 import { useNavigate } from "react-router-dom";
 import { blackCoverState } from "../../state/BlackCoverState";
+import { authorizationState } from "../../state/AuthorizationState";
+import { currentProfileState } from "../../state/CurrentProfileState";
 
 const ChatInfo = observer(() => {
   const [updateMode, setUpdateMode] = useState<boolean>(false);
@@ -96,7 +98,7 @@ const ChatInfo = observer(() => {
 
     if (currentChatId === undefined || currentChatState.chat === null) return;
 
-    const response = await currentChatState.postJoinToChatAsync(currentChatId);
+    await currentChatState.postJoinToChatAsync(currentChatId);
 
     chatListWithMessagesState.addChatInData(currentChatState.chat, currentChatState.messages)
     chatListWithMessagesState.resetDataForSearchChats();
@@ -105,6 +107,17 @@ const ChatInfo = observer(() => {
 
   const onClickOpenFullSizeAvatar = () => {
     blackCoverState.setImage(currentChatState.chat?.avatarLink ?? nonAvatar);
+  };
+
+  const showProfileByMessage = async (userId: string) => {
+    if (userId === authorizationState.data?.id) {
+      currentProfileState.setProfileNull();
+
+      return navigate("/", { replace: true });
+    }
+
+    await currentProfileState.getUserAsync(userId);
+    return navigate("/", { replace: true });
   };
 
   useEffect(() => {
@@ -198,7 +211,7 @@ const ChatInfo = observer(() => {
       {showMemberList && (
         <div className={styles.memberList}>
           {currentChatState.chat?.members.map((i) => (
-            <div className={styles.memberItem} key={i.id}>
+            <div className={styles.memberItem} key={i.id} onClick={() => showProfileByMessage(i.id)}>
               <img
                 className={styles.memberItemAvatar}
                 src={i.avatarLink ?? nonAvatar}

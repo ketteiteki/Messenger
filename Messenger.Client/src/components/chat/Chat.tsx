@@ -23,7 +23,7 @@ import AttachmentEntity from "../../models/entities/AttachmentEntity";
 const Chat = observer(() => {
   const [inputMessage, setInputMessage] = useState<string>("");
   const [attachmentList, setAttachmentList] = useState<File[]>([]);
-  const [attachmentListUrlBlob, setAttachmentListUrlBlob ] = useState<Array<string | ArrayBuffer | null>>([]);
+  const [attachmentListUrlBlob, setAttachmentListUrlBlob] = useState<Array<string | ArrayBuffer | null>>([]);
 
   const refMessageList = document.getElementById("messageList");
 
@@ -42,6 +42,9 @@ const Chat = observer(() => {
   const currentChatId = currentChatState.chat?.id;
   const isCurrentChatChannel = currentChatState.chat?.type === ChatType.Channel;
   const isCurrentChatMine = currentChatState.chat?.isOwner;
+  const currentChatAvatar = currentChatState.chat?.type !== ChatType.Dialog ?
+    currentChatState.chat?.avatarLink ?? nonAvatar
+    : currentChatState.chat.members.find(x => x.id !== authorizationState.data?.id)?.avatarLink ?? nonAvatar;
 
   const sendMessageHandler = async () => {
     await sendMessage();
@@ -76,7 +79,8 @@ const Chat = observer(() => {
       replyState.data?.text ?? null,
       replyState.data?.displayName ?? null,
       currentChatId,
-      attachmentList.map(x => new AttachmentEntity(Math.random().toString(), 1, nonAvatar))
+      attachmentList.map(x => new AttachmentEntity(Math.random().toString(), 1, nonAvatar)),
+      true
     );
 
     chatListWithMessagesState.addMessageInData(messageEntity);
@@ -240,11 +244,7 @@ const Chat = observer(() => {
           </p>
           <img
             className={styles.chatAvatar}
-            src={
-              currentChatState.chat?.avatarLink !== null
-                ? currentChatState.chat?.avatarLink
-                : nonAvatar
-            }
+            src={currentChatAvatar}
             alt=""
           />
         </div>
@@ -320,7 +320,7 @@ const Chat = observer(() => {
               isMember && (
                 <div className={styles.attachmentPanel}>
                   <div className={styles.attachmentPanelConstainer}>
-                    {attachmentListUrlBlob.map(x => <img className={styles.attachmentPanelItem} src={x?.toString()}/>)}
+                    {attachmentListUrlBlob.map(x => <img className={styles.attachmentPanelItem} src={x?.toString()} />)}
                   </div>
                   <button
                     className={styles.closeAttachmentButton}
