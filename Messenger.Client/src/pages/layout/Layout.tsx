@@ -15,6 +15,7 @@ import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
 import { blackCoverState } from "../../state/BlackCoverState";
 import { motion } from "framer-motion";
 import IChatDto from "../../models/interfaces/IChatDto";
+import { currentChatState } from "../../state/CurrentChatState";
 
 const Layout = observer(() => {
 
@@ -77,6 +78,7 @@ const Layout = observer(() => {
 
       signalRConfiguration.connection.on(SignalRMethodsName.DeleteDialogForInterlocutor, (chatdId: string) => {
         chatListWithMessagesState.deleteChatInDataById(chatdId);
+        currentChatState.setChatAndMessagesNull();
       });
 
       signalRConfiguration.connection
