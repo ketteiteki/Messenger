@@ -81,12 +81,13 @@ class ChatListWithMessagesState {
     const item = this.data.find(
       (c) => c.chat.id === messageDeleteNotification.chatId
     );
-
     if (item === undefined) return;
 
-    item.messages = item.messages.filter(
+    var filteredMessages = item.messages.filter(
       (x) => x.id !== messageDeleteNotification.messageId
     );
+
+    item.messages = filteredMessages;
   };
 
   public addChatInData = (chat: IChatDto, messages: IMessageDto[]) => {

@@ -77,32 +77,32 @@ public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand,
 				DateOfCreate = message.DateOfCreate
 			};
 			
+			var lastMessageNow = await _context.Messages
+				.Include(m => m.Owner)
+				.Where(m => m.ChatId == message.ChatId && m.Id != message.Id)
+				.OrderBy(m => m.DateOfCreate)
+				.LastAsync(cancellationToken);
+			
+			var messageDeleteNotification = new MessageDeleteNotificationDto
+			{
+				OwnerId = message.OwnerId,
+				ChatId = message.ChatId,
+				MessageId = message.Id,
+				NewLastMessageId = lastMessageNow.Id,
+				NewLastMessageText = lastMessageNow.Text,
+				NewLastMessageAuthorDisplayName = lastMessageNow.Owner?.DisplayName,
+				NewLastMessageDateOfCreate = lastMessageNow.DateOfCreate
+			};
+			
+			await _hubContext.Clients.Group(message.ChatId.ToString()).DeleteMessageAsync(messageDeleteNotification);
+			
 			return new Result<MessageDto>(messageDtoDeleteForAll);
 		}
 
 		var deletedMessageByUser = new DeletedMessageByUserEntity(message.Id, request.RequesterId);
-
-		var lastMessageNow = await _context.Messages
-			.Include(m => m.Owner)
-			.Where(m => m.ChatId == message.ChatId && m.Id != message.Id)
-			.OrderBy(m => m.DateOfCreate)
-			.LastAsync(cancellationToken);
 			
 		_context.DeletedMessageByUsers.Add(deletedMessageByUser);
 		await _context.SaveChangesAsync(cancellationToken);
-
-		var messageDeleteNotification = new MessageDeleteNotificationDto()
-		{
-			OwnerId = message.OwnerId,
-			ChatId = message.ChatId,
-			MessageId = message.Id,
-			NewLastMessageId = lastMessageNow.Id,
-			NewLastMessageText = lastMessageNow.Text,
-			NewLastMessageAuthorDisplayName = lastMessageNow.Owner?.DisplayName,
-			NewLastMessageDateOfCreate = lastMessageNow.DateOfCreate
-		};
-			
-		await _hubContext.Clients.Group(message.ChatId.ToString()).DeleteMessageAsync(messageDeleteNotification);
 
 		var messageDto = new MessageDto
 		{
