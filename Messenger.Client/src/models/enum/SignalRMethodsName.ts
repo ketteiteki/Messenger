@@ -7,4 +7,6 @@ export enum SignalRMethodsName {
   BroadcastMessageAsync = "BroadcastMessageAsync",
   UpdateMessageAsync = "UpdateMessageAsync",
   DeleteMessageAsync = "DeleteMessageAsync",
+  CreateDialogForInterlocutor = "CreateDialogForInterlocutor",
+  DeleteDialogForInterlocutor = "DeleteDialogForInterlocutor"
 }

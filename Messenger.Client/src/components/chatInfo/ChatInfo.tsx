@@ -226,7 +226,7 @@ const ChatInfo = observer(() => {
         className={styles.showMembersButton}
         onClick={onClickShowMemberListHandler}
       >
-        {showMemberList ? "Close" : "Show"} Members
+        {showMemberList ? "Hide" : "Show"} Members
       </button>
       {showMemberList && (
         <div className={styles.memberList} id="memberList" onScroll={getMembers}>
@@ -234,7 +234,7 @@ const ChatInfo = observer(() => {
             <motion.div
               initial={{ opacity: 0.7 }}
               animate={{ opacity: 1 }}
-              transition={{duration: .1}}
+              transition={{ duration: .1 }}
               className={styles.memberItem} key={i.id}
               onClick={() => showProfileByMessage(i.id)}>
               <img

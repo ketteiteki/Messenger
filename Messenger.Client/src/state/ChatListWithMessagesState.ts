@@ -97,6 +97,26 @@ class ChatListWithMessagesState {
     this.dataForSearchChats = [];
   };
 
+  public deleteChatInDataById = (chatId: string) => {
+    const item = this.data.findIndex((c) => c.chat.id === chatId);
+
+    if (item === undefined) return;
+
+    this.data.splice(item, 1);
+  };
+
+  public pushChatOnTop = (chatId: string) => {
+    const itemIndex = this.data.findIndex((x) => x.chat.id === chatId);
+
+    if (itemIndex === -1) return;
+
+    const chat = this.data[itemIndex];
+
+    this.data.splice(itemIndex, 1);
+
+    this.data.splice(0, 0, chat);
+  };
+
   //api
   public getMessageListAsync = async (
     chatId: string,

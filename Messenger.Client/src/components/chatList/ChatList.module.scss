@@ -41,11 +41,22 @@
   flex-grow: 1;
   border-right: 2px solid $light-grey;
   overflow-y: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    width: 2px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: white;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $light-grey-border;
+  }
 }
 
-.penSvg {
-  
-}
+.penSvg {}
 
 .createChatButton {
   position: absolute;

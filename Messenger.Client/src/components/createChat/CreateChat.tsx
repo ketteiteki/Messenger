@@ -6,6 +6,7 @@ import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState
 import nonAvatar from "../../assets/images/non_avatar.jpg";
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
 import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
+import { motion } from "framer-motion";
 
 const CreateChat = observer(() => {
   const [inputName, setInputName] = useState<string>("");
@@ -31,7 +32,7 @@ const CreateChat = observer(() => {
     }
   };
 
-  const onChangeCreateChatHandler = async () => {
+  const onClickCreateChatHandler = async () => {
 
     const inputNameConst = inputName;
     const inputTitleConst = inputTitle;
@@ -58,7 +59,10 @@ const CreateChat = observer(() => {
 
   return (
     <div className={styles.createChat}>
-      <div className={styles.avatarContainer}>
+      <motion.div
+        initial={{ y: -5 }}
+        animate={{ y: 0 }}
+        className={styles.avatarContainer}>
         <label htmlFor="avatar" className={styles.avatarBlackCover} />
         <input
           className={styles.avatarInput}
@@ -69,7 +73,7 @@ const CreateChat = observer(() => {
           accept="image/jpeg"
         />
         <img className={styles.avatar} src={blobUrlFile?.toString() || nonAvatar} />
-      </div>
+      </motion.div>
       <div className={styles.createChatContainer}>
         <input
           className={styles.inputTitle}
@@ -94,7 +98,7 @@ const CreateChat = observer(() => {
           <option value={ChatType.Conversation}>Conversation</option>
           <option value={ChatType.Channel}>Channel</option>
         </select>
-        <button className={styles.CreateChatButton} onClick={onChangeCreateChatHandler}>
+        <button className={styles.CreateChatButton} onClick={onClickCreateChatHandler}>
           Create Chat
         </button>
       </div>

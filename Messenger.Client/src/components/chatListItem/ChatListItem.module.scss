@@ -4,7 +4,6 @@
   display: flex;
   width: 100%;
   height: 60px;
-  border-bottom: 1px solid $light-grey-border;
   transition: .1s;
   cursor: pointer;
 
@@ -29,7 +28,13 @@
   padding: 12px;
 }
 
-.displayName {
+.chatName {
+  display: flex;
+  margin-bottom: 6px;
+}
+
+.chatNameValue {
+  margin-left: 5px;
 }
 
 .lastMessage {
@@ -42,7 +47,7 @@
 
 .date {
   position: absolute;
-  top: 10px;
+  top: 15px;
   right: 20px;
   font-size: 12px;
 }

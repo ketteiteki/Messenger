@@ -14,6 +14,7 @@ import { signalRConfiguration } from "../../services/signalR/SignalRConfiguratio
 import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
 import { blackCoverState } from "../../state/BlackCoverState";
 import { motion } from "framer-motion";
+import IChatDto from "../../models/interfaces/IChatDto";
 
 const Layout = observer(() => {
 
@@ -53,6 +54,7 @@ const Layout = observer(() => {
         message.isMessageRealtime = true;
         chatListWithMessagesState.addMessageInData(message);
         chatListWithMessagesState.setLastMessage(message);
+        chatListWithMessagesState.pushChatOnTop(message.chatId);
       });
 
       signalRConfiguration.connection.on(SignalRMethodsName.UpdateMessageAsync, (message: IMessageUpdateNotificationDto) => {
@@ -67,8 +69,14 @@ const Layout = observer(() => {
         chatListWithMessagesState.deleteMessageInDataByMessageDeleteNotification(message);
       });
 
-      signalRConfiguration.connection.on("CreateDialogForInterlocutor", (message: string) => {
-        console.log(message);
+      signalRConfiguration.connection.on(SignalRMethodsName.CreateDialogForInterlocutor, async (chat: IChatDto) => {
+        await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, chat.id);
+        chatListWithMessagesState.addChatInData(chat, []);
+        chatListWithMessagesState.pushChatOnTop(chat.id);
+      });
+
+      signalRConfiguration.connection.on(SignalRMethodsName.DeleteDialogForInterlocutor, (chatdId: string) => {
+        chatListWithMessagesState.deleteChatInDataById(chatdId);
       });
 
       signalRConfiguration.connection

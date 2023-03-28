@@ -86,6 +86,7 @@ const Chat = observer(() => {
 
     chatListWithMessagesState.addMessageInData(messageEntity);
     chatListWithMessagesState.setLastMessage(messageEntity);
+    chatListWithMessagesState.pushChatOnTop(messageEntity.chatId);
 
     await chatListWithMessagesState.postCreateMessageAsync(messageEntity, attachmentList);
 
@@ -176,7 +177,7 @@ const Chat = observer(() => {
   const messageListScrollBottomHandler = () => {
     if (refMessageList === null) return;
 
-    refMessageList.scrollTop = refMessageList.scrollHeight;
+    refMessageList.scrollTop = 1000000;
   };
 
   const getMessages = useDebouncedCallback(async () => {

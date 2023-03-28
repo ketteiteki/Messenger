@@ -15,6 +15,7 @@ import { signalRConfiguration } from "../../services/signalR/SignalRConfiguratio
 import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
 import { blackCoverState } from "../../state/BlackCoverState";
 import { motion } from "framer-motion";
+import { ChatType } from "../../models/enum/ChatType";
 
 const ProfileInfo = observer(() => {
 
@@ -37,9 +38,10 @@ const ProfileInfo = observer(() => {
   const [yMousePosition, setYMousePosition] = useState<number>(0);
 
   const currentProfileId = currentProfileState.date?.id;
-  const chatWithThisUser =
+  const dialogWithThisUser =
     chatListWithMessagesState.data.find(
-      (x) => x.chat.members.find(m => m.id !== authorizationState.data?.id)?.id === currentProfileId
+      (x) => x.chat.type === ChatType.Dialog
+        && x.chat.members.find(m => m.id !== authorizationState.data?.id)?.id === currentProfileId
     );
 
   const MouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -187,7 +189,7 @@ const ProfileInfo = observer(() => {
       )}
       {currentProfileState.date !== null &&
         authorizationState.data?.id !== currentProfileState.date?.id &&
-        chatWithThisUser === undefined && (
+        !dialogWithThisUser && (
           <button
             className={styles.startChattingButton}
             onClick={onClickStartChattingHandler}
@@ -201,7 +203,7 @@ const ProfileInfo = observer(() => {
             className={styles.showMembersButton}
             onClick={() => setShowSessionsHandler()}
           >
-            {showSessions ? "Close" : "Show"} Sessions
+            {showSessions ? "Hide" : "Show"} Sessions
           </button>
         )}
       {showSessions && (
