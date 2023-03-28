@@ -5,6 +5,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import nonAvatar from "../../assets/images/non_avatar.jpg";
 import { authorizationState } from "../../state/AuthorizationState";
 import { currentProfileState } from "../../state/CurrentProfileState";
+import { motion } from "framer-motion";
 
 const InfoBar = observer((props) => {
   const navigate = useNavigate();
@@ -17,9 +18,13 @@ const InfoBar = observer((props) => {
   return (
     <div className={styles.chatInfo}>
       <div className={styles.header}>
-        <p className={styles.headerDisplayName} onClick={showMyProfileHandler}>
+        <motion.p
+          initial={{ y: -5 }}
+          animate={{ y: 0 }}
+          className={styles.headerDisplayName}
+          onClick={showMyProfileHandler}>
           {authorizationState.data?.displayName}
-        </p>
+        </motion.p>
         <img
           className={styles.headerAvatar}
           src={

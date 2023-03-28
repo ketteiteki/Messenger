@@ -15,6 +15,9 @@ export default class MessageEntity implements IMessageDto {
   public chatId: string;
   public dateOfCreate: string = `${new Date()}`;
 
+  public loading: boolean = false;
+  public isMessageRealtime: boolean = false;
+
   constructor(
     text: string,
     ownerId: string,
@@ -24,7 +27,9 @@ export default class MessageEntity implements IMessageDto {
     replyToMessageText: string | null,
     replyToMessageAuthorDisplayName: string | null,
     chatId: string,
-    attachments: IAttachmentDto[]
+    attachments: IAttachmentDto[],
+    loading: boolean = false,
+    isMessageRealtime: boolean = false
   ) {
     this.text = text;
     this.ownerId = ownerId;
@@ -35,5 +40,7 @@ export default class MessageEntity implements IMessageDto {
     this.replyToMessageAuthorDisplayName = replyToMessageAuthorDisplayName;
     this.chatId = chatId;
     this.attachments = attachments;
+    this.loading = loading;
+    this.isMessageRealtime = isMessageRealtime;
   }
 }

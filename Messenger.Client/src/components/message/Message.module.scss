@@ -44,10 +44,13 @@
 }
 
 .messageReplyText {
+  max-width: 200px;
+  height: 15px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   margin-left: 5px;
   font-size: 14px;
-  word-break: break-all;
-  overflow-wrap: break-word;
 }
 
 .nickname {
@@ -84,6 +87,7 @@
   height: 45px;
   border-radius: 100%;
   flex-shrink: 0;
+  object-fit: cover;
   cursor: pointer;
 }
 
@@ -184,6 +188,7 @@
 
 .myMessageReplyText {
   max-width: 200px;
+  height: 15px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -204,3 +209,5 @@
   font-size: 13px;
   text-align: right;
 }
+
+.clockSvg {}

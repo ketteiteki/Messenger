@@ -11,6 +11,8 @@ import { currentProfileState } from "../../state/CurrentProfileState"
 import { currentChatState } from "../../state/CurrentChatState";
 import { ChatType } from "../../models/enum/ChatType";
 import { blackCoverState } from "../../state/BlackCoverState";
+import { ReactComponent as ClockSvg } from "../../assets/svg/clock.svg";
+import { motion } from "framer-motion";
 
 const Message = observer((props: IMessageDto) => {
   const [xMousePosition, setXMousePosition] = useState<number>(0);
@@ -68,7 +70,10 @@ const Message = observer((props: IMessageDto) => {
     <>
       {isMessageMine ? (
         <>
-          <div
+          <motion.div
+            initial={{ opacity: 0.7 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: .1 }}
             className={styles.myMessage}
             onContextMenu={showMenuHandler}
             onMouseMove={MouseMoveHandler}
@@ -112,14 +117,16 @@ const Message = observer((props: IMessageDto) => {
               </div>}
               <p className={styles.myText}>{props.text}</p>
               <p className={styles.myMetaData}>
+                {props.loading && <ClockSvg className={styles.clockSvg} width={10} fill={"#fff"} />}
                 {props.isEdit ? "edit" : ""}{" "}
                 {DateService.getTime(props.dateOfCreate)}
               </p>
             </div>
-          </div>
+          </motion.div>
         </>
       ) : (
-        <div
+        <motion.div
+          initial={{ opacity: .5 }} animate={{ opacity: 1 }}
           className={styles.message}
           onContextMenu={showMenuHandler}
           onMouseMove={MouseMoveHandler}
@@ -169,7 +176,7 @@ const Message = observer((props: IMessageDto) => {
               {DateService.getTime(props.dateOfCreate)}
             </p>
           </div>
-        </div>
+        </motion.div>
       )}
     </>
   );

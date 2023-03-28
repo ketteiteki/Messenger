@@ -19,11 +19,12 @@ import { editMessageState } from "../../state/EditMessageState";
 import MessageEntity from "../../models/entities/MessageEntity";
 import { useDebouncedCallback } from "use-debounce";
 import AttachmentEntity from "../../models/entities/AttachmentEntity";
+import { motion } from "framer-motion";
 
 const Chat = observer(() => {
   const [inputMessage, setInputMessage] = useState<string>("");
   const [attachmentList, setAttachmentList] = useState<File[]>([]);
-  const [attachmentListUrlBlob, setAttachmentListUrlBlob ] = useState<Array<string | ArrayBuffer | null>>([]);
+  const [attachmentListUrlBlob, setAttachmentListUrlBlob] = useState<Array<string | ArrayBuffer | null>>([]);
 
   const refMessageList = document.getElementById("messageList");
 
@@ -42,6 +43,9 @@ const Chat = observer(() => {
   const currentChatId = currentChatState.chat?.id;
   const isCurrentChatChannel = currentChatState.chat?.type === ChatType.Channel;
   const isCurrentChatMine = currentChatState.chat?.isOwner;
+  const currentChatAvatar = currentChatState.chat?.type !== ChatType.Dialog ?
+    currentChatState.chat?.avatarLink ?? nonAvatar
+    : currentChatState.chat.members.find(x => x.id !== authorizationState.data?.id)?.avatarLink ?? nonAvatar;
 
   const sendMessageHandler = async () => {
     await sendMessage();
@@ -76,11 +80,13 @@ const Chat = observer(() => {
       replyState.data?.text ?? null,
       replyState.data?.displayName ?? null,
       currentChatId,
-      attachmentList.map(x => new AttachmentEntity(Math.random().toString(), 1, nonAvatar))
+      attachmentList.map(x => new AttachmentEntity(Math.random().toString(), 1, nonAvatar)),
+      true
     );
 
     chatListWithMessagesState.addMessageInData(messageEntity);
     chatListWithMessagesState.setLastMessage(messageEntity);
+    chatListWithMessagesState.pushChatOnTop(messageEntity.chatId);
 
     await chatListWithMessagesState.postCreateMessageAsync(messageEntity, attachmentList);
 
@@ -161,8 +167,6 @@ const Chat = observer(() => {
 
     setAttachmentList(fileArray);
 
-    console.log(URL.createObjectURL(files[0]));
-
     const arrayUrlBlob: Array<string | ArrayBuffer | null> = [];
 
     fileArray.forEach(x => arrayUrlBlob.push(URL.createObjectURL(x)));
@@ -173,7 +177,7 @@ const Chat = observer(() => {
   const messageListScrollBottomHandler = () => {
     if (refMessageList === null) return;
 
-    refMessageList.scrollTop = refMessageList.scrollHeight;
+    refMessageList.scrollTop = 1000000;
   };
 
   const getMessages = useDebouncedCallback(async () => {
@@ -240,18 +244,20 @@ const Chat = observer(() => {
           </p>
           <img
             className={styles.chatAvatar}
-            src={
-              currentChatState.chat?.avatarLink !== null
-                ? currentChatState.chat?.avatarLink
-                : nonAvatar
-            }
+            src={currentChatAvatar}
             alt=""
           />
         </div>
       )}
       {currentChatState.chat === null ? (
         <div className={styles.chooseChat}>
-          <p className={styles.chooseChatPage}>Choose a chat</p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: .1 }}
+            className={styles.chooseChatPage}>
+            Choose a chat
+          </motion.p>
         </div>
       ) : banDateOfExpire !== null ? (
         <div className={styles.banned}>
@@ -320,7 +326,7 @@ const Chat = observer(() => {
               isMember && (
                 <div className={styles.attachmentPanel}>
                   <div className={styles.attachmentPanelConstainer}>
-                    {attachmentListUrlBlob.map(x => <img className={styles.attachmentPanelItem} src={x?.toString()}/>)}
+                    {attachmentListUrlBlob.map(x => <img className={styles.attachmentPanelItem} src={x?.toString()} />)}
                   </div>
                   <button
                     className={styles.closeAttachmentButton}

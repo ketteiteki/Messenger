@@ -22,4 +22,6 @@ export default interface IChatDto {
     roleUser: IRoleUserByChatDto;
     members: IUserDto[];
     usersWithRole: IRoleUserByChatDto[];
+
+    memberListPage: number;
 }

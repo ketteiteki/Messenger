@@ -12,12 +12,22 @@ import { useNavigate } from "react-router-dom";
 import { currentProfileState } from "../../state/CurrentProfileState";
 import DateService from "../../services/messenger/DateService";
 import { editMessageState } from "../../state/EditMessageState";
+import { motion } from "framer-motion";
+import { ReactComponent as ConversationLogoSvg } from "../../assets/svg/conversation_logo.svg";
+import { ReactComponent as ChannelLogoSvg } from "../../assets/svg/channel_logo.svg";
 
 const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
 
   const avatarLink = props.chat.type !== ChatType.Dialog ?
     props.chat.avatarLink || nonAvatar :
     props.chat.members.find(x => x.id !== authorizationState.data?.id)?.avatarLink || nonAvatar;
+
+  const isInChatOnlyRealTimeMessages = props.messages.length !== 0 &&
+    props.messages.filter(x => x.isMessageRealtime).length === props.messages.length;
+  const firstRealtimeMessage = props.messages.find(x => x.isMessageRealtime);
+  const lastMessageText = props.chat.lastMessageId ?
+    `${props.chat.lastMessageAuthorDisplayName ?? ""}: ${props.chat.lastMessageText ?? ""}`
+    : "Сhat is empty";
 
   const navigate = useNavigate();
 
@@ -29,6 +39,10 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
 
     if (props.messages.length === 0) {
       await chatListWithMessagesState.getMessageListAsync(props.chat.id, null);
+    } else if (isInChatOnlyRealTimeMessages) {
+      if (!firstRealtimeMessage) return;
+
+      await chatListWithMessagesState.getMessageListAsync(props.chat.id, firstRealtimeMessage?.dateOfCreate);
     }
 
     currentChatState.setChatAndMessages(props.chat, props.messages);
@@ -43,24 +57,30 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
   };
 
   return (
-    <div className={styles.chatListItem} onClick={onClickChatItem}>
+    <motion.div
+      initial={{ opacity: 0.7, y: -5 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: .2 }}
+      className={styles.chatListItem} onClick={onClickChatItem}>
       <img
         className={styles.avatar}
         src={avatarLink}
         alt=""
       />
       <div className={styles.container}>
-        <p className={styles.displayName}>
-          {props.chat.type === ChatType.Dialog
+        <p className={styles.chatName}>
+          {props.chat.type === ChatType.Conversation ? <ConversationLogoSvg className={styles.conversationLogoSvg} width={15} /> :
+            props.chat.type === ChatType.Channel ? <ChannelLogoSvg className={styles.conversationLogoSvg} width={14} /> : ""}
+          <p className={styles.chatNameValue}>{props.chat.type === ChatType.Dialog
             ? props.chat.members.find(
               (m) => m.id !== authorizationState.data?.id
             )?.displayName
-            : props.chat.title}
+            : props.chat.title}</p>
         </p>
-        <p className={styles.lastMessage}>{props.chat.lastMessageText ?? ""}</p>
+        <p className={styles.lastMessage}>{lastMessageText}</p>
         <p className={styles.date}>{props.chat.lastMessageDateOfCreate && DateService.getTime(props.chat.lastMessageDateOfCreate)}</p>
       </div>
-    </div>
+    </motion.div>
   );
 });
 

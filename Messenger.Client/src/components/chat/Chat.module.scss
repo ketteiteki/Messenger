@@ -6,7 +6,6 @@
   width: 100%;
   height: 100%;
   background-color: $light-grey;
-  border-radius: 0 20px 0 0;
 }
 
 .header {
@@ -14,7 +13,6 @@
   width: 100%;
   height: 71px;
   background-color: white;
-  border-radius: 0 20px 0 0;
 }
 
 .chatAvatar {
@@ -29,6 +27,7 @@
 
 .chatName {
   padding-top: 14px;
+  margin-bottom: 5px;
   text-align: center;
 }
 
@@ -43,6 +42,18 @@
   width: 100%;
   height: 100%;
   overflow-y: scroll;
+
+  &::-webkit-scrollbar {
+    width: 2px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $light-grey;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $light-grey-border;
+  }
 }
 
 .banned {

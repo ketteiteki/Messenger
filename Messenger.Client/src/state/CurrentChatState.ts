@@ -35,6 +35,12 @@ class CurrentChatState {
     }
   };
 
+  public setMemberListPage(value: number) {
+    if (this.chat !== null) {
+      this.chat.memberListPage = value;
+    }
+  }
+
   //api
   public getUserListByChatAsync = async (
     chatId: string,

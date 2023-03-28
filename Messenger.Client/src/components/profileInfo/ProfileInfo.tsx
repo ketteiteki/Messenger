@@ -14,8 +14,17 @@ import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
 import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
 import { blackCoverState } from "../../state/BlackCoverState";
+import { motion } from "framer-motion";
+import { ChatType } from "../../models/enum/ChatType";
 
 const ProfileInfo = observer(() => {
+
+  const isMyProfile = !currentProfileState.date;
+
+  const displayName = isMyProfile ? authorizationState.data?.displayName ?? "" : currentProfileState.date?.displayName ?? "";
+  const nickname = isMyProfile ? authorizationState.data?.nickname ?? "" : currentProfileState.date?.nickname ?? "";
+  const bio = isMyProfile ? authorizationState.data?.bio ?? "" : currentProfileState.date?.bio ?? "";
+
   const [updateMode, setUpdateMode] = useState<boolean>(false);
 
   const [inputDisplayName, setInputDisplayName] = useState<string>("");
@@ -29,11 +38,11 @@ const ProfileInfo = observer(() => {
   const [yMousePosition, setYMousePosition] = useState<number>(0);
 
   const currentProfileId = currentProfileState.date?.id;
-  const chatWithThisUser =
+  const dialogWithThisUser =
     chatListWithMessagesState.data.find(
-      (x) => x.chat.members.find(m => m.id !== authorizationState.data?.id)?.id === currentProfileId
+      (x) => x.chat.type === ChatType.Dialog
+        && x.chat.members.find(m => m.id !== authorizationState.data?.id)?.id === currentProfileId
     );
-  const isMyProfile = !currentProfileState.date;
 
   const MouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
     const localX = event.clientX - event.currentTarget.offsetLeft;
@@ -80,19 +89,9 @@ const ProfileInfo = observer(() => {
   };
 
   useEffect(() => {
-    setInputDisplayName(
-      currentProfileState.date?.displayName ||
-      authorizationState.data?.displayName ||
-      ""
-    );
-    setInputNickname(
-      currentProfileState.date?.nickname ||
-      authorizationState.data?.nickname ||
-      ""
-    );
-    setInputAdditionalData(
-      currentProfileState.date?.bio || authorizationState.data?.bio || ""
-    );
+    setInputDisplayName(displayName);
+    setInputNickname(nickname);
+    setInputAdditionalData(bio);
   }, [currentProfileState.date, authorizationState.data]);
 
   const onChangeAvatarHandler = async (
@@ -190,7 +189,7 @@ const ProfileInfo = observer(() => {
       )}
       {currentProfileState.date !== null &&
         authorizationState.data?.id !== currentProfileState.date?.id &&
-        chatWithThisUser === undefined && (
+        !dialogWithThisUser && (
           <button
             className={styles.startChattingButton}
             onClick={onClickStartChattingHandler}
@@ -204,18 +203,20 @@ const ProfileInfo = observer(() => {
             className={styles.showMembersButton}
             onClick={() => setShowSessionsHandler()}
           >
-            {showSessions ? "Close" : "Show"} Sessions
+            {showSessions ? "Hide" : "Show"} Sessions
           </button>
         )}
       {showSessions && (
         <div className={styles.sessionList}>
           {sessionsState.data.map((i) => (
-            <div
+            <motion.div
+              initial={{ opacity: 0.7 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: .1 }}
               className={styles.sessionItem}
               key={i.id}
-              onClick={() => deleteSessionHandler(i.id)}
             >
-              <button className={styles.sessionItemRemoveButton}>
+              <button className={styles.sessionItemRemoveButton} onClick={() => deleteSessionHandler(i.id)}>
                 <CrossSvg width={20} />
               </button>
               <div className={styles.sessionItemContainer}>
@@ -225,7 +226,7 @@ const ProfileInfo = observer(() => {
                   CreateAt: {DateService.getDateAndTime(i.createAt)}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}

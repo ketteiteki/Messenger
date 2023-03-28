@@ -13,6 +13,8 @@ import IMessageDeleteNotificationDto from "../../models/interfaces/IMessageDelet
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
 import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
 import { blackCoverState } from "../../state/BlackCoverState";
+import { motion } from "framer-motion";
+import IChatDto from "../../models/interfaces/IChatDto";
 
 const Layout = observer(() => {
 
@@ -49,9 +51,10 @@ const Layout = observer(() => {
       signalRConfiguration.connection.on(SignalRMethodsName.BroadcastMessageAsync, (message: IMessageDto) => {
         if (message.ownerId === authorizationResponse.data.id) return;
 
-        console.log("send message");
+        message.isMessageRealtime = true;
         chatListWithMessagesState.addMessageInData(message);
         chatListWithMessagesState.setLastMessage(message);
+        chatListWithMessagesState.pushChatOnTop(message.chatId);
       });
 
       signalRConfiguration.connection.on(SignalRMethodsName.UpdateMessageAsync, (message: IMessageUpdateNotificationDto) => {
@@ -66,8 +69,14 @@ const Layout = observer(() => {
         chatListWithMessagesState.deleteMessageInDataByMessageDeleteNotification(message);
       });
 
-      signalRConfiguration.connection.on("CreateDialogForInterlocutor", (message: string) => {
-        console.log(message);
+      signalRConfiguration.connection.on(SignalRMethodsName.CreateDialogForInterlocutor, async (chat: IChatDto) => {
+        await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, chat.id);
+        chatListWithMessagesState.addChatInData(chat, []);
+        chatListWithMessagesState.pushChatOnTop(chat.id);
+      });
+
+      signalRConfiguration.connection.on(SignalRMethodsName.DeleteDialogForInterlocutor, (chatdId: string) => {
+        chatListWithMessagesState.deleteChatInDataById(chatdId);
       });
 
       signalRConfiguration.connection
@@ -87,11 +96,18 @@ const Layout = observer(() => {
 
   return (
     <div className={styles.layout}>
-      {blackCoverState.isBlackCoverShown && <div className={styles.blackCover} onClick={() => blackCoverState.closeBlackCover()}>
-        <img
-          className={styles.blackCoverImage}
-          src={blackCoverState.imageLink ?? ""} onClick={(e) => e.stopPropagation()} />
-      </div>}
+      {blackCoverState.isBlackCoverShown &&
+        <motion.div
+          initial={{ opacity: .7 }}
+          animate={{ opacity: 1 }}
+          className={styles.blackCover}
+          onClick={() => blackCoverState.closeBlackCover()}>
+          <motion.img
+            initial={{ y: -5 }}
+            animate={{ y: 0 }}
+            className={styles.blackCoverImage}
+            src={blackCoverState.imageLink ?? ""} onClick={(e) => e.stopPropagation()} />
+        </motion.div>}
       <div className={styles.background} />
       <div className={styles.layoutContainer}>
         <ChatList />
