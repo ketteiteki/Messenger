@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Messenger.Services.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230323160037_CreateDatabase")]
-    partial class CreateDatabase
+    [Migration("20230328191608_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -262,64 +262,63 @@ namespace Messenger.Services.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.HasIndex("ReplyToMessageId")
-                        .IsUnique();
+                    b.HasIndex("ReplyToMessageId");
 
                     b.ToTable("Messages");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("48a946e8-5c84-488d-b946-a68d480eb7ad"),
+                            Id = new Guid("619186ff-6e99-4b20-94ad-da8595f30e78"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 23, 16, 0, 36, 401, DateTimeKind.Utc).AddTicks(5464),
+                            DateOfCreate = new DateTime(2023, 3, 28, 19, 16, 7, 863, DateTimeKind.Utc).AddTicks(2954),
                             IsEdit = false,
                             OwnerId = new Guid("a85825ba-f99b-4177-a858-96384303ea14"),
                             Text = "привет, какие книжки почитать?"
                         },
                         new
                         {
-                            Id = new Guid("479cb3a8-5e1f-4ea8-9287-eab106d6f5a6"),
+                            Id = new Guid("eae466b7-b0ed-480b-93c0-d19a54847714"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 23, 16, 0, 36, 401, DateTimeKind.Utc).AddTicks(6153),
+                            DateOfCreate = new DateTime(2023, 3, 28, 19, 16, 7, 863, DateTimeKind.Utc).AddTicks(3908),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
-                            ReplyToMessageId = new Guid("48a946e8-5c84-488d-b946-a68d480eb7ad"),
+                            ReplyToMessageId = new Guid("619186ff-6e99-4b20-94ad-da8595f30e78"),
                             Text = "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться..."
                         },
                         new
                         {
-                            Id = new Guid("a5726363-8e24-49ff-bcb8-8477e5c23ec0"),
+                            Id = new Guid("16028929-a50c-4ac0-b8c3-16e112da134b"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 23, 16, 0, 36, 401, DateTimeKind.Utc).AddTicks(6681),
+                            DateOfCreate = new DateTime(2023, 3, 28, 19, 16, 7, 864, DateTimeKind.Utc).AddTicks(449),
                             IsEdit = false,
                             OwnerId = new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"),
-                            ReplyToMessageId = new Guid("479cb3a8-5e1f-4ea8-9287-eab106d6f5a6"),
+                            ReplyToMessageId = new Guid("eae466b7-b0ed-480b-93c0-d19a54847714"),
                             Text = "ладно"
                         },
                         new
                         {
-                            Id = new Guid("e970fe7c-f5e4-4e49-901f-c2b77bf26af5"),
+                            Id = new Guid("af60db06-0111-4bd6-94bf-7ce6c7309acd"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 23, 16, 0, 36, 401, DateTimeKind.Utc).AddTicks(7199),
+                            DateOfCreate = new DateTime(2023, 3, 28, 19, 16, 7, 864, DateTimeKind.Utc).AddTicks(1114),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "ага"
                         },
                         new
                         {
-                            Id = new Guid("cc58c074-34c5-43ea-a650-5bb05bf7c7e8"),
+                            Id = new Guid("10b80560-3742-4564-b8b0-42c98af17bfc"),
                             ChatId = new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"),
-                            DateOfCreate = new DateTime(2023, 3, 23, 16, 0, 36, 401, DateTimeKind.Utc).AddTicks(7879),
+                            DateOfCreate = new DateTime(2023, 3, 28, 19, 16, 7, 864, DateTimeKind.Utc).AddTicks(1788),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "привет"
                         },
                         new
                         {
-                            Id = new Guid("abe544f4-8f16-4f3d-8e5d-4712aa830092"),
+                            Id = new Guid("0a0abd9e-e759-4ec3-ad17-5d3c5f1b2e51"),
                             ChatId = new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"),
-                            DateOfCreate = new DateTime(2023, 3, 23, 16, 0, 36, 401, DateTimeKind.Utc).AddTicks(8421),
+                            DateOfCreate = new DateTime(2023, 3, 28, 19, 16, 7, 864, DateTimeKind.Utc).AddTicks(2375),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "привет, как дела?"
@@ -436,6 +435,7 @@ namespace Messenger.Services.Migrations
                         new
                         {
                             Id = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
+                            AvatarFileName = "kaminome.jpg",
                             Bio = "the best account",
                             DisplayName = "kami no me",
                             Nickname = "kaminome",
@@ -445,6 +445,7 @@ namespace Messenger.Services.Migrations
                         new
                         {
                             Id = new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"),
+                            AvatarFileName = "alice.jpg",
                             Bio = "cool status",
                             DisplayName = "alice1",
                             Nickname = "alice1234",
@@ -589,8 +590,8 @@ namespace Messenger.Services.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Messenger.Domain.Entities.MessageEntity", "ReplyToMessage")
-                        .WithOne()
-                        .HasForeignKey("Messenger.Domain.Entities.MessageEntity", "ReplyToMessageId")
+                        .WithMany()
+                        .HasForeignKey("ReplyToMessageId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Chat");

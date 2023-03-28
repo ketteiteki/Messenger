@@ -11,7 +11,7 @@ public class MessageEntityConfiguration : IEntityTypeConfiguration<MessageEntity
 	{
 		builder
 			.HasOne(m => m.ReplyToMessage)
-			.WithOne()
+			.WithMany()
 			.OnDelete(DeleteBehavior.SetNull);
 		
 		builder
