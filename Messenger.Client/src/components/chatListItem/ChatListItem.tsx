@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { currentProfileState } from "../../state/CurrentProfileState";
 import DateService from "../../services/messenger/DateService";
 import { editMessageState } from "../../state/EditMessageState";
+import { motion } from "framer-motion";
 
 const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
 
@@ -51,7 +52,11 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
   };
 
   return (
-    <div className={styles.chatListItem} onClick={onClickChatItem}>
+    <motion.div
+      initial={{ opacity: 0.7, y: -5 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{duration: .2}}
+      className={styles.chatListItem} onClick={onClickChatItem}>
       <img
         className={styles.avatar}
         src={avatarLink}
@@ -68,7 +73,7 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
         <p className={styles.lastMessage}>{props.chat.lastMessageText ?? ""}</p>
         <p className={styles.date}>{props.chat.lastMessageDateOfCreate && DateService.getTime(props.chat.lastMessageDateOfCreate)}</p>
       </div>
-    </div>
+    </motion.div>
   );
 });
 

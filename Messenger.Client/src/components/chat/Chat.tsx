@@ -19,6 +19,7 @@ import { editMessageState } from "../../state/EditMessageState";
 import MessageEntity from "../../models/entities/MessageEntity";
 import { useDebouncedCallback } from "use-debounce";
 import AttachmentEntity from "../../models/entities/AttachmentEntity";
+import { motion } from "framer-motion";
 
 const Chat = observer(() => {
   const [inputMessage, setInputMessage] = useState<string>("");
@@ -165,8 +166,6 @@ const Chat = observer(() => {
 
     setAttachmentList(fileArray);
 
-    console.log(URL.createObjectURL(files[0]));
-
     const arrayUrlBlob: Array<string | ArrayBuffer | null> = [];
 
     fileArray.forEach(x => arrayUrlBlob.push(URL.createObjectURL(x)));
@@ -251,7 +250,13 @@ const Chat = observer(() => {
       )}
       {currentChatState.chat === null ? (
         <div className={styles.chooseChat}>
-          <p className={styles.chooseChatPage}>Choose a chat</p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: .1 }}
+            className={styles.chooseChatPage}>
+            Choose a chat
+          </motion.p>
         </div>
       ) : banDateOfExpire !== null ? (
         <div className={styles.banned}>

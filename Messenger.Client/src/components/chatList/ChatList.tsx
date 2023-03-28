@@ -12,6 +12,7 @@ import { signalRConfiguration } from "../../services/signalR/SignalRConfiguratio
 import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
 import { currentChatState } from "../../state/CurrentChatState";
 import { currentProfileState } from "../../state/CurrentProfileState";
+import { motion } from "framer-motion";
 
 const ChatList = observer(() => {
   const [inputSearch, setInputSearch] = useState<string>("");
@@ -69,7 +70,8 @@ const ChatList = observer(() => {
     <div className={styles.chatList}>
       <div className={styles.header}>
         <MessegnerLogoSvg width={30} />
-        <p>Messenger</p>
+        <motion.p initial={{ y: -5 }} animate={{ y: 0 }}
+        >Messenger</motion.p>
         <Link to={"/createChat"} className={styles.createChatButton}>
           <PenSvg className={styles.penSvg} width={25} />
         </Link>

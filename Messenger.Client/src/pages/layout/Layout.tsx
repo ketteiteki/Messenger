@@ -13,6 +13,7 @@ import IMessageDeleteNotificationDto from "../../models/interfaces/IMessageDelet
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
 import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
 import { blackCoverState } from "../../state/BlackCoverState";
+import { motion } from "framer-motion";
 
 const Layout = observer(() => {
 
@@ -87,11 +88,18 @@ const Layout = observer(() => {
 
   return (
     <div className={styles.layout}>
-      {blackCoverState.isBlackCoverShown && <div className={styles.blackCover} onClick={() => blackCoverState.closeBlackCover()}>
-        <img
-          className={styles.blackCoverImage}
-          src={blackCoverState.imageLink ?? ""} onClick={(e) => e.stopPropagation()} />
-      </div>}
+      {blackCoverState.isBlackCoverShown &&
+        <motion.div
+          initial={{ opacity: .7 }}
+          animate={{ opacity: 1 }}
+          className={styles.blackCover}
+          onClick={() => blackCoverState.closeBlackCover()}>
+          <motion.img
+            initial={{ y: -5 }}
+            animate={{ y: 0 }}
+            className={styles.blackCoverImage}
+            src={blackCoverState.imageLink ?? ""} onClick={(e) => e.stopPropagation()} />
+        </motion.div>}
       <div className={styles.background} />
       <div className={styles.layoutContainer}>
         <ChatList />

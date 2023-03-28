@@ -14,6 +14,7 @@ import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
 import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
 import { blackCoverState } from "../../state/BlackCoverState";
+import { motion } from "framer-motion";
 
 const ProfileInfo = observer(() => {
 
@@ -40,7 +41,6 @@ const ProfileInfo = observer(() => {
     chatListWithMessagesState.data.find(
       (x) => x.chat.members.find(m => m.id !== authorizationState.data?.id)?.id === currentProfileId
     );
-  // const isMyProfile = !currentProfileState.date;
 
   const MouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
     const localX = event.clientX - event.currentTarget.offsetLeft;
@@ -207,7 +207,10 @@ const ProfileInfo = observer(() => {
       {showSessions && (
         <div className={styles.sessionList}>
           {sessionsState.data.map((i) => (
-            <div
+            <motion.div
+              initial={{ opacity: 0.7 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: .1 }}
               className={styles.sessionItem}
               key={i.id}
             >
@@ -221,7 +224,7 @@ const ProfileInfo = observer(() => {
                   CreateAt: {DateService.getDateAndTime(i.createAt)}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}

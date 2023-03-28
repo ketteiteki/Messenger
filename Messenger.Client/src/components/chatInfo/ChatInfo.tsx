@@ -11,6 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { blackCoverState } from "../../state/BlackCoverState";
 import { authorizationState } from "../../state/AuthorizationState";
 import { currentProfileState } from "../../state/CurrentProfileState";
+import { useDebouncedCallback } from "use-debounce";
+import { motion } from "framer-motion";
 
 const ChatInfo = observer(() => {
   const [updateMode, setUpdateMode] = useState<boolean>(false);
@@ -24,10 +26,14 @@ const ChatInfo = observer(() => {
   const [xMousePosition, setXMousePosition] = useState<number>(0);
   const [yMousePosition, setYMousePosition] = useState<number>(0);
 
+  const [memberListPage, setMemberListPage] = useState<number>(2);
+
   const navigate = useNavigate();
 
   const currentChatId = currentChatState.chat?.id;
   const isMyChat = currentChatState.chat?.isOwner;
+  const currentChatMemberListPage = currentChatState.chat?.memberListPage;
+  const memberListBaseCount = 10;
 
   const mouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
     const localX = event.clientX - event.currentTarget.offsetLeft;
@@ -61,20 +67,6 @@ const ChatInfo = observer(() => {
     }
 
     setUpdateMode(false);
-  };
-
-  const onClickShowMemberListHandler = async () => {
-    if (currentChatState.chat === null) return;
-
-    setShowMemberList(!showMemberList);
-
-    if (currentChatState.chat.members.length === 0) {
-      await currentChatState.getUserListByChatAsync(
-        currentChatState.chat.id,
-        20,
-        1
-      );
-    }
   };
 
   const onChangeAvatarHandler = async (
@@ -120,12 +112,40 @@ const ChatInfo = observer(() => {
     return navigate("/", { replace: true });
   };
 
+  const onClickShowMemberListHandler = async () => {
+    if (currentChatState.chat === null) return;
+
+    setShowMemberList(!showMemberList);
+
+    if (currentChatState.chat.members.length === 0) {
+      await currentChatState.getUserListByChatAsync(currentChatState.chat.id, memberListBaseCount, 1);
+    }
+  };
+
+  const getMembers = useDebouncedCallback(async () => {
+    const memberListElement = document.getElementById("memberList");
+
+    if (!currentChatState.chat || !memberListElement) return;
+
+    if (memberListElement.scrollHeight - memberListElement.scrollTop === memberListElement.clientHeight) {
+      if (!currentChatId) return;
+
+      var response = await currentChatState.getUserListByChatAsync(currentChatState.chat.id, memberListBaseCount, memberListPage);
+
+      if (response.data.length === 0) return;
+
+      setMemberListPage(memberListPage + 1);
+      currentChatState.setMemberListPage(memberListPage + 1);
+    }
+  }, 800);
+
   useEffect(() => {
     setInputTitle(currentChatState.chat?.title ?? "");
     setInputName(currentChatState.chat?.name ?? "");
     SetShowMenu(false);
     setShowMemberList(false);
     setUpdateMode(false);
+    setMemberListPage(currentChatMemberListPage ?? 2);
   }, [currentChatState.chat]);
 
   return (
@@ -209,9 +229,14 @@ const ChatInfo = observer(() => {
         {showMemberList ? "Close" : "Show"} Members
       </button>
       {showMemberList && (
-        <div className={styles.memberList}>
+        <div className={styles.memberList} id="memberList" onScroll={getMembers}>
           {currentChatState.chat?.members.map((i) => (
-            <div className={styles.memberItem} key={i.id} onClick={() => showProfileByMessage(i.id)}>
+            <motion.div
+              initial={{ opacity: 0.7 }}
+              animate={{ opacity: 1 }}
+              transition={{duration: .1}}
+              className={styles.memberItem} key={i.id}
+              onClick={() => showProfileByMessage(i.id)}>
               <img
                 className={styles.memberItemAvatar}
                 src={i.avatarLink ?? nonAvatar}
@@ -228,7 +253,7 @@ const ChatInfo = observer(() => {
                   }
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}
