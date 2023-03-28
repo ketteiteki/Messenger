@@ -88,12 +88,6 @@ const ProfileInfo = observer(() => {
     }
   };
 
-  useEffect(() => {
-    setInputDisplayName(displayName);
-    setInputNickname(nickname);
-    setInputAdditionalData(bio);
-  }, [currentProfileState.date, authorizationState.data]);
-
   const onChangeAvatarHandler = async (
     event: React.FormEvent<HTMLInputElement>
   ) => {
@@ -107,6 +101,13 @@ const ProfileInfo = observer(() => {
   const onClickOpenFullSizeAvatar = () => {
     blackCoverState.setImage(currentProfileState.date?.avatarLink ?? nonAvatar);
   };
+
+  useEffect(() => {
+    setInputDisplayName(displayName);
+    setInputNickname(nickname);
+    setInputAdditionalData(bio);
+    SetShowSessions(false);
+  }, [currentProfileState.date, authorizationState.data]);
 
   return (
     <div

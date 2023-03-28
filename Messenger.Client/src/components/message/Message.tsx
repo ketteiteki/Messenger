@@ -147,19 +147,25 @@ const Message = observer((props: IMessageDto) => {
           <img
             className={styles.avatar}
             src={
-              props.ownerAvatarLink !== null
-                ? `${props.ownerAvatarLink}`
-                : nonAvatar
+              currentChatState.chat?.type === ChatType.Channel ?
+                currentChatState.chat.avatarLink ?? nonAvatar
+                : props.ownerAvatarLink ?? nonAvatar
             }
             onClick={showProfileByMessage}
             alt="avatar"
           />
           <div className={styles.messageData}>
-            {!props.attachments[0] && <p className={styles.nickname} onClick={showProfileByMessage}>{props.ownerDisplayName}</p>}
+            {!props.attachments[0] &&
+              <p className={styles.nickname} onClick={showProfileByMessage}>
+                {currentChatState.chat?.type !== ChatType.Channel ?
+                  props.ownerDisplayName
+                  : currentChatState.chat.title}</p>}
             {props.replyToMessageId && (
               <div className={styles.messageReply}>
                 <p className={styles.messageReplyDisplayName}>
-                  {props.replyToMessageAuthorDisplayName}
+                  {currentChatState.chat?.type !== ChatType.Channel ?
+                    props.replyToMessageAuthorDisplayName
+                    : currentChatState.chat.title}
                 </p>
                 <p className={styles.messageReplyText}>
                   {props.replyToMessageText || ""}

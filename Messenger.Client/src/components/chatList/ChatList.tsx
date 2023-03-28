@@ -29,10 +29,7 @@ const ChatList = observer(() => {
 
       if (response.status === 200) {
         response.data.forEach(async (c) => {
-          await signalRConfiguration.connection?.invoke(
-            SignalRMethodsName.JoinChat,
-            c.id
-          );
+          await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, c.id);
         });
       }
     }, []),
@@ -47,22 +44,14 @@ const ChatList = observer(() => {
 
   useEffect(() => {
     if (inputSearch === "") {
-      currentProfileState.setProfileNull();
-
       const dataChats = chatListWithMessagesState.data;
       const dataForSearchChats = chatListWithMessagesState.dataForSearchChats;
 
       dataForSearchChats.forEach(async (i) => {
         if (dataChats.find((x) => x.chat.id === i.chat.id)) return;
-        await signalRConfiguration.connection?.invoke(
-          SignalRMethodsName.LeaveChat,
-          i.chat.id
-        );
+
+        await signalRConfiguration.connection?.invoke(SignalRMethodsName.LeaveChat, i.chat.id);
       });
-
-      currentChatState.setChatAndMessagesNull();
-
-      navigate("/", { replace: true });
     }
   }, [inputSearch]);
 
