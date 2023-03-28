@@ -1,4 +1,4 @@
-using Messenger.BusinessLogic.Models.Enum;
+using Messenger.BusinessLogic.Models.Enums;
 using Microsoft.AspNetCore.Http;
 
 namespace Messenger.BusinessLogic.Models.Requests;

@@ -4,7 +4,7 @@ using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.BusinessLogic.ApiCommands.Messages;
 using Messenger.BusinessLogic.ApiQueries.Messages;
 using Messenger.BusinessLogic.Responses;
-using Messenger.Domain.Enum;
+using Messenger.Domain.Enums;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;

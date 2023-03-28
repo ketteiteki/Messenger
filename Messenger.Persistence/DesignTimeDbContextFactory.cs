@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace Messenger.Services;
+namespace Messenger.Persistence;
 
 public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<DatabaseContext>
 {

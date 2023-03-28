@@ -2,7 +2,7 @@ using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.BusinessLogic.ApiQueries.Chats;
-using Messenger.Domain.Enum;
+using Messenger.Domain.Enums;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
