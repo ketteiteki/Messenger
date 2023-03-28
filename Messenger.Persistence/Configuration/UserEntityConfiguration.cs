@@ -24,7 +24,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
             displayName: "kami no me",
             nickname: "kaminome",
             bio: "the best account",
-            avatarFileName: null,
+            avatarFileName: "kaminome.jpg",
             passwordHash: "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==",
             passwordSalt: "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI="
         )
@@ -36,7 +36,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
             displayName: "alice1",
             nickname: "alice1234",
             bio: "cool status",
-            avatarFileName: null,
+            avatarFileName: "alice.jpg",
             passwordHash: "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==",
             passwordSalt: "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI="
         )
