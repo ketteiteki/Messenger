@@ -46,10 +46,13 @@ public class DeleteChatCommandHandler : IRequestHandler<DeleteChatCommand, Resul
         {
             await _blobService.DeleteBlobAsync(chat.AvatarFileName);
         }
-		
-        _context.Messages.Remove(chat.LastMessage);
+
+        if (chat.LastMessage != null)
+        {
+            _context.Messages.Remove(chat.LastMessage);
         
-        await _context.SaveChangesAsync(cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
         
         _context.Chats.Remove(chat);
         
