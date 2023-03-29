@@ -68,9 +68,8 @@ const Chat = observer(() => {
       authorizationOwnerDisplayName === undefined ||
       currentChatId === undefined ||
       authorizationId === undefined
-    ) return;
-
-    if (inputMessage === "") return;
+    )
+      return;
 
     const messageEntity = new MessageEntity(
       inputMessage,
@@ -209,7 +208,6 @@ const Chat = observer(() => {
     chatListWithMessagesState.addChatInData(currentChatState.chat, currentChatState.messages)
     chatListWithMessagesState.resetDataForSearchChats();
     currentChatState.setChatAndMessages(currentChatState.chat, currentChatState.messages);
-    chatListWithMessagesState.setSearchInput("");
   }
 
   const onClickCloseAttachmentPanelHandler = () => {
@@ -222,6 +220,17 @@ const Chat = observer(() => {
 
     setInputMessage(editMessageState.data.text);
   }, [editMessageState.data]);
+
+  useEffect(() => {
+    const messageListElement = document.getElementById("messageList");
+
+    if (!messageListElement) return;
+
+    if (messageListElement.clientHeight + 160 >= messageListElement.scrollHeight - messageListElement.scrollTop) {
+      messageListScrollBottomHandler();
+    }
+
+  }, [currentChatState.messages.length]);
 
   useEffect(() => {
     setAttachmentList([]);

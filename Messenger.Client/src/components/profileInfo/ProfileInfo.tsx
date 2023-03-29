@@ -45,9 +45,6 @@ const ProfileInfo = observer(() => {
         && x.chat.members.find(m => m.id !== authorizationState.data?.id)?.id === currentProfileId
     );
 
-  console.log(isMyProfile);
-  console.log(dialogWithThisUser);
-
   const MouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
     const localX = event.clientX - event.currentTarget.offsetLeft;
     const localY = event.clientY - event.currentTarget.offsetTop;
@@ -135,7 +132,7 @@ const ProfileInfo = observer(() => {
           setUpdateMode={setUpdateMode}
         />
       )}
-      {dialogWithThisUser && !isMyProfile &&
+      {((dialogWithThisUser && !isMyProfile) || isMyProfile) && 
         <button
           className={styles.settingsButton}
           onClick={() => SetShowMenu(true)}
