@@ -16,6 +16,7 @@ import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
 import { blackCoverState } from "../../state/BlackCoverState";
 import { motion } from "framer-motion";
 import { ChatType } from "../../models/enum/ChatType";
+import { currentChatState } from "../../state/CurrentChatState";
 
 const ProfileInfo = observer(() => {
 
@@ -43,6 +44,9 @@ const ProfileInfo = observer(() => {
       (x) => x.chat.type === ChatType.Dialog
         && x.chat.members.find(m => m.id !== authorizationState.data?.id)?.id === currentProfileId
     );
+
+  console.log(isMyProfile);
+  console.log(dialogWithThisUser);
 
   const MouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
     const localX = event.clientX - event.currentTarget.offsetLeft;
@@ -76,15 +80,17 @@ const ProfileInfo = observer(() => {
   const onClickStartChattingHandler = async () => {
     if (currentProfileId === undefined) return;
 
-    const response = await chatListWithMessagesState.postCreateDialogAsync(
-      currentProfileId
-    );
+    const response = await chatListWithMessagesState.postCreateDialogAsync(currentProfileId);
+
+    const dialogDataItem = chatListWithMessagesState.data.find(x => x.chat.id === response.data.id);
+
+    if (!dialogDataItem) return;
+
+    currentChatState.setChatAndMessages(dialogDataItem.chat, dialogDataItem.messages);
+    chatListWithMessagesState.pushChatOnTop(dialogDataItem.chat.id);
 
     if (response.status === 200) {
-      await signalRConfiguration.connection?.invoke(
-        SignalRMethodsName.JoinChat,
-        response.data.id
-      );
+      await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, response.data.id);
     }
   };
 
@@ -129,12 +135,13 @@ const ProfileInfo = observer(() => {
           setUpdateMode={setUpdateMode}
         />
       )}
-      <button
-        className={styles.settingsButton}
-        onClick={() => SetShowMenu(true)}
-      >
-        <SettingsSvg className={styles.settingsSvg} width={20} />
-      </button>
+      {dialogWithThisUser && !isMyProfile &&
+        <button
+          className={styles.settingsButton}
+          onClick={() => SetShowMenu(true)}
+        >
+          <SettingsSvg className={styles.settingsSvg} width={20} />
+        </button>}
       <div className={styles.avatarContainer}>
         {isMyProfile && <label htmlFor="avatar" className={styles.avatarBlackCover} />}
         <input

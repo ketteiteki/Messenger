@@ -93,9 +93,9 @@ const Message = observer((props: IMessageDto) => {
             <img
               className={styles.myAvatar}
               src={
-                props.ownerAvatarLink !== null
-                  ? `${props.ownerAvatarLink}`
-                  : nonAvatar
+                currentChatState.chat?.type === ChatType.Channel ?
+                  currentChatState.chat.avatarLink ?? nonAvatar
+                  : props.ownerAvatarLink ?? nonAvatar
               }
               onClick={showProfileByMessage}
               alt="avatar"

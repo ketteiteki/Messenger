@@ -92,6 +92,7 @@ const ChatInfo = observer(() => {
 
     await currentChatState.postJoinToChatAsync(currentChatId);
 
+    chatListWithMessagesState.setSearchInput("");
     chatListWithMessagesState.addChatInData(currentChatState.chat, currentChatState.messages)
     chatListWithMessagesState.resetDataForSearchChats();
     currentChatState.setChatAndMessages(currentChatState.chat, currentChatState.messages);
@@ -140,6 +141,10 @@ const ChatInfo = observer(() => {
   }, 800);
 
   useEffect(() => {
+    if (currentChatState.chat === null) {
+      return navigate("/", { replace: true });
+    }
+
     setInputTitle(currentChatState.chat?.title ?? "");
     setInputName(currentChatState.chat?.name ?? "");
     SetShowMenu(false);

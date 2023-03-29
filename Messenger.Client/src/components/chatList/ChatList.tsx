@@ -6,18 +6,14 @@ import { ReactComponent as LoupeSvg } from "../../assets/svg/loupe.svg";
 import { ReactComponent as PenSvg } from "../../assets/svg/pen.svg";
 import ChatListItem from "../chatListItem/ChatListItem";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDebouncedCallback } from "use-debounce";
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
 import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
-import { currentChatState } from "../../state/CurrentChatState";
-import { currentProfileState } from "../../state/CurrentProfileState";
 import { motion } from "framer-motion";
 
 const ChatList = observer(() => {
-  const [inputSearch, setInputSearch] = useState<string>("");
-
-  const navigate = useNavigate();
+  const searchInput = chatListWithMessagesState.searchInput;
 
   const debounced = useDebouncedCallback(
     useCallback(async (value) => {
@@ -38,12 +34,12 @@ const ChatList = observer(() => {
   );
 
   const searchChatListHandler = (value: string) => {
-    setInputSearch(value);
+    chatListWithMessagesState.setSearchInput(value);
     debounced(value);
   };
 
   useEffect(() => {
-    if (inputSearch === "") {
+    if (searchInput === "") {
       const dataChats = chatListWithMessagesState.data;
       const dataForSearchChats = chatListWithMessagesState.dataForSearchChats;
 
@@ -53,7 +49,7 @@ const ChatList = observer(() => {
         await signalRConfiguration.connection?.invoke(SignalRMethodsName.LeaveChat, i.chat.id);
       });
     }
-  }, [inputSearch]);
+  }, [searchInput]);
 
   return (
     <div className={styles.chatList}>
@@ -75,11 +71,11 @@ const ChatList = observer(() => {
         />
       </div>
       <div className={styles.items}>
-        {inputSearch === "" &&
+        {searchInput === "" &&
           chatListWithMessagesState.data.map((i) => (
             <ChatListItem key={i.chat.id} {...i} />
           ))}
-        {inputSearch !== "" &&
+        {searchInput !== "" &&
           chatListWithMessagesState.dataForSearchChats.map((i) => (
             <ChatListItem key={i.chat.id} {...i} />
           ))}
