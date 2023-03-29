@@ -25,9 +25,11 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
   const isInChatOnlyRealTimeMessages = props.messages.length !== 0 &&
     props.messages.filter(x => x.isMessageRealtime).length === props.messages.length;
   const firstRealtimeMessage = props.messages.find(x => x.isMessageRealtime);
-  const lastMessageText = props.chat.lastMessageId ?
+
+  const lastMessageTextForChannel = props.chat.lastMessageText ?? "Chat is empty";
+  const lastMessageTextForConversationAndDialog = props.chat.lastMessageId ?
     `${props.chat.lastMessageAuthorDisplayName ?? ""}: ${props.chat.lastMessageText ?? ""}`
-    : "Сhat is empty";
+    : "Chat is empty";
 
   const navigate = useNavigate();
 
@@ -77,7 +79,9 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
             )?.displayName
             : props.chat.title}</p>
         </p>
-        <p className={styles.lastMessage}>{lastMessageText}</p>
+        <p className={styles.lastMessage}>{
+          props.chat.type === ChatType.Channel ?
+            lastMessageTextForChannel : lastMessageTextForConversationAndDialog}</p>
         <p className={styles.date}>{props.chat.lastMessageDateOfCreate && DateService.getTime(props.chat.lastMessageDateOfCreate)}</p>
       </div>
     </motion.div>

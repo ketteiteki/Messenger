@@ -12,6 +12,7 @@ import { IChatListWithMessagesDataItem } from "./types/ChatListWithMessagesState
 class ChatListWithMessagesState {
   public data: IChatListWithMessagesDataItem[] = [];
   public dataForSearchChats: IChatListWithMessagesDataItem[] = [];
+  public searchInput: string = "";
 
   constructor() {
     makeAutoObservable(
@@ -21,6 +22,10 @@ class ChatListWithMessagesState {
         deep: true,
       }
     );
+  }
+
+  public setSearchInput = (text: string) => {
+    this.searchInput = text;
   }
 
   public setLastMessage = (message: IMessageDto) => {
@@ -66,28 +71,42 @@ class ChatListWithMessagesState {
   };
 
   public deleteMessageInData = (chatId: string, messageId: string) => {
+    console.log("start");
     const dataItem = this.data.find(x => x.chat.id === chatId);
 
     const messageItemIndex = dataItem?.messages.findIndex(x => x.id === messageId);
 
-    if (!messageItemIndex) return;
+    if (!messageItemIndex || !dataItem) return;
 
-    dataItem?.messages.splice(messageItemIndex, 1);
+    dataItem.messages.splice(messageItemIndex, 1);
+
+    const lastMessageNow = dataItem?.messages[dataItem?.messages.length - 1];
+
+    dataItem.chat.lastMessageId = lastMessageNow?.id ?? null;
+    dataItem.chat.lastMessageAuthorDisplayName = lastMessageNow?.ownerDisplayName ?? null;
+    dataItem.chat.lastMessageText = lastMessageNow?.text ?? null;
+    dataItem.chat.lastMessageDateOfCreate = lastMessageNow?.dateOfCreate ?? null;
   };
 
   public deleteMessageInDataByMessageDeleteNotification = (
     messageDeleteNotification: IMessageDeleteNotificationDto
   ) => {
-    const item = this.data.find(
-      (c) => c.chat.id === messageDeleteNotification.chatId
-    );
-    if (item === undefined) return;
+    const dataItem = this.data.find((c) => c.chat.id === messageDeleteNotification.chatId);
 
-    var filteredMessages = item.messages.filter(
-      (x) => x.id !== messageDeleteNotification.messageId
-    );
+    if (!dataItem) return;
 
-    item.messages = filteredMessages;
+    const messageIndex = dataItem.messages.findIndex((x) => x.id === messageDeleteNotification.messageId);
+
+    if (messageIndex === -1) return;
+
+    dataItem.messages.splice(messageIndex, 1);
+
+    const lastMessageNow = dataItem?.messages[dataItem?.messages.length - 1];
+
+    dataItem.chat.lastMessageId = lastMessageNow?.id ?? null;
+    dataItem.chat.lastMessageAuthorDisplayName = lastMessageNow?.ownerDisplayName ?? null;
+    dataItem.chat.lastMessageText = lastMessageNow?.text ?? null;
+    dataItem.chat.lastMessageDateOfCreate = lastMessageNow?.dateOfCreate ?? null;
   };
 
   public addChatInData = (chat: IChatDto, messages: IMessageDto[]) => {
@@ -204,15 +223,22 @@ class ChatListWithMessagesState {
   };
 
   public delDeleteMessageAsync = async (chatId: string, messageId: string) => {
-    const item = this.data.find((c) => c.chat.id === chatId);
+    const dataItem = this.data.find((c) => c.chat.id === chatId);
 
-    if (item === undefined) return;
+    if (!dataItem) return;
 
-    const messageIndex = item.messages.findIndex((x) => x.id === messageId);
+    const messageIndex = dataItem.messages.findIndex((x) => x.id === messageId);
 
     if (messageIndex === -1) return;
 
-    item.messages.splice(messageIndex, 1);
+    dataItem.messages.splice(messageIndex, 1);
+
+    const lastMessageNow = dataItem?.messages[dataItem?.messages.length - 1];
+
+    dataItem.chat.lastMessageId = lastMessageNow?.id ?? null;
+    dataItem.chat.lastMessageAuthorDisplayName = lastMessageNow?.ownerDisplayName ?? null;
+    dataItem.chat.lastMessageText = lastMessageNow?.text ?? null;
+    dataItem.chat.lastMessageDateOfCreate = lastMessageNow?.dateOfCreate ?? null;
 
     const response = await MessagesApi.delDeleteMessageAsync(messageId, true);
 

@@ -68,8 +68,9 @@ const Chat = observer(() => {
       authorizationOwnerDisplayName === undefined ||
       currentChatId === undefined ||
       authorizationId === undefined
-    )
-      return;
+    ) return;
+
+    if (inputMessage === "") return;
 
     const messageEntity = new MessageEntity(
       inputMessage,
@@ -208,6 +209,7 @@ const Chat = observer(() => {
     chatListWithMessagesState.addChatInData(currentChatState.chat, currentChatState.messages)
     chatListWithMessagesState.resetDataForSearchChats();
     currentChatState.setChatAndMessages(currentChatState.chat, currentChatState.messages);
+    chatListWithMessagesState.setSearchInput("");
   }
 
   const onClickCloseAttachmentPanelHandler = () => {
