@@ -2,8 +2,8 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.Domain.Enum;
-using Messenger.Services;
+using Messenger.Domain.Enums;
+using Messenger.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.BusinessLogic.ApiQueries.Dialogs;

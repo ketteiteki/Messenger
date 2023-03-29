@@ -3,7 +3,7 @@ using Messenger.Application.Services;
 using Messenger.Domain.Constants;
 using Messenger.Infrastructure;
 using Messenger.Infrastructure.Configuration;
-using Messenger.Services;
+using Messenger.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

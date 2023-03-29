@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Dialogs;
-using Messenger.Domain.Enum;
+using Messenger.Domain.Enums;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;

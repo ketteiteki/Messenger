@@ -2,7 +2,7 @@ using Messenger.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Messenger.Services.Configuration;
+namespace Messenger.Persistence.Configuration;
 
 public class RoleUserByChatEntityConfiguration : IEntityTypeConfiguration<RoleUserByChatEntity>
 {

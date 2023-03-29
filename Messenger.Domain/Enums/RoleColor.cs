@@ -1,4 +1,4 @@
-namespace Messenger.Domain.Enum;
+namespace Messenger.Domain.Enums;
 
 public enum RoleColor
 {

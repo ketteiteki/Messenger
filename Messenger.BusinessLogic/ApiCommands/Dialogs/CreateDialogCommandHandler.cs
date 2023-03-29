@@ -4,8 +4,8 @@ using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Entities;
-using Messenger.Domain.Enum;
-using Messenger.Services;
+using Messenger.Domain.Enums;
+using Messenger.Persistence;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,8 +1,8 @@
-using System.Reflection;
 using Messenger.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
-namespace Messenger.Services;
+namespace Messenger.Persistence;
 
 public class DatabaseContext : DbContext
 {
