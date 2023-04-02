@@ -43,8 +43,8 @@ class ChatListWithMessagesState {
     const item = this.data.find((c) => c.chat.id === message.chatId);
     const itemInSearchData = this.dataForSearchChats.find((c) => c.chat.id === message.chatId);
 
-    item?.messages.push(message);
-    itemInSearchData?.messages.push(message);
+    item?.messages.unshift(message);
+    itemInSearchData?.messages.unshift(message);
   };
 
   public updateMessageInData = (
@@ -145,7 +145,7 @@ class ChatListWithMessagesState {
     const response = await MessagesApi.getMessageListAsync(
       chatId,
       fromMessageDateTime,
-      40
+      30
     );
 
     if (response.status === 200) {
@@ -155,10 +155,10 @@ class ChatListWithMessagesState {
           (i) => i.chat.id === chatId
         );
 
-        const messages = response.data.reverse();
+        const messages = response.data;
 
-        dataItem?.messages.unshift(...messages);
-        dataForSearchItem?.messages.unshift(...messages);
+        dataItem?.messages.push(...messages);
+        dataForSearchItem?.messages.push(...messages);
       });
     }
 

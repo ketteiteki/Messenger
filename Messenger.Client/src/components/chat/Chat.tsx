@@ -26,7 +26,8 @@ const Chat = observer(() => {
   const [attachmentList, setAttachmentList] = useState<File[]>([]);
   const [attachmentListUrlBlob, setAttachmentListUrlBlob] = useState<Array<string | ArrayBuffer | null>>([]);
 
-  const refMessageList = document.getElementById("messageList");
+  const messageListRef = useRef<HTMLDivElement>(null);
+  const messageListLastElement = useRef<HTMLDivElement>(null);
 
   const banDateOfExpire = currentChatState.chat?.banDateOfExpire;
   const muteDateOfExpire = currentChatState.chat?.banDateOfExpire;
@@ -175,27 +176,25 @@ const Chat = observer(() => {
   }
 
   const messageListScrollBottomHandler = () => {
-    if (refMessageList === null) return;
+    if (!messageListLastElement.current) return;
 
-    refMessageList.scrollTop = 1000000;
+    messageListLastElement.current.scrollIntoView();
   };
 
-  const getMessages = useDebouncedCallback(async () => {
-    const messageListElement = document.getElementById("messageList");
+  const onScrollGetMessages = useDebouncedCallback(async () => {
+    const messagesOfCurrentChat = chatListWithMessagesState.data.find((x) => x.chat.id === currentChatId)?.messages;
 
-    const firstMessageInArray = chatListWithMessagesState.data.find(
-      (x) => x.chat.id === currentChatId
-    )?.messages[0];
+    if (!messagesOfCurrentChat) return;
 
-    if (
-      messageListElement === null ||
-      currentChatId === undefined ||
-      firstMessageInArray === undefined
-    )
+    const firstMessageArray = messagesOfCurrentChat[messagesOfCurrentChat.length - 1];
+
+    if (!currentChatId || !firstMessageArray || !messageListRef.current)
       return;
 
-    if (messageListElement?.scrollTop === 0) {
-      await chatListWithMessagesState.getMessageListAsync(currentChatId, firstMessageInArray.dateOfCreate);
+    const { scrollTop, scrollHeight, clientHeight } = messageListRef.current;
+
+    if (-scrollTop + clientHeight >= scrollHeight - 10) {
+      await chatListWithMessagesState.getMessageListAsync(currentChatId, firstMessageArray.dateOfCreate);
     }
   }, 800);
 
@@ -281,9 +280,11 @@ const Chat = observer(() => {
         <>
           <div
             className={styles.messageList}
+            ref={messageListRef}
             id="messageList"
-            onScroll={getMessages}
+            onScroll={onScrollGetMessages}
           >
+            <div className={styles.messageListLastElement} ref={messageListLastElement} />
             {currentChatState.messages.map((i) => (
               <Message {...i} key={i.id} />
             ))}
