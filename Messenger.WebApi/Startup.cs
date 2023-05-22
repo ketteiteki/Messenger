@@ -40,15 +40,12 @@ public class Startup
 
     public void Configure(IApplicationBuilder applicationBuilder, IHostEnvironment environment)
     {
-        if (environment.IsDevelopment())
+        applicationBuilder.UseSwagger();
+        applicationBuilder.UseSwaggerUI(options =>
         {
-            applicationBuilder.UseSwagger();
-            applicationBuilder.UseSwaggerUI(options =>
-            {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Messenger Api v1");
-                options.RoutePrefix = "";
-            });
-        }
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Messenger Api v1");
+            options.RoutePrefix = "";
+        });
         
         applicationBuilder.UseStaticFiles();
 
@@ -70,5 +67,6 @@ public class Startup
         });
         
         applicationBuilder.MigrateDatabase();
+        applicationBuilder.InitializeAzureBlob(_configuration);
     }
 }

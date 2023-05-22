@@ -8,5 +8,7 @@ public interface IBlobService
 
     Task<string> UploadFileBlobAsync(IFormFile file);
 
+    bool UploadFolderToBlob(string folderPath);
+    
     Task<bool> DeleteBlobAsync(string fileName);
 }

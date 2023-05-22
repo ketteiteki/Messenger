@@ -26,10 +26,10 @@ public class IntegrationTestBase : IAsyncLifetime
 	
 	protected IntegrationTestBase()
 	{
-		var pathAppSettingsDevelopment = BaseDirService.GetPathAppSettingsJson(isDevelopment: true);
+		var pathAppSettings = BaseDirService.GetPathAppSettingsJson(false);
 
 		var configuration = new ConfigurationBuilder()
-			.AddJsonFile(pathAppSettingsDevelopment)
+			.AddJsonFile(pathAppSettings)
 			.Build();
 
 		var databaseConnectionString = configuration[AppSettingConstants.DatabaseConnectionStringForIntegrationTests];
