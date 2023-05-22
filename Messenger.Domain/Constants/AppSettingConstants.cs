@@ -20,6 +20,7 @@ public static class AppSettingConstants
 
     public const string BlobContainer = "BLOB_CONTAINER"; 
 
-    public const string BlobAccess = "BLOB_ACCESS"; 
+    public const string BlobAccess = "BLOB_ACCESS";
 
+    public const string SeedImagesFolder = "SEED_IMAGES_FOLDER";
 }

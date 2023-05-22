@@ -6,10 +6,10 @@ public class BaseDirService : IBaseDirService
 {
 	public string GetPathWwwRoot() => Path.Combine(AppContext.BaseDirectory, @"../../../../Messenger.WebApi/wwwroot");
 
-	public string GetPathAppSettingsJson(bool isDevelopment)
+	public string GetPathAppSettingsJson(bool isDocker)
 	{
-		if (isDevelopment)
-			return Path.Combine(AppContext.BaseDirectory, "../../../../Messenger.WebApi/appsettings.Development.json");
+		if (isDocker)
+			return Path.Combine(AppContext.BaseDirectory, "../../../../Messenger.WebApi/appsettings.Docker.json");
 
 		return Path.Combine(AppContext.BaseDirectory, "../../../../Messenger.WebApi/appsettings.json");
 	}

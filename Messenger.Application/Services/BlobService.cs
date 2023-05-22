@@ -16,12 +16,19 @@ public class BlobService : IBlobService
         _blobServiceSettings = blobServiceSettings;
     }
 
-    public Task<string> GetBlobAsync(string fileName)
+    public async Task<string> GetBlobAsync(string fileName)
     {
         var containerClient = _blobServiceClient.GetBlobContainerClient(_blobServiceSettings.MessengerBlobContainerName);
         var client = containerClient.GetBlobClient(fileName);
 
-        return Task.FromResult(client.Uri.AbsoluteUri);
+        var blobExists = await client.ExistsAsync();
+
+        if (!blobExists.Value)
+        {
+            throw new FileNotFoundException("Blob file was not found at storage account.");
+        }
+
+        return client.Uri.AbsoluteUri;
     }
 
     public async Task<string> UploadFileBlobAsync(IFormFile file)
@@ -55,10 +62,37 @@ public class BlobService : IBlobService
         return result.Value;
     }
 
+    public bool UploadFolderToBlob(string folderPath)
+    {
+        var containerClient = GetContainerClient(_blobServiceSettings.MessengerBlobContainerName);
+        var combinePath = Path.Combine(AppContext.BaseDirectory, folderPath);
+        var files = Directory.GetFiles(combinePath);
+
+        foreach (var file in files)
+        {
+            var fileName = Path.GetFileName(file);
+            var client = containerClient.GetBlobClient(fileName);
+            var fileExists = client.Exists();
+
+            if (fileExists.Value)
+            {
+                continue;
+            }
+
+            using var stream = File.OpenRead(file);
+            var headers = new BlobHttpHeaders { ContentType = "image/jpg" };
+            client.Upload(stream, headers);
+        }
+
+        return true;
+    }
+
     private BlobContainerClient GetContainerClient(string blobContainerName)
     {
         var containerClient = _blobServiceClient.GetBlobContainerClient(blobContainerName);
         containerClient.CreateIfNotExists();
+        containerClient.SetAccessPolicy(PublicAccessType.BlobContainer);
+
         return containerClient;
     }
 }
