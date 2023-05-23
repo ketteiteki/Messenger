@@ -10,10 +10,10 @@ COPY ["Messenger.Client/package-lock.json", "Messenger.Client/"]
 COPY ["Messenger.Client/.env", "Messenger.Client/"]
 WORKDIR "/react/Messenger.Client"
 RUN npm ci
-RUN sed -i 's|REACT_APP_BASE_API=https://localhost:7400|REACT_APP_BASE_API=http://localhost:7400|' .env
 WORKDIR /react
 COPY . .
 WORKDIR "/react/Messenger.Client"
+RUN sed -i 's|REACT_APP_BASE_API=https://localhost:7400|REACT_APP_BASE_API=http://localhost:7400|' .env
 RUN npm run build
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 as build

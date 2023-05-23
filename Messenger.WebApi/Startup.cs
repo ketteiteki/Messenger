@@ -77,6 +77,12 @@ public class Startup
         applicationBuilder.Map(SpaConstants.Registration, builder => builder.UseSpa(spa => spa.Options.SourcePath = "/wwwroot"));
         
         applicationBuilder.MigrateDatabase();
-        applicationBuilder.InitializeAzureBlob(_configuration);
+
+        var shouldMigrate = _configuration.GetValue<bool>("ShouldMigrateBlob");
+        
+        if (shouldMigrate)
+        {
+            applicationBuilder.InitializeAzureBlob(_configuration);
+        }
     }
 }
