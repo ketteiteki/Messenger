@@ -13,4 +13,40 @@
         <ProjectReference Include="..\Messenger.Persistence\Messenger.Persistence.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\asset-manifest.json" />
+      <_ContentIncludedByDefault Remove="wwwroot\icon.ico" />
+      <_ContentIncludedByDefault Remove="wwwroot\index.html" />
+      <_ContentIncludedByDefault Remove="wwwroot\logo192.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\logo512.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\manifest.json" />
+      <_ContentIncludedByDefault Remove="wwwroot\robots.txt" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\css\main.68bd7902.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\css\main.68bd7902.css.map" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\js\787.92851d35.chunk.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\js\787.92851d35.chunk.js.map" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\js\main.22806cd9.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\js\main.22806cd9.js.LICENSE.txt" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\js\main.22806cd9.js.map" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\attachment.deb17889d3dcaff887562fa932199d9f.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\channel_logo.fb38c272dca8431273d1f4d5ae5b488b.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\clock.3ea397d45dfd4d6a19c9fe753c14e617.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\conversation_logo.c620e91f65925d0fc2b7b5018d3d2b2e.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\cross.206fe3f9a7b02e731c0ceb0f68dd6c8a.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\edit_black.c3d7728c4e1d5e0b491dcc39c3f1e2c9.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\loupe.312ae9b543c4477e2d31b856e1e061d3.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\messenger_logo.91b560568592631770b768b8f1635e76.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\non_avatar.31ee06c7fce787f63148.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\pen.a5454d6ffc794a443a19bfcfe42ab06c.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\reply_black.152d42e670d883d103f3074e9767aac9.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\send_message.ca0836fdf794debfd5889faa30f6ad65.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\three_dots.b161863d423efa99ec2c5d7a03695c0b.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\tick_white.33bfc99a43deea56d74b824a5771fc6d.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\media\trash_bin_black.f93124fb4281eb7bde5a52db77f996c4.svg" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\" />
+    </ItemGroup>
+
 </Project>

@@ -2,6 +2,7 @@ using Messenger.BusinessLogic.Hubs;
 using Messenger.Domain.Constants;
 using Messenger.Infrastructure.DependencyInjection;
 using Messenger.Infrastructure.Middlewares;
+using Microsoft.OpenApi.Models;
 
 namespace Messenger.WebApi;
 
@@ -35,7 +36,11 @@ public class Startup
         
         serviceCollection.ConfigureCors(CorsPolicyName, allowOrigins);
 
-        serviceCollection.AddSwagger();
+        serviceCollection.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1",
+                new OpenApiInfo { Title = "Messenger API", Version = "v1" });
+        });
     }
 
     public void Configure(IApplicationBuilder applicationBuilder, IHostEnvironment environment)
@@ -44,7 +49,6 @@ public class Startup
         applicationBuilder.UseSwaggerUI(options =>
         {
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "Messenger Api v1");
-            options.RoutePrefix = "";
         });
         
         applicationBuilder.UseStaticFiles();
@@ -65,6 +69,12 @@ public class Startup
             options.MapHub<ChatHub>("/notification").RequireCors(CorsPolicyName);
             options.MapControllers();
         });
+        
+        applicationBuilder.Map(SpaConstants.Layout, builder => builder.UseSpa(spa => spa.Options.SourcePath = "/wwwroot"));
+        applicationBuilder.Map(SpaConstants.ChatInfo, builder => builder.UseSpa(spa => spa.Options.SourcePath = "/wwwroot"));
+        applicationBuilder.Map(SpaConstants.CreateChat, builder => builder.UseSpa(spa => spa.Options.SourcePath = "/wwwroot"));
+        applicationBuilder.Map(SpaConstants.Login, builder => builder.UseSpa(spa => spa.Options.SourcePath = "/wwwroot"));
+        applicationBuilder.Map(SpaConstants.Registration, builder => builder.UseSpa(spa => spa.Options.SourcePath = "/wwwroot"));
         
         applicationBuilder.MigrateDatabase();
         applicationBuilder.InitializeAzureBlob(_configuration);
