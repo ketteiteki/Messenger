@@ -18,6 +18,7 @@ interface IMessageBurgerMenu {
   displayName: string;
   text: string;
   isMyMessage: boolean;
+  isMessageLast: boolean;
   setShowMenu: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -30,6 +31,7 @@ const MessageBurgerMenu = observer(
     chatId,
     displayName,
     text,
+    isMessageLast,
     setShowMenu,
   }: IMessageBurgerMenu) => {
     const [xMousePosition, setXMousePosition] = useState<number>(x - 5);
@@ -62,7 +64,10 @@ const MessageBurgerMenu = observer(
     return (
       <div
         className={styles.messageBurgerMenu}
-        style={{ left: `${xMousePosition}px`, top: `${yMousePosition}px` }}
+        style={{
+          left: `${xMousePosition}px`,
+          top: isMessageLast && isMyMessage ? `${yMousePosition - 80}px` : `${yMousePosition}px`
+        }}
         onMouseLeave={() => setShowMenu(false)}
       >
         <button className={styles.replyMessageButton} onClick={setReplyHandler}>

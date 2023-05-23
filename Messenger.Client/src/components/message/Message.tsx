@@ -33,6 +33,7 @@ const Message = observer((props: IMessageDto) => {
   const isMessageMine = props.ownerId === authorizationState.data?.id;
   const isCurrentChatChannel = currentChatState.chat?.type === ChatType.Channel;
   const isCurrentChatMine = currentChatState.chat?.isOwner;
+  const isMessageLast = currentChatState.messages.findIndex(x => x.id === props.id) === 0;
 
   const showMenuHandler = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -87,6 +88,7 @@ const Message = observer((props: IMessageDto) => {
                 displayName={props.ownerDisplayName || ""}
                 text={props.text}
                 isMyMessage={isMessageMine}
+                isMessageLast={isMessageLast}
                 setShowMenu={setShowMenu}
               />
             )}
@@ -141,6 +143,7 @@ const Message = observer((props: IMessageDto) => {
                 displayName={props.ownerDisplayName || ""}
                 text={props.text}
                 isMyMessage={isMessageMine}
+                isMessageLast={isMessageLast}
                 setShowMenu={setShowMenu}
               />
             )}
