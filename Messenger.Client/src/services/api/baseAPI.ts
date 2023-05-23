@@ -1,10 +1,9 @@
 import { authorizationState } from "../../state/AuthorizationState";
 import axios from "axios";
-import AppConstants from "../../constants/AppConstants";
 import TokenService from "../messenger/TokenService";
 
 const api = axios.create({
-  baseURL: `${AppConstants.serverDomain}/api`,
+  baseURL: `${process.env.REACT_APP_BASE_API}/api`,
   headers: {
     "Content-Type": "application/json",
   },
