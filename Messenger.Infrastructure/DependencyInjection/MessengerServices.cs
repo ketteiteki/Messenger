@@ -1,6 +1,7 @@
 using Azure.Storage.Blobs;
 using Messenger.Application.Interfaces;
 using Messenger.Application.Services;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Messenger.Infrastructure.DependencyInjection;
@@ -24,6 +25,8 @@ public static class MessengerServices
 		var blobServiceClient = new BlobServiceClient(messengerBlobUrl);
 		
 		serviceCollection.AddSingleton(_ => blobServiceClient);
+
+		serviceCollection.AddSingleton(_ => new MemoryCache(new MemoryCacheOptions()));
 		
 		serviceCollection.AddSingleton<IBlobServiceSettings, BlobServiceSettings>(_ => blobServiceSettings);
 
