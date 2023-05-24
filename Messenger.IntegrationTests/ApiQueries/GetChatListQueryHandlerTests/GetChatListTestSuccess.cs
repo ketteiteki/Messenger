@@ -4,6 +4,7 @@ using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.BusinessLogic.ApiCommands.Dialogs;
 using Messenger.BusinessLogic.ApiCommands.Messages;
 using Messenger.BusinessLogic.ApiQueries.Chats;
+using Messenger.Domain.Constants;
 using Messenger.Domain.Enums;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
@@ -103,6 +104,13 @@ public class GetChatListTestSuccess : IntegrationTestBase, IIntegrationTest
 			}
 			
 			chat.IsMember.Should().Be(true);
+
+			if (chat.Id == SeedDataConstants.DotnetChatId || chat.Id == SeedDataConstants.DotnetFloodChatId)
+			{
+				chat.IsOwner.Should().Be(false);
+				continue;
+			}
+			
 			chat.IsOwner.Should().Be(true);
 		}
 		
