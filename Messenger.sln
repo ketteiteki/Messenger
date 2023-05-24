@@ -16,6 +16,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "items", "items", "{2B4345B4
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		README.md = README.md
+		Dockerfile = Dockerfile
+		.dockerignore = .dockerignore
+		docker-compose.yml = docker-compose.yml
+		Nginx_Config_Via_IP_Address.conf = Nginx_Config_Via_IP_Address.conf
+		Nginx_Config_Via_DNS.conf = Nginx_Config_Via_DNS.conf
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{CD5D3173-E469-496C-ACAC-EF31C95D06E8}"
