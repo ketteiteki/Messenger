@@ -3,6 +3,19 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
+FROM node:16.18.0-alpine as reactBuild
+WORKDIR /react
+COPY ["Messenger.Client/package.json", "Messenger.Client/"]
+COPY ["Messenger.Client/package-lock.json", "Messenger.Client/"]
+COPY ["Messenger.Client/.env", "Messenger.Client/"]
+WORKDIR "/react/Messenger.Client"
+RUN npm ci
+WORKDIR /react
+COPY . .
+WORKDIR "/react/Messenger.Client"
+RUN sed -i 's|REACT_APP_BASE_API=https://localhost:7400|REACT_APP_BASE_API=http://localhost:7400|' .env
+RUN npm run build
+
 FROM mcr.microsoft.com/dotnet/sdk:6.0 as build
 WORKDIR /src
 COPY ["Messenger.Application/Messenger.Application.csproj", "Messenger.Application/"]
@@ -19,6 +32,7 @@ RUN dotnet build "Messenger.WebApi.csproj" -c Release -o /app/build --no-restore
 
 FROM build as publish
 RUN dotnet publish "Messenger.WebApi.csproj" -c Release -o /app/publish --no-restore /p:UseAppHost=false
+COPY --from=reactBuild /react/Messenger.WebApi/wwwroot/ /app/publish/wwwroot/
 
 FROM base as final
 WORKDIR /app

@@ -8,7 +8,7 @@ class SignalRConfiguration {
   public buildConnection = (accessToken: string) => {
     const connectionBuilder = new signalR.HubConnectionBuilder();
     this.connection = connectionBuilder
-      .withUrl(AppConstants.serverDomain + "/notification", {
+      .withUrl(process.env.REACT_APP_BASE_API + "/notification", {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets,
         accessTokenFactory: () => accessToken,

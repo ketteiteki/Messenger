@@ -14,13 +14,6 @@ services:
     depends_on:
       - db
 
-  client:
-    build:
-      context: ./Messenger.Client
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-
   db:
     image: postgres:15.2-alpine
     restart: always
