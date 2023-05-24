@@ -40,6 +40,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SeedImages", "SeedImages", 
 	ProjectSection(SolutionItems) = preProject
 		img\SeedImages\dotnetchat.jpg = img\SeedImages\dotnetchat.jpg
 		img\SeedImages\dotnettalkschat.jpg = img\SeedImages\dotnettalkschat.jpg
+		img\SeedImages\kaminome.jpg = img\SeedImages\kaminome.jpg
+		img\SeedImages\alice.jpg = img\SeedImages\alice.jpg
 	EndProjectSection
 EndProject
 Global

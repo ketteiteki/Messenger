@@ -4,6 +4,7 @@ using Messenger.BusinessLogic.Models.Responses;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
+using Messenger.Domain.Enums;
 using Messenger.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -62,6 +63,51 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 
 		_context.Users.Add(newUser);
 		_context.Sessions.Add(session);
+		await _context.SaveChangesAsync(cancellationToken);
+
+		var isDotnetChatCreated = await _context.Chats.AnyAsync(x => x.Id == SeedDataConstants.DotnetChatId, cancellationToken);
+		var isDotnetFloodChatCreated = await _context.Chats.AnyAsync(x => x.Id == SeedDataConstants.DotnetFloodChatId, cancellationToken);
+
+		if (!isDotnetChatCreated && !isDotnetFloodChatCreated)
+		{
+			var dotnetChat = new ChatEntity(
+				title: "DotNetRuChat",
+				name: "DotNetRuChat",
+				type: ChatType.Conversation,
+				ownerId: null,
+				avatarFileName: "dotnetchat.jpg",
+				lastMessageId: null)
+			{
+				Id = SeedDataConstants.DotnetChatId
+			};
+		
+			var dotnetFloodChat = new ChatEntity(
+				title: ".NET Talks",
+				name: "dotnettalks",
+				type: ChatType.Conversation,
+				ownerId: null,
+				avatarFileName: "dotnettalkschat.jpg",
+				lastMessageId: null)
+			{
+				Id = SeedDataConstants.DotnetFloodChatId
+			};
+			
+			_context.Chats.AddRange(dotnetChat, dotnetFloodChat);
+		}
+
+		var userChatForDotnetChat = new ChatUserEntity(
+			newUser.Id,
+			SeedDataConstants.DotnetChatId,
+			true,
+			muteDateOfExpire: null);
+		
+		var userChatForDotnetFloodChat = new ChatUserEntity(
+			newUser.Id,
+			SeedDataConstants.DotnetFloodChatId,
+			true,
+			muteDateOfExpire: null);
+			
+		_context.ChatUsers.AddRange(userChatForDotnetChat, userChatForDotnetFloodChat);
 		await _context.SaveChangesAsync(cancellationToken);
 		
 		var authorizationResponse = new AuthorizationResponse(

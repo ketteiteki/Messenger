@@ -7,7 +7,14 @@ public class UpdateConversationCommandValidator : AbstractValidator<UpdateChatDa
 {
     public UpdateConversationCommandValidator()
     {
-        RuleFor(x => x.Name).Length(4, 20);
-        RuleFor(x => x.Title).Length(4, 20);
+        RuleFor(x => x.Name)
+            .Must(title => title.All(char.IsLetterOrDigit))
+            .WithMessage("Name must only contain letters or numbers.")
+            .Length(4, 20);
+        
+        RuleFor(x => x.Title)
+            .Must(title => title.All(char.IsLetterOrDigit))
+            .WithMessage("Title must only contain letters or numbers.")
+            .Length(4, 20);
     }
 }
