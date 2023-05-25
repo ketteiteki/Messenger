@@ -196,7 +196,7 @@ const ChatInfo = observer(() => {
           onClick={onClickOpenFullSizeAvatar}
         />
       </div>
-      {updateMode === false && <p className={styles.title}>{inputTitle}</p>}
+      {updateMode === false && <p className={styles.title}>{inputTitle || "------"}</p>}
       {updateMode && (
         <input
           className={styles.inputTitle}
@@ -205,7 +205,7 @@ const ChatInfo = observer(() => {
           onChange={(e) => setInputTitle(e.currentTarget.value)}
         />
       )}
-      {updateMode === false && <p className={styles.name}>{inputName}</p>}
+      {updateMode === false && <p className={styles.name}>{inputName || "------"}</p>}
       {updateMode && (
         <input
           className={styles.inputName}

@@ -4,6 +4,7 @@ import styles from "./Login.module.scss";
 import { authorizationState } from "../../state/AuthorizationState";
 import { useNavigate, Link } from "react-router-dom";
 import TokenService from "../../services/messenger/TokenService";
+import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
 
 const Login = observer(() => {
   const [inputNickname, setInputNickname] = useState<string>("");
@@ -14,6 +15,8 @@ const Login = observer(() => {
   useEffect(() => {
     TokenService.deleteLocalAccessToken();
     TokenService.deleteLocalRefreshToken();
+    authorizationState.clearAuthorizationData();
+    chatListWithMessagesState.clearChatListWithMessagesData();
   }, []);
 
   const loginHandler = async () => {

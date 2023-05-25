@@ -6,6 +6,9 @@ import { ReactComponent as TrashBinSvg } from "../../assets/svg/trash_bin_black.
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
 import { currentChatState } from "../../state/CurrentChatState";
 import { useNavigate } from "react-router-dom";
+import { blackCoverState } from "../../state/BlackCoverState";
+import ModalWindow from "../modalWindow/ModalWindow";
+import ModalWindowEntity from "../../models/entities/ModalWindowEntity";
 
 interface ProfileInfoBurgerMenu {
   x: number;
@@ -22,18 +25,27 @@ const ChatInfoBurgerMenu = observer(
     const navigate = useNavigate();
 
     const onClickDeleteChatHandler = async () => {
-      await chatListWithMessagesState.delDeleteChatAsync(
-        currentChatState.chat?.id ?? ""
-      );
-      currentChatState.setChatAndMessagesNull();
 
-      navigate("/", { replace: true });
+      const text = "Are you sure you want to delete the chat?";
+
+      const okFun = async () => {
+        await chatListWithMessagesState.delDeleteChatAsync(
+          currentChatState.chat?.id ?? ""
+        );
+        currentChatState.setChatAndMessagesNull();
+
+        navigate("/", { replace: true });
+      }
+
+      const modalWindowEntity = new ModalWindowEntity(text, okFun, blackCoverState.closeBlackCover);
+
+      blackCoverState.setModalWindow(modalWindowEntity);
     };
 
     return (
       <div
         className={styles.chatInfoBurgerMenu}
-        style={{ left: `${xMousePosition}px`, top: `${yMousePosition}px` }}
+        style={{ left: `${xMousePosition + 5}px`, top: `${yMousePosition - 5}px` }}
         onMouseLeave={() => setShowMenu(false)}
       >
         <button

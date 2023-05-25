@@ -132,7 +132,7 @@ const ProfileInfo = observer(() => {
           setUpdateMode={setUpdateMode}
         />
       )}
-      {((dialogWithThisUser && !isMyProfile) || isMyProfile) && 
+      {((dialogWithThisUser && !isMyProfile) || isMyProfile) &&
         <button
           className={styles.settingsButton}
           onClick={() => SetShowMenu(true)}
@@ -160,7 +160,7 @@ const ProfileInfo = observer(() => {
         />
       </div>
       {updateMode === false && (
-        <p className={styles.displayName}>{inputDisplayName}</p>
+        <p className={styles.displayName}>{inputDisplayName || "------"}</p>
       )}
       {updateMode && (
         <input
@@ -171,7 +171,7 @@ const ProfileInfo = observer(() => {
         />
       )}
       {updateMode === false && (
-        <p className={styles.nickname}>{inputNickname}</p>
+        <p className={styles.nickname}>{inputNickname || "------"}</p>
       )}
       {updateMode && (
         <input
@@ -182,7 +182,7 @@ const ProfileInfo = observer(() => {
         />
       )}
       {updateMode === false && (
-        <p className={styles.additionalData}>{inputAdditionalData}</p>
+        <p className={styles.additionalData}>{inputAdditionalData || "------"}</p>
       )}
       {updateMode && (
         <input
@@ -226,7 +226,6 @@ const ProfileInfo = observer(() => {
               </button>
               <div className={styles.sessionItemContainer}>
                 <p className={styles.sessionId}>Id: {i.id}</p>
-                <p className={styles.sessionIp}>Ip: {i.ip}</p>
                 <p className={styles.createAt}>
                   CreateAt: {DateService.getDateAndTime(i.createAt)}
                 </p>

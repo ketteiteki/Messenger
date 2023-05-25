@@ -3,10 +3,14 @@ import { observer } from "mobx-react-lite";
 import styles from "./ProfileInfoBurgerMenu.module.scss";
 import { ReactComponent as EditSvg } from "../../assets/svg/edit_black.svg";
 import { ReactComponent as TrashBinSvg } from "../../assets/svg/trash_bin_black.svg";
+import { ReactComponent as LoguoutSvg } from "../../assets/svg/logout.svg";
 import { currentProfileState } from "../../state/CurrentProfileState";
 import { authorizationState } from "../../state/AuthorizationState";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
 import { currentChatState } from "../../state/CurrentChatState";
+import { blackCoverState } from "../../state/BlackCoverState";
+import ModalWindowEntity from "../../models/entities/ModalWindowEntity";
+import { useNavigate } from "react-router-dom";
 
 interface ProfileInfoBurgerMenu {
   x: number;
@@ -24,32 +28,58 @@ const ProfileInfoBurgerMenu = observer(
     const authorizationId = authorizationState.data?.id;
     const currentProfileId = currentProfileState.date?.id;
 
+    const navigate = useNavigate();
+
+    const onClickDeleteProfileHandler = async () => {
+
+      const text = "Do you want to delete your account?";
+
+      const okFun = async () => {
+        await currentProfileState.delDeleteProfileAsync();
+        
+        navigate("/registration", { replace: true });
+      };
+
+      const modalWindowEntity = new ModalWindowEntity(text, okFun, blackCoverState.closeBlackCover);
+
+      blackCoverState.setModalWindow(modalWindowEntity);
+    };
+
     const deleteDialogHandler = async () => {
-      if (authorizationId === undefined || currentChatState === undefined)
-        return;
 
-      const chatId = chatListWithMessagesState.data.find(
-        (x) =>
-          x.chat.members.find((m) => m.id !== authorizationId)?.id ===
-          currentProfileState.date?.id
-      )?.chat.id;
+      const text = "Do you want to delete the dialog?";
 
-      if (chatId !== undefined) {
-        chatListWithMessagesState.delDeleteDialogAsync(chatId, true);
+      const okFun = () => {
+        if (authorizationId === undefined || currentChatState === undefined)
+          return;
 
-        currentProfileState.setProfileNull();
-        currentChatState.setChatAndMessagesNull();
-      }
+        const chatId = chatListWithMessagesState.data.find(
+          (x) =>
+            x.chat.members.find((m) => m.id !== authorizationId)?.id ===
+            currentProfileState.date?.id
+        )?.chat.id;
+
+        if (chatId !== undefined) {
+          chatListWithMessagesState.delDeleteDialogAsync(chatId, true);
+
+          currentProfileState.setProfileNull();
+          currentChatState.setChatAndMessagesNull();
+        }
+      };
+
+      const modalWindowEntity = new ModalWindowEntity(text, okFun, blackCoverState.closeBlackCover);
+
+      blackCoverState.setModalWindow(modalWindowEntity);
     };
 
     return (
       <div
         className={styles.profileInfoBurgerMenu}
-        style={{ left: `${xMousePosition}px`, top: `${yMousePosition}px` }}
+        style={{ left: `${xMousePosition + 5}px`, top: `${yMousePosition - 5}px` }}
         onMouseLeave={() => setShowMenu(false)}
       >
         {currentProfileState.date?.id === authorizationState.data?.id ||
-        currentProfileState.date === null ? (
+          currentProfileState.date === null ? (
           <>
             <button
               className={styles.editAccountButton}
@@ -60,7 +90,14 @@ const ProfileInfoBurgerMenu = observer(
             </button>
             <button
               className={styles.deleteButton}
-              onClick={currentProfileState.delDeleteProfileAsync}
+              onClick={onClickDeleteProfileHandler}
+            >
+              <LoguoutSvg width={20} />
+              <p>Logout</p>
+            </button>
+            <button
+              className={styles.deleteButton}
+              onClick={onClickDeleteProfileHandler}
             >
               <TrashBinSvg width={20} />
               <p>Delete</p>

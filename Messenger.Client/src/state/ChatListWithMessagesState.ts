@@ -137,6 +137,12 @@ class ChatListWithMessagesState {
     this.data.splice(0, 0, chat);
   };
 
+  public clearChatListWithMessagesData = () => {
+    this.data = [];
+    this.dataForSearchChats = [];
+    this.searchInput = "";
+  };
+
   //api
   public getMessageListAsync = async (
     chatId: string,
