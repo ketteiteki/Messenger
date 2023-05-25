@@ -1,0 +1,53 @@
+@import "../../App.scss";
+
+.window {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  height: 130px;
+  border-radius: 10px;
+  margin: auto;
+  background-color: white;
+}
+
+.textContainer {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.text {
+
+}
+
+.buttonsContainer {
+  margin: auto;
+}
+
+.okButton {
+  width: 130px;
+  height: 35px;
+  border: none;
+  background-color: $blue;
+  color: white;
+  cursor: pointer;
+  margin-right: 25px;
+  border-radius: 5px;
+
+  &:hover {
+    background-color: $blueHover;
+  }
+}
+
+.cancelButton {
+  width: 130px;
+  height: 35px;
+  border: none;
+  background-color: $darkBlue;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+
+  &:hover {
+    background-color: $darkBlueHover;
+  }
+}

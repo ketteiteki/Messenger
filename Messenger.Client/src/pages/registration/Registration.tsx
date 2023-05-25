@@ -4,6 +4,7 @@ import styles from "./Registration.module.scss";
 import { authorizationState } from "../../state/AuthorizationState";
 import { useNavigate, Link } from "react-router-dom";
 import TokenService from "../../services/messenger/TokenService";
+import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
 
 const Registration = observer(() => {
   const [inputDisplayName, setInputDisplayName] = useState<string>("");
@@ -15,6 +16,8 @@ const Registration = observer(() => {
   useEffect(() => {
     TokenService.deleteLocalAccessToken();
     TokenService.deleteLocalRefreshToken();
+    authorizationState.clearAuthorizationData();
+    chatListWithMessagesState.clearChatListWithMessagesData();
   }, []);
 
   const registerHandler = async () => {

@@ -16,6 +16,7 @@ import { blackCoverState } from "../../state/BlackCoverState";
 import { motion } from "framer-motion";
 import IChatDto from "../../models/interfaces/IChatDto";
 import { currentChatState } from "../../state/CurrentChatState";
+import ModalWindow from "../../components/modalWindow/ModalWindow";
 
 const Layout = observer(() => {
 
@@ -98,7 +99,9 @@ const Layout = observer(() => {
 
   return (
     <div className={styles.layout}>
-      {blackCoverState.isBlackCoverShown &&
+      {
+        blackCoverState.isBlackCoverShown &&
+        blackCoverState.imageLink &&
         <motion.div
           initial={{ opacity: .7 }}
           animate={{ opacity: 1 }}
@@ -108,8 +111,20 @@ const Layout = observer(() => {
             initial={{ y: -5 }}
             animate={{ y: 0 }}
             className={styles.blackCoverImage}
-            src={blackCoverState.imageLink ?? ""} onClick={(e) => e.stopPropagation()} />
-        </motion.div>}
+            src={blackCoverState.imageLink} onClick={(e) => e.stopPropagation()} />
+        </motion.div>
+      }
+      {
+        blackCoverState.isBlackCoverShown &&
+        blackCoverState.modalWindow &&
+        <motion.div
+          initial={{ opacity: .7 }}
+          animate={{ opacity: 1 }}
+          className={styles.blackCover}
+          onClick={() => blackCoverState.closeBlackCover()}>
+          <ModalWindow />
+        </motion.div>
+      }
       <div className={styles.background} />
       <div className={styles.layoutContainer}>
         <ChatList />

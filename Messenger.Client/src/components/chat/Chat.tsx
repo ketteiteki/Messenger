@@ -204,6 +204,7 @@ const Chat = observer(() => {
 
     const response = await currentChatState.postJoinToChatAsync(currentChatId);
 
+    chatListWithMessagesState.setSearchInput("");
     chatListWithMessagesState.addChatInData(currentChatState.chat, currentChatState.messages)
     chatListWithMessagesState.resetDataForSearchChats();
     currentChatState.setChatAndMessages(currentChatState.chat, currentChatState.messages);
