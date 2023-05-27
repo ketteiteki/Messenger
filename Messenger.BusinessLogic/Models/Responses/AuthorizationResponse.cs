@@ -17,6 +17,8 @@ public class AuthorizationResponse
 
 	public string AvatarLink { get; set; }
 	
+	public Guid CurrentSessionId { get; set; }
+	
 	public AuthorizationResponse(
 		string accessToken,
 		Guid refreshToken,
@@ -24,7 +26,8 @@ public class AuthorizationResponse
 		string displayName,
 		string nickname, 
 		string bio,
-		string avatarLink)
+		string avatarLink,
+		Guid currentSessionId)
 	{
 		AccessToken = accessToken;
 		RefreshToken = refreshToken;
@@ -33,5 +36,6 @@ public class AuthorizationResponse
 		Nickname = nickname;
 		Bio = bio;
 		AvatarLink = avatarLink;
+		CurrentSessionId = currentSessionId;
 	}
 }

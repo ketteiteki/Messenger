@@ -158,6 +158,17 @@
   }
 }
 
+.currentSessionItem {
+  position: relative;
+  border-bottom: 1px solid $grey;
+  transition: 0.2s;
+  background-color: $light-blue;
+
+  p {
+    color: $grey-font-page;
+  }
+} 
+
 .sessionItem {
   position: relative;
   border-bottom: 2px solid $grey;
@@ -177,7 +188,6 @@
   position: absolute;
   top: 5px;
   right: 5px;
-  background-color: inherit;
   border: none;
   border-radius: 2px;
   cursor: pointer;

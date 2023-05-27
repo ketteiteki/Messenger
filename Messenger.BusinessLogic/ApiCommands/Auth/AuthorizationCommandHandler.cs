@@ -32,19 +32,12 @@ public class AuthorizationCommandHandler : IRequestHandler<AuthorizationCommand,
 	{
 		var accessTokenSignKey = _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
 		var accessTokenLifeTimeMinutes = _configuration[AppSettingConstants.MessengerAccessTokenLifetimeMinutes];
-		
-		if (!_tokenService.TryValidateAccessToken(request.AuthorizationToken, accessTokenSignKey, out var validatedJwtToken))
-		{
-			return new Result<AuthorizationResponse>(new AuthenticationError("Incorrect token"));
-		}
 
-		var requesterGuid = new Guid(validatedJwtToken.Claims.First(c => c.Type == ClaimConstants.Id).Value);
-
-		var requester = await _context.Users.FirstAsync(u => u.Id == requesterGuid, cancellationToken);
+		var requester = await _context.Users.FirstAsync(u => u.Id == request.RequesterId, cancellationToken);
 
 		var session = await _context.Sessions
 			.FirstOrDefaultAsync(s => s.AccessToken == request.AuthorizationToken && 
-			                          s.UserId == requesterGuid, cancellationToken);
+			                          s.UserId == request.RequesterId, cancellationToken);
 
 		if (session == null)
 		{
@@ -68,7 +61,8 @@ public class AuthorizationCommandHandler : IRequestHandler<AuthorizationCommand,
 			requester.DisplayName,
 			requester.Nickname,
 			requester.Bio,
-			avatarLink);
+			avatarLink,
+			session.Id);
 		
 		return new Result<AuthorizationResponse>(authorizationResponse);
 	}

@@ -15,6 +15,10 @@ class SessionsState {
     );
   }
 
+  public clearData() {
+    this.data = [];
+  };
+
   //api
   public getSessionListAsync = async () => {
     const response = await AuthorizationApi.getSessionListAsync();

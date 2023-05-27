@@ -44,17 +44,21 @@ const CreateChat = observer(() => {
     setFile(null);
     setBlobUrlFile(null);
 
-    const response = await chatListWithMessagesState.postCreateChatAsync(
-      inputNameConst,
-      inputTitleConst,
-      selectChatTypeValueConst,
-      fileConst ?? null
-    );
+    try {
+      const response = await chatListWithMessagesState.postCreateChatAsync(
+        inputNameConst,
+        inputTitleConst,
+        selectChatTypeValueConst,
+        fileConst ?? null
+      );
 
-    await signalRConfiguration.connection?.invoke(
-      SignalRMethodsName.JoinChat,
-      response.data.id
-    );
+      await signalRConfiguration.connection?.invoke(
+        SignalRMethodsName.JoinChat,
+        response.data.id
+      );
+    } catch (error: any) {
+      alert(error.response.data.message);
+    }
   };
 
   return (

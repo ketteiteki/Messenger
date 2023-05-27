@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import styles from "./ChatList.module.scss";
 import { ReactComponent as MessegnerLogoSvg } from "../../assets/svg/messenger_logo.svg";
@@ -19,14 +19,16 @@ const ChatList = observer(() => {
     useCallback(async (value) => {
       if (value === "") return;
 
-      const response = await chatListWithMessagesState.getChatListBySearchAsync(
-        value
-      );
+      try {
+        const response = await chatListWithMessagesState.getChatListBySearchAsync(value);
 
-      if (response.status === 200) {
-        response.data.forEach(async (c) => {
-          await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, c.id);
-        });
+        if (response.status === 200) {
+          response.data.forEach(async (c) => {
+            await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, c.id);
+          });
+        }
+      } catch (error: any) {
+        alert(error.response.data.message);
       }
     }, []),
     700,
@@ -72,14 +74,18 @@ const ChatList = observer(() => {
         />
       </div>
       <div className={styles.items}>
-        {searchInput === "" &&
+        {
+          searchInput === "" &&
           chatListWithMessagesState.data.map((i) => (
             <ChatListItem key={i.chat.id} {...i} />
-          ))}
-        {searchInput !== "" &&
+          ))
+        }
+        {
+          searchInput !== "" &&
           chatListWithMessagesState.dataForSearchChats.map((i) => (
             <ChatListItem key={i.chat.id} {...i} />
-          ))}
+          ))
+        }
       </div>
     </div>
   );

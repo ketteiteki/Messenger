@@ -71,7 +71,6 @@ class ChatListWithMessagesState {
   };
 
   public deleteMessageInData = (chatId: string, messageId: string) => {
-    console.log("start");
     const dataItem = this.data.find(x => x.chat.id === chatId);
 
     const messageItemIndex = dataItem?.messages.findIndex(x => x.id === messageId);
@@ -267,8 +266,6 @@ class ChatListWithMessagesState {
     messageEntity: IMessageDto,
     files: File[]
   ) => {
-    console.log(files);
-
     const response = await MessagesApi.postCreateMessageAsync(
       messageEntity.text,
       messageEntity.chatId,

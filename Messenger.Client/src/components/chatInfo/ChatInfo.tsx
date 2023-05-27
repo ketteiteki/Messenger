@@ -44,10 +44,14 @@ const ChatInfo = observer(() => {
   };
 
   const onClickLeaveChatHandler = async () => {
-    currentChatState.chat &&
-      (await chatListWithMessagesState.postLeaveFromChatAsync(
-        currentChatState.chat.id
-      ));
+    if (currentChatState.chat) {
+      try {
+        await chatListWithMessagesState.postLeaveFromChatAsync(currentChatState.chat.id)
+      } catch (error: any) {
+        alert(error.response.data.message);
+      }
+    }
+
     currentChatState.setChatAndMessagesNull();
 
     return navigate("/", { replace: true });
@@ -56,14 +60,18 @@ const ChatInfo = observer(() => {
   const updateChatHandler = async () => {
     const currentChatId = currentChatState.chat?.id;
 
-    const response = await chatListWithMessagesState.putUpdateChatDataAsync(
-      currentChatId ?? "",
-      inputName ?? "",
-      inputTitle ?? ""
-    );
+    try {
+      const response = await chatListWithMessagesState.putUpdateChatDataAsync(
+        currentChatId ?? "",
+        inputName ?? "",
+        inputTitle ?? ""
+      );
 
-    if (response.status === 200) {
-      currentChatState.updateChatByChat(response.data);
+      if (response.status === 200) {
+        currentChatState.updateChatByChat(response.data);
+      }
+    } catch (error: any) {
+      alert(error.response.data.message);
     }
 
     setUpdateMode(false);
@@ -73,16 +81,16 @@ const ChatInfo = observer(() => {
     event: React.FormEvent<HTMLInputElement>
   ) => {
     const files = event.currentTarget.files;
-
     const currentChatId = currentChatState.chat?.id;
 
     if (currentChatId === undefined) return;
 
     if (files && files.length > 0) {
-      await chatListWithMessagesState.putUpdateChatAvatarAsync(
-        currentChatId,
-        files[0]
-      );
+      try {
+        await chatListWithMessagesState.putUpdateChatAvatarAsync(currentChatId, files[0]);
+      } catch (error: any) {
+        alert(error.response.data.message);
+      }
     }
   };
 
@@ -90,7 +98,11 @@ const ChatInfo = observer(() => {
 
     if (currentChatId === undefined || currentChatState.chat === null) return;
 
-    await currentChatState.postJoinToChatAsync(currentChatId);
+    try {
+      await currentChatState.postJoinToChatAsync(currentChatId);
+    } catch (error: any) {
+      alert(error.response.data.message);
+    }
 
     chatListWithMessagesState.setSearchInput("");
     chatListWithMessagesState.addChatInData(currentChatState.chat, currentChatState.messages)
@@ -109,7 +121,12 @@ const ChatInfo = observer(() => {
       return navigate("/", { replace: true });
     }
 
-    await currentProfileState.getUserAsync(userId);
+    try {
+      await currentProfileState.getUserAsync(userId);
+    } catch (error: any) {
+      alert(error.response.data.message);
+    }
+
     return navigate("/", { replace: true });
   };
 
@@ -119,7 +136,11 @@ const ChatInfo = observer(() => {
     setShowMemberList(!showMemberList);
 
     if (currentChatState.chat.members.length === 0) {
-      await currentChatState.getUserListByChatAsync(currentChatState.chat.id, memberListBaseCount, 1);
+      try {
+        await currentChatState.getUserListByChatAsync(currentChatState.chat.id, memberListBaseCount, 1);
+      } catch (error: any) {
+        alert(error.response.data.message);
+      }
     }
   };
 
@@ -131,9 +152,12 @@ const ChatInfo = observer(() => {
     if (memberListElement.scrollHeight - memberListElement.scrollTop === memberListElement.clientHeight) {
       if (!currentChatId) return;
 
-      var response = await currentChatState.getUserListByChatAsync(currentChatState.chat.id, memberListBaseCount, memberListPage);
-
-      if (response.data.length === 0) return;
+      try {
+        var response = await currentChatState.getUserListByChatAsync(currentChatState.chat.id, memberListBaseCount, memberListPage);
+        if (response.data.length === 0) return;
+      } catch (error: any) {
+        alert(error.response.data.message);
+      }
 
       setMemberListPage(memberListPage + 1);
       currentChatState.setMemberListPage(memberListPage + 1);
@@ -158,29 +182,37 @@ const ChatInfo = observer(() => {
       className={styles.chatInfo}
       onMouseMove={(event) => mouseMoveHandler(event)}
     >
-      {updateMode && (
-        <button className={styles.okButton} onClick={updateChatHandler}>
-          <TickSvg width={15} height={23} />
-        </button>
-      )}
-      {showMenu && (
-        <ChatInfoBurgerMenu
-          x={xMousePosition}
-          y={yMousePosition}
-          setShowMenu={SetShowMenu}
-          setUpdateMode={setUpdateMode}
-        />
-      )}
-      {currentChatState.chat?.isOwner && (
-        <button
-          className={styles.settingsButton}
-          onClick={() => SetShowMenu(true)}
-        >
-          <SettingsSvg className={styles.settingsSvg} width={20} />
-        </button>
-      )}
+      {
+        updateMode && (
+          <button className={styles.okButton} onClick={updateChatHandler}>
+            <TickSvg width={15} height={23} />
+          </button>
+        )
+      }
+      {
+        showMenu && (
+          <ChatInfoBurgerMenu
+            x={xMousePosition}
+            y={yMousePosition}
+            setShowMenu={SetShowMenu}
+            setUpdateMode={setUpdateMode}
+          />
+        )
+      }
+      {
+        currentChatState.chat?.isOwner && (
+          <button
+            className={styles.settingsButton}
+            onClick={() => SetShowMenu(true)}
+          >
+            <SettingsSvg className={styles.settingsSvg} width={20} />
+          </button>
+        )
+      }
       <div className={styles.avatarContainer}>
-        {isMyChat && <label htmlFor="avatar" className={styles.avatarBlackCover} />}
+        {
+          isMyChat && <label htmlFor="avatar" className={styles.avatarBlackCover} />
+        }
         <input
           className={styles.avatarInput}
           onChange={onChangeAvatarHandler}
@@ -196,72 +228,84 @@ const ChatInfo = observer(() => {
           onClick={onClickOpenFullSizeAvatar}
         />
       </div>
-      {updateMode === false && <p className={styles.title}>{inputTitle || "------"}</p>}
-      {updateMode && (
-        <input
-          className={styles.inputTitle}
-          type="text"
-          value={inputTitle}
-          onChange={(e) => setInputTitle(e.currentTarget.value)}
-        />
-      )}
-      {updateMode === false && <p className={styles.name}>{inputName || "------"}</p>}
-      {updateMode && (
-        <input
-          className={styles.inputName}
-          type="text"
-          value={inputName}
-          onChange={(e) => setInputName(e.target.value)}
-        />
-      )}
-      {chatListWithMessagesState.data.find(
-        (x) => x.chat.id === currentChatState.chat?.id
-      ) === undefined ? (
-        <button className={styles.joinChattingButton} onClick={onClickJoinChatHandler}>Join</button>
-      ) : (
-        <button
-          className={styles.leaveChattingButton}
-          onClick={onClickLeaveChatHandler}
-        >
-          Leave
-        </button>
-      )}
+      {
+        updateMode === false && <p className={styles.title}>{inputTitle || "------"}</p>
+      }
+      {
+        updateMode && (
+          <input
+            className={styles.inputTitle}
+            type="text"
+            value={inputTitle}
+            onChange={(e) => setInputTitle(e.currentTarget.value)}
+          />
+        )
+      }
+      {
+        updateMode === false && <p className={styles.name}>{inputName || "------"}</p>
+      }
+      {
+        updateMode && (
+          <input
+            className={styles.inputName}
+            type="text"
+            value={inputName}
+            onChange={(e) => setInputName(e.target.value)}
+          />
+        )
+      }
+      {
+        chatListWithMessagesState.data.find((x) => x.chat.id === currentChatState.chat?.id) === undefined ? (
+          <button className={styles.joinChattingButton} onClick={onClickJoinChatHandler}>Join</button>
+        ) : (
+          <button
+            className={styles.leaveChattingButton}
+            onClick={onClickLeaveChatHandler}
+          >
+            Leave
+          </button>
+        )
+      }
 
       <button
         className={styles.showMembersButton}
         onClick={onClickShowMemberListHandler}
       >
-        {showMemberList ? "Hide" : "Show"} Members
+        {
+          showMemberList ? "Hide" : "Show"
+        } Members
       </button>
-      {showMemberList && (
-        <div className={styles.memberList} id="memberList" onScroll={getMembers}>
-          {currentChatState.chat?.members.map((i) => (
-            <motion.div
-              initial={{ opacity: 0.7 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: .1 }}
-              className={styles.memberItem} key={i.id}
-              onClick={() => showProfileByMessage(i.id)}>
-              <img
-                className={styles.memberItemAvatar}
-                src={i.avatarLink ?? nonAvatar}
-                alt=""
-              />
-              <div className={styles.memberItemContainer}>
-                <p className={styles.memberItemDisplayName}>{i.displayName}</p>
-                <p className={styles.memberItemBio}>{i.bio}</p>
-                <p className={styles.memberItemRole}>
-                  {
-                    currentChatState.chat?.usersWithRole.find(
-                      (u) => u.userId === i.id
-                    )?.roleTitle
-                  }
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      )}
+      {
+        showMemberList && (
+          <div className={styles.memberList} id="memberList" onScroll={getMembers}>
+            {currentChatState.chat?.members.map((i) => (
+              <motion.div
+                initial={{ opacity: 0.7 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: .1 }}
+                className={styles.memberItem} key={i.id}
+                onClick={() => showProfileByMessage(i.id)}>
+                <img
+                  className={styles.memberItemAvatar}
+                  src={i.avatarLink ?? nonAvatar}
+                  alt=""
+                />
+                <div className={styles.memberItemContainer}>
+                  <p className={styles.memberItemDisplayName}>{i.displayName}</p>
+                  <p className={styles.memberItemBio}>{i.bio}</p>
+                  <p className={styles.memberItemRole}>
+                    {
+                      currentChatState.chat?.usersWithRole.find(
+                        (u) => u.userId === i.id
+                      )?.roleTitle
+                    }
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )
+      }
     </div>
   );
 });

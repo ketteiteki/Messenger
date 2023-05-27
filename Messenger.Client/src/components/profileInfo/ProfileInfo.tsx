@@ -17,6 +17,8 @@ import { blackCoverState } from "../../state/BlackCoverState";
 import { motion } from "framer-motion";
 import { ChatType } from "../../models/enum/ChatType";
 import { currentChatState } from "../../state/CurrentChatState";
+import TokenService from "../../services/messenger/TokenService";
+import { useNavigate } from "react-router-dom";
 
 const ProfileInfo = observer(() => {
 
@@ -38,6 +40,8 @@ const ProfileInfo = observer(() => {
   const [xMousePosition, setXMousePosition] = useState<number>(0);
   const [yMousePosition, setYMousePosition] = useState<number>(0);
 
+  const navigate = useNavigate();
+
   const currentProfileId = currentProfileState.date?.id;
   const dialogWithThisUser =
     chatListWithMessagesState.data.find(
@@ -54,11 +58,15 @@ const ProfileInfo = observer(() => {
   };
 
   const onClickUpdateProfileDateHandler = async () => {
-    await authorizationState.putUpdateProfileAsync(
-      inputDisplayName,
-      inputNickname,
-      inputAdditionalData
-    );
+    try {
+      await authorizationState.putUpdateProfileAsync(
+        inputDisplayName,
+        inputNickname,
+        inputAdditionalData
+      );
+    } catch (error: any) {
+      alert(error.response.data.message);
+    }
     setUpdateMode(false);
   };
 
@@ -66,28 +74,46 @@ const ProfileInfo = observer(() => {
     SetShowSessions(!showSessions);
 
     if (sessionsState.data.length === 0) {
-      sessionsState.getSessionListAsync();
+      try {
+        await sessionsState.getSessionListAsync();
+      } catch (error: any) {
+        alert(error.response.data.message);
+      }
     }
   };
 
   const deleteSessionHandler = async (sessionId: string) => {
-    await sessionsState.delDeleteSessionAsync(sessionId);
+    try {
+      await sessionsState.delDeleteSessionAsync(sessionId);
+
+      if (sessionId === authorizationState.data?.currentSessionId) {
+        TokenService.deleteLocalAccessToken();
+        TokenService.deleteLocalRefreshToken();
+        navigate("/login", { replace: true });
+      }
+    } catch (error: any) {
+      alert(error.response.data.message);
+    }
   };
 
   const onClickStartChattingHandler = async () => {
     if (currentProfileId === undefined) return;
 
-    const response = await chatListWithMessagesState.postCreateDialogAsync(currentProfileId);
+    try {
+      const response = await chatListWithMessagesState.postCreateDialogAsync(currentProfileId);
 
-    const dialogDataItem = chatListWithMessagesState.data.find(x => x.chat.id === response.data.id);
+      const dialogDataItem = chatListWithMessagesState.data.find(x => x.chat.id === response.data.id);
 
-    if (!dialogDataItem) return;
+      if (!dialogDataItem) return;
 
-    currentChatState.setChatAndMessages(dialogDataItem.chat, dialogDataItem.messages);
-    chatListWithMessagesState.pushChatOnTop(dialogDataItem.chat.id);
+      currentChatState.setChatAndMessages(dialogDataItem.chat, dialogDataItem.messages);
+      chatListWithMessagesState.pushChatOnTop(dialogDataItem.chat.id);
 
-    if (response.status === 200) {
-      await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, response.data.id);
+      if (response.status === 200) {
+        await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, response.data.id);
+      }
+    } catch (error: any) {
+      alert(error.response.data.message);
     }
   };
 
@@ -96,8 +122,12 @@ const ProfileInfo = observer(() => {
   ) => {
     const files = event.currentTarget.files;
 
-    if (files && files.length > 0) {
-      await authorizationState.putUpdateProfileAvatarAsync(files[0]);
+    try {
+      if (files && files.length > 0) {
+        await authorizationState.putUpdateProfileAvatarAsync(files[0]);
+      }
+    } catch (error: any) {
+      alert(error.response.data.message);
     }
   };
 
@@ -117,22 +147,27 @@ const ProfileInfo = observer(() => {
       className={styles.profileInfo}
       onMouseMove={(event) => MouseMoveHandler(event)}
     >
-      {updateMode && (
-        <button className={styles.okButton} onClick={onClickUpdateProfileDateHandler}>
-          <TickSvg width={15} height={23} />
-        </button>
-      )}
+      {
+        updateMode && (
+          <button className={styles.okButton} onClick={onClickUpdateProfileDateHandler}>
+            <TickSvg width={15} height={23} />
+          </button>
+        )
+      }
 
-      {showMenu && (
-        <ProfileInfoBurgerMenu
-          x={xMousePosition}
-          y={yMousePosition}
-          profileId={currentProfileState.date?.id ?? ""}
-          setShowMenu={SetShowMenu}
-          setUpdateMode={setUpdateMode}
-        />
-      )}
-      {((dialogWithThisUser && !isMyProfile) || isMyProfile) &&
+      {
+        showMenu && (
+          <ProfileInfoBurgerMenu
+            x={xMousePosition}
+            y={yMousePosition}
+            profileId={currentProfileState.date?.id ?? ""}
+            setShowMenu={SetShowMenu}
+            setUpdateMode={setUpdateMode}
+          />
+        )
+      }
+      {
+        ((dialogWithThisUser && !isMyProfile) || isMyProfile) &&
         <button
           className={styles.settingsButton}
           onClick={() => SetShowMenu(true)}
@@ -140,7 +175,9 @@ const ProfileInfo = observer(() => {
           <SettingsSvg className={styles.settingsSvg} width={20} />
         </button>}
       <div className={styles.avatarContainer}>
-        {isMyProfile && <label htmlFor="avatar" className={styles.avatarBlackCover} />}
+        {
+          isMyProfile && <label htmlFor="avatar" className={styles.avatarBlackCover} />
+        }
         <input
           className={styles.avatarInput}
           onChange={onChangeAvatarHandler}
@@ -159,40 +196,53 @@ const ProfileInfo = observer(() => {
           onClick={onClickOpenFullSizeAvatar}
         />
       </div>
-      {updateMode === false && (
-        <p className={styles.displayName}>{inputDisplayName || "------"}</p>
-      )}
-      {updateMode && (
-        <input
-          className={styles.inputDisplayName}
-          type="text"
-          value={inputDisplayName}
-          onChange={(e) => setInputDisplayName(e.currentTarget.value)}
-        />
-      )}
-      {updateMode === false && (
-        <p className={styles.nickname}>{inputNickname || "------"}</p>
-      )}
-      {updateMode && (
-        <input
-          className={styles.inputNickname}
-          type="text"
-          value={inputNickname}
-          onChange={(e) => setInputNickname(e.currentTarget.value)}
-        />
-      )}
-      {updateMode === false && (
-        <p className={styles.additionalData}>{inputAdditionalData || "------"}</p>
-      )}
-      {updateMode && (
-        <input
-          className={styles.inputAdditionalData}
-          type="text"
-          value={inputAdditionalData}
-          onChange={(e) => setInputAdditionalData(e.currentTarget.value)}
-        />
-      )}
-      {currentProfileState.date !== null &&
+      {
+        updateMode === false && (
+          <p className={styles.displayName}>{inputDisplayName || "------"}</p>
+        )
+      }
+      {
+        updateMode && (
+          <input
+            className={styles.inputDisplayName}
+            type="text"
+            value={inputDisplayName}
+            onChange={(e) => setInputDisplayName(e.currentTarget.value)}
+          />
+        )
+      }
+      {
+        updateMode === false && (
+          <p className={styles.nickname}>{inputNickname || "------"}</p>
+        )
+      }
+      {
+        updateMode && (
+          <input
+            className={styles.inputNickname}
+            type="text"
+            value={inputNickname}
+            onChange={(e) => setInputNickname(e.currentTarget.value)}
+          />
+        )
+      }
+      {
+        updateMode === false && (
+          <p className={styles.additionalData}>{inputAdditionalData}</p>
+        )
+      }
+      {
+        updateMode && (
+          <input
+            className={styles.inputAdditionalData}
+            type="text"
+            value={inputAdditionalData}
+            onChange={(e) => setInputAdditionalData(e.currentTarget.value)}
+          />
+        )
+      }
+      {
+        currentProfileState.date !== null &&
         authorizationState.data?.id !== currentProfileState.date?.id &&
         !dialogWithThisUser && (
           <button
@@ -201,39 +251,48 @@ const ProfileInfo = observer(() => {
           >
             Start Chatting
           </button>
-        )}
-      {(currentProfileState.date?.id === authorizationState.data?.id ||
-        currentProfileState.date === null) && (
+        )
+      }
+      {
+        (currentProfileState.date?.id === authorizationState.data?.id ||
+          currentProfileState.date === null) && (
           <button
             className={styles.showMembersButton}
             onClick={() => setShowSessionsHandler()}
           >
             {showSessions ? "Hide" : "Show"} Sessions
           </button>
-        )}
-      {showSessions && (
-        <div className={styles.sessionList}>
-          {sessionsState.data.map((i) => (
-            <motion.div
-              initial={{ opacity: 0.7 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: .1 }}
-              className={styles.sessionItem}
-              key={i.id}
-            >
-              <button className={styles.sessionItemRemoveButton} onClick={() => deleteSessionHandler(i.id)}>
-                <CrossSvg width={20} />
-              </button>
-              <div className={styles.sessionItemContainer}>
-                <p className={styles.sessionId}>Id: {i.id}</p>
-                <p className={styles.createAt}>
-                  CreateAt: {DateService.getDateAndTime(i.createAt)}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      )}
+        )
+      }
+      {
+        showSessions && (
+          <div className={styles.sessionList}>
+            {
+              sessionsState.data.map((i) => (
+                <motion.div
+                  initial={{ opacity: 0.7 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: .1 }}
+                  className={i.id === authorizationState.data?.currentSessionId ?
+                    styles.currentSessionItem :
+                    styles.sessionItem}
+                  key={i.id}
+                >
+                  <div className={styles.sessionItemRemoveButton} onClick={() => deleteSessionHandler(i.id)}>
+                    <CrossSvg width={20} />
+                  </div>
+                  <div className={styles.sessionItemContainer}>
+                    <p className={styles.sessionId}>Id: {i.id}</p>
+                    <p className={styles.createAt}>
+                      CreateAt: {DateService.getDateAndTime(i.createAt)}
+                    </p>
+                  </div>
+                </motion.div>
+              ))
+            }
+          </div>
+        )
+      }
     </div>
   );
 });

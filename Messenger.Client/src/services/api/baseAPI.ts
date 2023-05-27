@@ -11,7 +11,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("AuthorizationToken");
+    const token = authorizationState.data?.accessToken ?? localStorage.getItem("AuthorizationToken");
     if (token) {
       config.headers = {
         ...config.headers,
@@ -39,16 +39,14 @@ api.interceptors.response.use(
     ) {
       if (err.response.status === 401 && !originalConfig._retry) {
         originalConfig._retry = true;
-        console.log(3);
         authorizationState.incrementCountFailRefresh();
         try {
           const refreshToken = TokenService.getLocalRefreshToken();
 
           const response = await api.post(`/Auth/refresh/${refreshToken}`);
 
-          const { accessToken } = response.data;
-          TokenService.setLocalAccessToken(accessToken);
-
+          TokenService.setLocalAccessToken(response.data.accessToken);
+          
           return api(originalConfig);
         } catch (_error) {
           return Promise.reject(_error);

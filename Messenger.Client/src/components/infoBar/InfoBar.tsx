@@ -23,7 +23,9 @@ const InfoBar = observer((props) => {
           animate={{ y: 0 }}
           className={styles.headerDisplayName}
           onClick={showMyProfileHandler}>
-          {authorizationState.data?.displayName}
+          {
+            authorizationState.data?.displayName
+          }
         </motion.p>
         <img
           className={styles.headerAvatar}

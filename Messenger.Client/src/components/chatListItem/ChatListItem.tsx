@@ -39,19 +39,31 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
       editMessageState.setEditMessageNull();
     }
 
-    if (props.messages.length === 0) {
-      await chatListWithMessagesState.getMessageListAsync(props.chat.id, null);
-    } else if (isInChatOnlyRealTimeMessages) {
-      if (!firstRealtimeMessage) return;
+    try {
+      if (props.messages.length === 0) {
+        await chatListWithMessagesState.getMessageListAsync(props.chat.id, null);
+      } else if (isInChatOnlyRealTimeMessages) {
+        if (!firstRealtimeMessage) return;
 
-      await chatListWithMessagesState.getMessageListAsync(props.chat.id, firstRealtimeMessage?.dateOfCreate);
+        await chatListWithMessagesState.getMessageListAsync(props.chat.id, firstRealtimeMessage?.dateOfCreate);
+      }
+    } catch (error: any) {
+      alert(error.response.data.message);
     }
 
     currentChatState.setChatAndMessages(props.chat, props.messages);
 
     if (props.chat.type === ChatType.Dialog) {
       const interlocutorId = currentChatState.chat?.members.find(m => m.id !== authorizationState.data?.id)?.id;
-      interlocutorId && await currentProfileState.getUserAsync(interlocutorId);
+
+      try {
+        if (interlocutorId) {
+          await currentProfileState.getUserAsync(interlocutorId);
+        }
+      } catch (error: any) {
+        alert(error.response.data.message);
+      }
+
       return navigate("/", { replace: true });
     }
 
@@ -71,18 +83,31 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
       />
       <div className={styles.container}>
         <p className={styles.chatName}>
-          {props.chat.type === ChatType.Conversation ? <ConversationLogoSvg className={styles.conversationLogoSvg} width={15} /> :
-            props.chat.type === ChatType.Channel ? <ChannelLogoSvg className={styles.conversationLogoSvg} width={14} /> : ""}
-          <p className={styles.chatNameValue}>{props.chat.type === ChatType.Dialog
-            ? props.chat.members.find(
-              (m) => m.id !== authorizationState.data?.id
-            )?.displayName
-            : props.chat.title}</p>
+          {
+            props.chat.type === ChatType.Conversation ? <ConversationLogoSvg className={styles.conversationLogoSvg} width={15} /> :
+              props.chat.type === ChatType.Channel ? <ChannelLogoSvg className={styles.conversationLogoSvg} width={14} /> : ""
+          }
+          <p className={styles.chatNameValue}>
+            {
+              props.chat.type === ChatType.Dialog
+                ? props.chat.members.find(
+                  (m) => m.id !== authorizationState.data?.id
+                )?.displayName
+                : props.chat.title
+            }
+          </p>
         </p>
-        <p className={styles.lastMessage}>{
-          props.chat.type === ChatType.Channel ?
-            lastMessageTextForChannel : lastMessageTextForConversationAndDialog}</p>
-        <p className={styles.date}>{props.chat.lastMessageDateOfCreate && DateService.getTime(props.chat.lastMessageDateOfCreate)}</p>
+        <p className={styles.lastMessage}>
+          {
+            props.chat.type === ChatType.Channel ?
+              lastMessageTextForChannel : lastMessageTextForConversationAndDialog
+          }
+        </p>
+        <p className={styles.date}>
+          {
+            props.chat.lastMessageDateOfCreate && DateService.getTime(props.chat.lastMessageDateOfCreate)
+          }
+        </p>
       </div>
     </motion.div>
   );

@@ -86,7 +86,8 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<Authoriz
 			requester.DisplayName,
 			requester.Nickname,
 			requester.Bio,
-			avatarLink);
+			avatarLink,
+			session.Id);
 		
 		return new Result<AuthorizationResponse>(authorizationResponse);
 	}

@@ -5,5 +5,6 @@ using Messenger.BusinessLogic.Responses;
 namespace Messenger.BusinessLogic.ApiCommands.Auth;
 
 public record AuthorizationCommand(
-	string AuthorizationToken) 
-	: IRequest<Result<AuthorizationResponse>>;
+    Guid RequesterId,
+    string AuthorizationToken) 
+    : IRequest<Result<AuthorizationResponse>>;

@@ -8,4 +8,5 @@ export default interface IAuthorizationResponse {
     nickname: string;
     bio: string | null;
     avatarLink: string | null;
+    currentSessionId: string;
 }

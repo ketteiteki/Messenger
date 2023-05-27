@@ -20,12 +20,15 @@ public class AuthController : ApiControllerBase
 	[ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(AuthorizationResponse), StatusCodes.Status200OK)]
-	[HttpGet("authorization/{token}")]
-	public async Task<IActionResult> Authorization(
-		string token,
-		CancellationToken cancellationToken)
+	[Authorize]
+	[HttpGet("authorization")]
+	public async Task<IActionResult> Authorization(CancellationToken cancellationToken)
 	{
-		var query = new AuthorizationCommand(token);
+		var requesterGuid = new Guid(HttpContext.User.Claims.First(x => x.Type == ClaimConstants.Id).Value);
+		var authorizationToken = HttpContext.Request.Headers
+			.First(x => x.Key == HeadersConstants.Authorization).Value.ToString().Split(" ")[^1];
+		
+		var query = new AuthorizationCommand(requesterGuid, authorizationToken);
 
 		return await RequestAsync(query, cancellationToken);
 	}

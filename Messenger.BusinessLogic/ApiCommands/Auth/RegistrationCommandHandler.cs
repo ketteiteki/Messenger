@@ -117,7 +117,8 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 			newUser.DisplayName,
 			newUser.Nickname,
 			newUser.Bio,
-			avatarLink: null);
+			avatarLink: null,
+			session.Id);
 
 		return new Result<AuthorizationResponse>(authorizationResponse);
 	}

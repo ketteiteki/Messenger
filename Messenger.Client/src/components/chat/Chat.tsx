@@ -52,9 +52,7 @@ const Chat = observer(() => {
     await sendMessage();
   };
 
-  const sendMessageEnterHandler = async (
-    e: React.KeyboardEvent<HTMLTextAreaElement>
-  ) => {
+  const sendMessageEnterHandler = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (currentChatState.chat === null) return;
     if (e.key === "Enter") {
       e.preventDefault();
@@ -68,7 +66,8 @@ const Chat = observer(() => {
       currentChatState.chat === null ||
       authorizationOwnerDisplayName === undefined ||
       currentChatId === undefined ||
-      authorizationId === undefined
+      authorizationId === undefined ||
+      !inputMessage.trim()
     )
       return;
 
@@ -89,7 +88,11 @@ const Chat = observer(() => {
     chatListWithMessagesState.setLastMessage(messageEntity);
     chatListWithMessagesState.pushChatOnTop(messageEntity.chatId);
 
-    await chatListWithMessagesState.postCreateMessageAsync(messageEntity, attachmentList);
+    try {
+      await chatListWithMessagesState.postCreateMessageAsync(messageEntity, attachmentList);
+    } catch (error: any) {
+      alert(error.response.data.message);
+    }
 
     setAttachmentList([]);
     messageListScrollBottomHandler();
@@ -99,14 +102,18 @@ const Chat = observer(() => {
   };
 
   const editMessageHandler = async () => {
-    if (currentChatState.chat === null || editMessageState.data === null)
+    if (currentChatState.chat === null || editMessageState.data === null || !inputMessage.trim())
       return;
 
-    await chatListWithMessagesState.putUpdateMessageAsync(
-      currentChatState.chat.id,
-      editMessageState.data.messageId,
-      inputMessage
-    );
+    try {
+      await chatListWithMessagesState.putUpdateMessageAsync(
+        currentChatState.chat.id,
+        editMessageState.data.messageId,
+        inputMessage
+      );
+    } catch (error: any) {
+      alert(error.response.data.message);
+    }
 
     setInputMessage("");
     editMessageState.setEditMessageNull();
@@ -115,17 +122,21 @@ const Chat = observer(() => {
   const editMessageEnterHandler = async (
     e: React.KeyboardEvent<HTMLTextAreaElement>
   ) => {
-    if (currentChatState.chat === null || editMessageState.data === null)
-      return;
-
     if (e.key === "Enter") {
       e.preventDefault();
 
-      await chatListWithMessagesState.putUpdateMessageAsync(
-        currentChatState.chat.id,
-        editMessageState.data.messageId,
-        inputMessage
-      );
+      if (currentChatState.chat === null || editMessageState.data === null || !inputMessage.trim())
+        return;
+
+      try {
+        await chatListWithMessagesState.putUpdateMessageAsync(
+          currentChatState.chat.id,
+          editMessageState.data.messageId,
+          inputMessage
+        );
+      } catch (error: any) {
+        alert(error.response.data.message);
+      }
 
       setInputMessage("");
       editMessageState.setEditMessageNull();
@@ -142,9 +153,7 @@ const Chat = observer(() => {
     }
   };
 
-  const onEnterGatewayHandler = async (
-    e: React.KeyboardEvent<HTMLTextAreaElement>
-  ) => {
+  const onEnterGatewayHandler = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (editMessageState.data === null) {
       sendMessageEnterHandler(e);
     }
@@ -194,7 +203,11 @@ const Chat = observer(() => {
     const { scrollTop, scrollHeight, clientHeight } = messageListRef.current;
 
     if (-scrollTop + clientHeight >= scrollHeight - 10) {
-      await chatListWithMessagesState.getMessageListAsync(currentChatId, firstMessageArray.dateOfCreate);
+      try {
+        await chatListWithMessagesState.getMessageListAsync(currentChatId, firstMessageArray.dateOfCreate);
+      } catch (error: any) {
+        alert(error.response.data.message);
+      }
     }
   }, 800);
 
@@ -202,7 +215,11 @@ const Chat = observer(() => {
 
     if (currentChatId === undefined || currentChatState.chat === null) return;
 
-    const response = await currentChatState.postJoinToChatAsync(currentChatId);
+    try {
+      await currentChatState.postJoinToChatAsync(currentChatId);
+    } catch (error: any) {
+      alert(error.response.data.message);
+    }
 
     chatListWithMessagesState.setSearchInput("");
     chatListWithMessagesState.addChatInData(currentChatState.chat, currentChatState.messages)
@@ -241,160 +258,178 @@ const Chat = observer(() => {
 
   return (
     <div className={styles.chat}>
-      {(banDateOfExpire === null || currentChatState.chat !== null) && (
-        <div className={styles.header}>
-          <p className={styles.chatName}>
-            {currentChatState.chat?.type !== ChatType.Dialog
-              ? currentChatState.chat?.title
-              : interlocutorDisplayName}
-          </p>
-          <p className={styles.additionalData}>
-            {currentChatState.chat?.type !== ChatType.Dialog
-              ? `Members: ${currentChatState.chat?.membersCount}`
-              : interlocutorNickname}
-          </p>
-          <img
-            className={styles.chatAvatar}
-            src={currentChatAvatar}
-            alt=""
-          />
-        </div>
-      )}
-      {currentChatState.chat === null ? (
-        <div className={styles.chooseChat}>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: .1 }}
-            className={styles.chooseChatPage}>
-            Choose a chat
-          </motion.p>
-        </div>
-      ) : banDateOfExpire !== null ? (
-        <div className={styles.banned}>
-          <p className={styles.bannedPage}>
-            You are banned. Ban expires:{" "}
-            {DateService.getDateAndTime(banDateOfExpire!)}
-          </p>
-        </div>
-      ) : (
-        <>
-          <div
-            className={styles.messageList}
-            ref={messageListRef}
-            id="messageList"
-            onScroll={onScrollGetMessages}
-          >
-            <div className={styles.messageListLastElement} ref={messageListLastElement} />
-            {currentChatState.messages.map((i) => (
-              <Message {...i} key={i.id} />
-            ))}
+      {
+        (banDateOfExpire === null || currentChatState.chat !== null) && (
+          <div className={styles.header}>
+            <p className={styles.chatName}>
+              {currentChatState.chat?.type !== ChatType.Dialog
+                ? currentChatState.chat?.title
+                : interlocutorDisplayName}
+            </p>
+            <p className={styles.additionalData}>
+              {currentChatState.chat?.type !== ChatType.Dialog
+                ? `Members: ${currentChatState.chat?.membersCount}`
+                : interlocutorNickname}
+            </p>
+            <img
+              className={styles.chatAvatar}
+              src={currentChatAvatar}
+              alt=""
+            />
           </div>
-          {((isCurrentChatChannel && isCurrentChatMine) || !isCurrentChatChannel) && <div className={styles.footer}>
-            {replyState.data !== null &&
-              banDateOfExpire === null &&
-              muteDateOfExpire === null &&
-              isMember && (
-                <div className={styles.reply}>
-                  <ReplySvg className={styles.replySvg} width={20} />
-                  <div className={styles.replyConstainer}>
-                    <p className={styles.replyDisplayName}>
-                      {replyState.data.displayName}
-                    </p>
-                    <p className={styles.replyMessageText}>
-                      {replyState.data.text}
-                    </p>
-                  </div>
-                  <button
-                    className={styles.closeReplyButton}
-                    onClick={replyState.setReplyNull}
-                  >
-                    <CrossSvg width={20} />
-                  </button>
-                </div>
-              )}
-            {editMessageState.data !== null &&
-              banDateOfExpire === null &&
-              muteDateOfExpire === null &&
-              isMember && (
-                <div className={styles.editMessage}>
-                  <EditSvg className={styles.editMessageSvg} width={20} />
-                  <div className={styles.editMessageConstainer}>
-                    <p className={styles.editMessagePage}>Edit Message</p>
-                    <p className={styles.editMessageText}>
-                      {editMessageState.data.text}
-                    </p>
-                  </div>
-                  <button
-                    className={styles.closeEditMessageButton}
-                    onClick={onClickCloseEditMessageHandler}
-                  >
-                    <CrossSvg width={20} />
-                  </button>
-                </div>
-              )}
-            {attachmentList[0] &&
-              banDateOfExpire === null &&
-              muteDateOfExpire === null &&
-              isMember && (
-                <div className={styles.attachmentPanel}>
-                  <div className={styles.attachmentPanelConstainer}>
-                    {attachmentListUrlBlob.map(x => <img className={styles.attachmentPanelItem} src={x?.toString()} />)}
-                  </div>
-                  <button
-                    className={styles.closeAttachmentButton}
-                    onClick={onClickCloseAttachmentPanelHandler}
-                  >
-                    <CrossSvg width={20} />
-                  </button>
-                </div>
-              )}
-            {banDateOfExpire === null &&
-              muteDateOfExpire === null &&
-              isMember && (
-                <>
-                  <input
-                    className={styles.attachmentInput}
-                    onChange={onChangeAttachmentsHandler}
-                    type="file"
-                    id="attachment"
-                    name="attachment"
-                    multiple
-                    accept="image/jpeg"
-                  />
-                  <label htmlFor="attachment" className={styles.attachmentLabel}>
-                    <AttachmentSvg className={styles.attachmentSvg} width={25} />
-                  </label>
-                  <TextArea
-                    id="sendMessageTextArea"
-                    className={styles.textarea}
-                    autoSize={{ maxRows: 3 }}
-                    placeholder="Send Message"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.currentTarget.value)}
-                    onKeyDown={onEnterGatewayHandler}
-                  />
-                  <SendMessageSvg
-                    className={styles.sendMessageSvg}
-                    width={30}
-                    onClick={onClickGatewayHandler}
-                  />
-                </>
-              )}
-            {isMember === false && (
-              <button className={styles.JoinChatButton} onClick={joinChatHandler}>Join</button>
-            )}
-            {muteDateOfExpire !== null && banDateOfExpire === null && (
-              <div className={styles.muted}>
-                <p className={styles.mutedPage}>
-                  You are muted. Mute expires:{" "}
-                  {DateService.getDateAndTime(muteDateOfExpire || "")}
-                </p>
+        )
+      }
+      {
+        currentChatState.chat === null ? (
+          <div className={styles.chooseChat}>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: .1 }}
+              className={styles.chooseChatPage}>
+              Choose a chat
+            </motion.p>
+          </div>
+        ) : banDateOfExpire !== null ? (
+          <div className={styles.banned}>
+            <p className={styles.bannedPage}>
+              You are banned. Ban expires:{" "}
+              {DateService.getDateAndTime(banDateOfExpire!)}
+            </p>
+          </div>
+        ) : (
+          <>
+            <div
+              className={styles.messageList}
+              ref={messageListRef}
+              id="messageList"
+              onScroll={onScrollGetMessages}
+            >
+              <div className={styles.messageListLastElement} ref={messageListLastElement} />
+              {currentChatState.messages.map((i) => (
+                <Message {...i} key={i.id} />
+              ))}
+            </div>
+            {
+              ((isCurrentChatChannel && isCurrentChatMine) || !isCurrentChatChannel) && <div className={styles.footer}>
+                {
+                  replyState.data !== null &&
+                  banDateOfExpire === null &&
+                  muteDateOfExpire === null &&
+                  isMember && (
+                    <div className={styles.reply}>
+                      <ReplySvg className={styles.replySvg} width={20} />
+                      <div className={styles.replyConstainer}>
+                        <p className={styles.replyDisplayName}>
+                          {replyState.data.displayName}
+                        </p>
+                        <p className={styles.replyMessageText}>
+                          {replyState.data.text}
+                        </p>
+                      </div>
+                      <button
+                        className={styles.closeReplyButton}
+                        onClick={replyState.setReplyNull}
+                      >
+                        <CrossSvg width={20} />
+                      </button>
+                    </div>
+                  )
+                }
+                {
+                  editMessageState.data !== null &&
+                  banDateOfExpire === null &&
+                  muteDateOfExpire === null &&
+                  isMember && (
+                    <div className={styles.editMessage}>
+                      <EditSvg className={styles.editMessageSvg} width={20} />
+                      <div className={styles.editMessageConstainer}>
+                        <p className={styles.editMessagePage}>Edit Message</p>
+                        <p className={styles.editMessageText}>
+                          {editMessageState.data.text}
+                        </p>
+                      </div>
+                      <button
+                        className={styles.closeEditMessageButton}
+                        onClick={onClickCloseEditMessageHandler}
+                      >
+                        <CrossSvg width={20} />
+                      </button>
+                    </div>
+                  )
+                }
+                {
+                  attachmentList[0] &&
+                  banDateOfExpire === null &&
+                  muteDateOfExpire === null &&
+                  isMember && (
+                    <div className={styles.attachmentPanel}>
+                      <div className={styles.attachmentPanelConstainer}>
+                        {attachmentListUrlBlob.map(x => <img className={styles.attachmentPanelItem} src={x?.toString()} />)}
+                      </div>
+                      <button
+                        className={styles.closeAttachmentButton}
+                        onClick={onClickCloseAttachmentPanelHandler}
+                      >
+                        <CrossSvg width={20} />
+                      </button>
+                    </div>
+                  )
+                }
+                {
+                  banDateOfExpire === null &&
+                  muteDateOfExpire === null &&
+                  isMember && (
+                    <>
+                      <input
+                        className={styles.attachmentInput}
+                        onChange={onChangeAttachmentsHandler}
+                        type="file"
+                        id="attachment"
+                        name="attachment"
+                        multiple
+                        accept="image/jpeg"
+                      />
+                      <label htmlFor="attachment" className={styles.attachmentLabel}>
+                        <AttachmentSvg className={styles.attachmentSvg} width={25} />
+                      </label>
+                      <TextArea
+                        id="sendMessageTextArea"
+                        className={styles.textarea}
+                        autoSize={{ maxRows: 3 }}
+                        placeholder="Send Message"
+                        value={inputMessage}
+                        onChange={(e) => setInputMessage(e.currentTarget.value)}
+                        onKeyDown={onEnterGatewayHandler}
+                      />
+                      <SendMessageSvg
+                        className={styles.sendMessageSvg}
+                        width={30}
+                        onClick={onClickGatewayHandler}
+                      />
+                    </>
+                  )
+                }
+                {
+                  isMember === false && (
+                    <button className={styles.JoinChatButton} onClick={joinChatHandler}>Join</button>
+                  )
+                }
+                {
+                  muteDateOfExpire !== null && banDateOfExpire === null && (
+                    <div className={styles.muted}>
+                      <p className={styles.mutedPage}>
+                        You are muted. Mute expires:{" "}
+                        {DateService.getDateAndTime(muteDateOfExpire || "")}
+                      </p>
+                    </div>
+                  )
+                }
               </div>
-            )}
-          </div>}
-        </>
-      )}
+            }
+          </>
+        )
+      }
     </div>
   );
 });

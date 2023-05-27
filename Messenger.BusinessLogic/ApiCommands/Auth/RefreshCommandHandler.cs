@@ -77,7 +77,8 @@ public class RefreshCommandHandler : IRequestHandler<RefreshCommand, Result<Auth
             newSession.User.DisplayName,
             newSession.User.Nickname,
             newSession.User.Bio,
-            avatarLink);
+            avatarLink,
+            newSession.Id);
         
         return new Result<AuthorizationResponse>(authorizationResponse);
     }

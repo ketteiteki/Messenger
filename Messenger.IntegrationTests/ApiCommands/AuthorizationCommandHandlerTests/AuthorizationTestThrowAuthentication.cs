@@ -12,9 +12,9 @@ public class AuthorizationTestThrowAuthentication : IntegrationTestBase, IIntegr
     [Fact]
     public async Task Test()
     {
-        await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
-        var authorizationCommand = new AuthorizationCommand(AuthorizationToken: "wrong token");
+        var authorizationCommand = new AuthorizationCommand(user21Th.Value.Id, AuthorizationToken: "wrong token");
         
         var authorizationResult = await MessengerModule.RequestAsync(authorizationCommand, CancellationToken.None);
 

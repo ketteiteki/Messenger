@@ -9,7 +9,11 @@ const ModalWindow = observer(() => {
   return (
     <div className={styles.window}>
       <div className={styles.textContainer}>
-        <p className={styles.text}>{modelWindowEntity?.text}</p>
+        <p className={styles.text}>
+          {
+            modelWindowEntity?.text
+          }
+        </p>
       </div>
       <div className={styles.buttonsContainer}>
         <button className={styles.okButton} onClick={modelWindowEntity?.okAction}>Ok</button>

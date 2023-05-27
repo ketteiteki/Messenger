@@ -4,7 +4,7 @@ import api from "./baseAPI";
 
 export default class AuthorizationApi {
     public static async getAuthorizationAsync(accessToken: string) {
-        return await api.get<IAuthorizationResponse>(`/Auth/authorization/${accessToken}`);
+        return await api.get<IAuthorizationResponse>(`/Auth/authorization`);
     }
 
     public static async getSessionAsync(accessToken: string) {

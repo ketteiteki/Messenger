@@ -5,6 +5,9 @@ import { authorizationState } from "../../state/AuthorizationState";
 import { useNavigate, Link } from "react-router-dom";
 import TokenService from "../../services/messenger/TokenService";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
+import { sessionsState } from "../../state/SessionsState";
+import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
+import { currentChatState } from "../../state/CurrentChatState";
 
 const Login = observer(() => {
   const [inputNickname, setInputNickname] = useState<string>("");
@@ -17,16 +20,23 @@ const Login = observer(() => {
     TokenService.deleteLocalRefreshToken();
     authorizationState.clearAuthorizationData();
     chatListWithMessagesState.clearChatListWithMessagesData();
+    currentChatState.clearChatAndMessages();
+    sessionsState.clearData();
+    signalRConfiguration.connection?.stop();
   }, []);
 
   const loginHandler = async () => {
-    const response = await authorizationState.postLoginAsync(
-      inputNickname,
-      inputPassword
-    );
+    try {
+      const response = await authorizationState.postLoginAsync(
+        inputNickname,
+        inputPassword
+      );
 
-    if (response.status === 200) {
-      return navigate("/", { replace: true });
+      if (response.status === 200) {
+        return navigate("/", { replace: true });
+      }
+    } catch (error: any) {
+      alert(error.response.data.message);
     }
   };
 

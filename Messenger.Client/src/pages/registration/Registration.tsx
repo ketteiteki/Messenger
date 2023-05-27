@@ -5,6 +5,9 @@ import { authorizationState } from "../../state/AuthorizationState";
 import { useNavigate, Link } from "react-router-dom";
 import TokenService from "../../services/messenger/TokenService";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
+import { sessionsState } from "../../state/SessionsState";
+import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
+import { currentChatState } from "../../state/CurrentChatState";
 
 const Registration = observer(() => {
   const [inputDisplayName, setInputDisplayName] = useState<string>("");
@@ -18,17 +21,24 @@ const Registration = observer(() => {
     TokenService.deleteLocalRefreshToken();
     authorizationState.clearAuthorizationData();
     chatListWithMessagesState.clearChatListWithMessagesData();
+    currentChatState.clearChatAndMessages();
+    sessionsState.clearData();
+    signalRConfiguration.connection?.stop();
   }, []);
 
   const registerHandler = async () => {
-    var response = await authorizationState.postRegistrationAsync(
-      inputDisplayName,
-      inputNickname,
-      inputPassword
-    );
+    try {
+      var response = await authorizationState.postRegistrationAsync(
+        inputDisplayName,
+        inputNickname,
+        inputPassword
+      );
 
-    if (response.status === 200) {
-      return navigate("/", { replace: true });
+      if (response.status === 200) {
+        return navigate("/", { replace: true });
+      }
+    } catch (error: any) {
+      alert(error.response.data.message);
     }
   };
 

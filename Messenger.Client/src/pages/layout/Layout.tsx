@@ -32,7 +32,6 @@ const Layout = observer(() => {
 
   useEffect(() => {
     const accessToken = localStorage.getItem("AuthorizationToken");
-
     const fun = async () => {
       if (accessToken == null) {
         return navigate("/registration", { replace: true });
@@ -46,13 +45,12 @@ const Layout = observer(() => {
 
       const response = await chatListWithMessagesState.getChatListAsync();
 
-      signalRConfiguration.buildConnection(accessToken);
+      signalRConfiguration.buildConnection(authorizationResponse.data.accessToken);
 
       if (signalRConfiguration.connection === null) return;
-
       signalRConfiguration.connection.on(SignalRMethodsName.BroadcastMessageAsync, (message: IMessageDto) => {
         if (message.ownerId === authorizationResponse.data.id) return;
-
+        
         message.isMessageRealtime = true;
         chatListWithMessagesState.addMessageInData(message);
         chatListWithMessagesState.setLastMessage(message);

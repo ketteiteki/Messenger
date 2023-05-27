@@ -41,6 +41,11 @@ class CurrentChatState {
     }
   }
 
+  public clearChatAndMessages() {
+    this.chat = null;
+    this.messages = [];
+  };
+
   //api
   public getUserListByChatAsync = async (
     chatId: string,
