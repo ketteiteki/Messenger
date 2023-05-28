@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import styles from "./ChatList.module.scss";
-import { ReactComponent as MessegnerLogoSvg } from "../../assets/svg/messenger_logo.svg";
-import { ReactComponent as LoupeSvg } from "../../assets/svg/loupe.svg";
+import { ReactComponent as MessengerLogoSvg } from "../../assets/svg/messenger_logo.svg";
+import { ReactComponent as SearchSvg } from "../../assets/svg/loupe.svg";
 import { ReactComponent as PenSvg } from "../../assets/svg/pen.svg";
 import ChatListItem from "../chatListItem/ChatListItem";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
@@ -17,18 +17,20 @@ const ChatList = observer(() => {
 
   const debounced = useDebouncedCallback(
     useCallback(async (value) => {
-      if (value === "") return;
+      if (!value) return;
 
       try {
         const response = await chatListWithMessagesState.getChatListBySearchAsync(value);
 
         if (response.status === 200) {
-          response.data.forEach(async (c) => {
-            await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, c.id);
+          response.data.forEach((c) => {
+            signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, c.id);
           });
         }
       } catch (error: any) {
-        alert(error.response.data.message);
+          if (error.response.status !== 401) {
+              alert(error.response.data.message);
+          }
       }
     }, []),
     700,
@@ -41,7 +43,7 @@ const ChatList = observer(() => {
   };
 
   useEffect(() => {
-    if (searchInput === "") {
+    if (!searchInput) {
       const dataChats = chatListWithMessagesState.data;
       const dataForSearchChats = chatListWithMessagesState.dataForSearchChats;
 
@@ -56,7 +58,7 @@ const ChatList = observer(() => {
   return (
     <div className={styles.chatList}>
       <div className={styles.header}>
-        <MessegnerLogoSvg width={30} />
+        <MessengerLogoSvg width={30} />
         <motion.p initial={{ y: -5 }} animate={{ y: 0 }}
         >Messenger</motion.p>
         <Link to={"/createChat"} className={styles.createChatButton}>
@@ -64,7 +66,7 @@ const ChatList = observer(() => {
         </Link>
       </div>
       <div className={styles.search}>
-        <LoupeSvg width={18} />
+        <SearchSvg width={18} />
         <input
           type="text"
           placeholder="Search"
@@ -75,13 +77,13 @@ const ChatList = observer(() => {
       </div>
       <div className={styles.items}>
         {
-          searchInput === "" &&
+          !searchInput &&
           chatListWithMessagesState.data.map((i) => (
             <ChatListItem key={i.chat.id} {...i} />
           ))
         }
         {
-          searchInput !== "" &&
+          searchInput &&
           chatListWithMessagesState.dataForSearchChats.map((i) => (
             <ChatListItem key={i.chat.id} {...i} />
           ))

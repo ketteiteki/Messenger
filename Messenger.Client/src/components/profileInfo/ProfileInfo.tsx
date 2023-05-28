@@ -19,6 +19,7 @@ import { ChatType } from "../../models/enum/ChatType";
 import { currentChatState } from "../../state/CurrentChatState";
 import TokenService from "../../services/messenger/TokenService";
 import { useNavigate } from "react-router-dom";
+import RouteConstants from "../../constants/RouteConstants";
 
 const ProfileInfo = observer(() => {
 
@@ -39,6 +40,9 @@ const ProfileInfo = observer(() => {
 
   const [xMousePosition, setXMousePosition] = useState<number>(0);
   const [yMousePosition, setYMousePosition] = useState<number>(0);
+
+  const currentProfileStateDate = currentProfileState.date;
+  const authorizationStateData =  authorizationState.data;
 
   const navigate = useNavigate();
 
@@ -65,7 +69,9 @@ const ProfileInfo = observer(() => {
         inputAdditionalData
       );
     } catch (error: any) {
-      alert(error.response.data.message);
+      if (error.response.status !== 401) {
+        alert(error.response.data.message);
+      }
     }
     setUpdateMode(false);
   };
@@ -77,7 +83,9 @@ const ProfileInfo = observer(() => {
       try {
         await sessionsState.getSessionListAsync();
       } catch (error: any) {
-        alert(error.response.data.message);
+        if (error.response.status !== 401) {
+          alert(error.response.data.message);
+        }
       }
     }
   };
@@ -89,15 +97,17 @@ const ProfileInfo = observer(() => {
       if (sessionId === authorizationState.data?.currentSessionId) {
         TokenService.deleteLocalAccessToken();
         TokenService.deleteLocalRefreshToken();
-        navigate("/login", { replace: true });
+        return navigate(RouteConstants.Login, { replace: true });
       }
     } catch (error: any) {
-      alert(error.response.data.message);
+      if (error.response.status !== 401) {
+        alert(error.response.data.message);
+      }
     }
   };
 
   const onClickStartChattingHandler = async () => {
-    if (currentProfileId === undefined) return;
+    if (!currentProfileId) return;
 
     try {
       const response = await chatListWithMessagesState.postCreateDialogAsync(currentProfileId);
@@ -113,7 +123,9 @@ const ProfileInfo = observer(() => {
         await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, response.data.id);
       }
     } catch (error: any) {
-      alert(error.response.data.message);
+      if (error.response.status !== 401) {
+        alert(error.response.data.message);
+      }
     }
   };
 
@@ -127,7 +139,9 @@ const ProfileInfo = observer(() => {
         await authorizationState.putUpdateProfileAvatarAsync(files[0]);
       }
     } catch (error: any) {
-      alert(error.response.data.message);
+      if (error.response.status !== 401) {
+        alert(error.response.data.message);
+      }
     }
   };
 
@@ -140,7 +154,7 @@ const ProfileInfo = observer(() => {
     setInputNickname(nickname);
     setInputAdditionalData(bio);
     SetShowSessions(false);
-  }, [currentProfileState.date, authorizationState.data]);
+  }, [currentProfileStateDate, authorizationStateData]);
 
   return (
     <div
@@ -194,10 +208,10 @@ const ProfileInfo = observer(() => {
               : authorizationState.data?.avatarLink || nonAvatar
           }
           onClick={onClickOpenFullSizeAvatar}
-        />
+         alt={"avatar"}/>
       </div>
       {
-        updateMode === false && (
+        !updateMode && (
           <p className={styles.displayName}>{inputDisplayName || "------"}</p>
         )
       }
@@ -212,7 +226,7 @@ const ProfileInfo = observer(() => {
         )
       }
       {
-        updateMode === false && (
+        !updateMode && (
           <p className={styles.nickname}>{inputNickname || "------"}</p>
         )
       }
@@ -227,7 +241,7 @@ const ProfileInfo = observer(() => {
         )
       }
       {
-        updateMode === false && (
+        !updateMode && (
           <p className={styles.additionalData}>{inputAdditionalData}</p>
         )
       }
@@ -242,7 +256,7 @@ const ProfileInfo = observer(() => {
         )
       }
       {
-        currentProfileState.date !== null &&
+        currentProfileState.date &&
         authorizationState.data?.id !== currentProfileState.date?.id &&
         !dialogWithThisUser && (
           <button
@@ -255,7 +269,7 @@ const ProfileInfo = observer(() => {
       }
       {
         (currentProfileState.date?.id === authorizationState.data?.id ||
-          currentProfileState.date === null) && (
+          !currentProfileState.date) && (
           <button
             className={styles.showMembersButton}
             onClick={() => setShowSessionsHandler()}

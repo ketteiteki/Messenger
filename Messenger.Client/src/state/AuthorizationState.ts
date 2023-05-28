@@ -7,6 +7,7 @@ import TokenService from "../services/messenger/TokenService";
 class AuthorizationState {
   public data: IAuthorizationResponse | null = null;
   public countFailRefresh: number = 0;
+  public isRefreshFail: boolean = false;
 
   constructor() {
     makeAutoObservable(
@@ -30,9 +31,13 @@ class AuthorizationState {
     this.countFailRefresh = 0;
   }
 
+  public setIsRefreshFail = () => {
+    this.isRefreshFail = true;
+  }
+
   //api
-  public getAuthorizationAsync = async (accessToken: string) => {
-    const response = await AuthorizationApi.getAuthorizationAsync(accessToken);
+  public getAuthorizationAsync = async () => {
+    const response = await AuthorizationApi.getAuthorizationAsync();
 
     if (response.status === 200) {
       runInAction(() => {
@@ -94,7 +99,7 @@ class AuthorizationState {
 
     if (response.status === 200) {
       runInAction(() => {
-        if (this.data !== null) {
+        if (this.data) {
           this.data.displayName = response.data.displayName;
           this.data.nickname = response.data.nickname;
           this.data.bio = response.data.bio;
@@ -110,7 +115,7 @@ class AuthorizationState {
 
     if (response.status === 200) {
       runInAction(() => {
-        if (this.data !== null) {
+        if (this.data) {
           this.data.avatarLink = response.data.avatarLink;
         }
       });

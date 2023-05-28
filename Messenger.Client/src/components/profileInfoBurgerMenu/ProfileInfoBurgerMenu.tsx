@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite";
 import styles from "./ProfileInfoBurgerMenu.module.scss";
 import { ReactComponent as EditSvg } from "../../assets/svg/edit_black.svg";
 import { ReactComponent as TrashBinSvg } from "../../assets/svg/trash_bin_black.svg";
-import { ReactComponent as LoguoutSvg } from "../../assets/svg/logout.svg";
+import { ReactComponent as SearchSvg } from "../../assets/svg/logout.svg";
 import { currentProfileState } from "../../state/CurrentProfileState";
 import { authorizationState } from "../../state/AuthorizationState";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
@@ -12,8 +12,9 @@ import { blackCoverState } from "../../state/BlackCoverState";
 import ModalWindowEntity from "../../models/entities/ModalWindowEntity";
 import { useNavigate } from "react-router-dom";
 import TokenService from "../../services/messenger/TokenService";
+import RouteConstants from "../../constants/RouteConstants";
 
-interface ProfileInfoBurgerMenu {
+interface IProfileInfoBurgerMenuProps {
   x: number;
   y: number;
   profileId: string;
@@ -21,10 +22,9 @@ interface ProfileInfoBurgerMenu {
   setUpdateMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ProfileInfoBurgerMenu = observer(
-  ({ x, y, setShowMenu, setUpdateMode }: ProfileInfoBurgerMenu) => {
-    const [xMousePosition, setXMousePosition] = useState<number>(x - 100);
-    const [yMousePosition, setYMousePosition] = useState<number>(y);
+const ProfileInfoBurgerMenu = observer(({ x, y, setShowMenu, setUpdateMode }: IProfileInfoBurgerMenuProps) => {
+    const [xMousePosition] = useState<number>(x - 100);
+    const [yMousePosition] = useState<number>(y);
 
     const authorizationId = authorizationState.data?.id;
 
@@ -37,7 +37,7 @@ const ProfileInfoBurgerMenu = observer(
       const okFun = async () => {
         TokenService.deleteLocalAccessToken();
         TokenService.deleteLocalRefreshToken();
-        navigate("/login", { replace: true });
+        return navigate(RouteConstants.Login, { replace: true });
       };
 
       const modalWindowEntity = new ModalWindowEntity(text, okFun, blackCoverState.closeBlackCover);
@@ -51,9 +51,11 @@ const ProfileInfoBurgerMenu = observer(
       const okFun = async () => {
         try {
           await currentProfileState.delDeleteProfileAsync();
-          navigate("/registration", { replace: true });
+          return navigate(RouteConstants.Registration, { replace: true });
         } catch (error: any) {
-          alert(error.response.data.message);
+            if (error.response.status !== 401) {
+                alert(error.response.data.message);
+            }
         }
       };
 
@@ -66,7 +68,7 @@ const ProfileInfoBurgerMenu = observer(
       const text = "Do you want to delete the dialog?";
 
       const okFun = async () => {
-        if (authorizationId === undefined || currentChatState === undefined)
+        if (!authorizationId || !currentChatState)
           return;
 
         const chatId = chatListWithMessagesState.data.find((x) =>
@@ -74,11 +76,13 @@ const ProfileInfoBurgerMenu = observer(
           currentProfileState.date?.id
         )?.chat.id;
 
-        if (chatId !== undefined) {
+        if (chatId) {
           try {
             await chatListWithMessagesState.delDeleteDialogAsync(chatId, true);
           } catch (error: any) {
-            alert(error.response.data.message);
+              if (error.response.status !== 401) {
+                  alert(error.response.data.message);
+              }
           }
 
           currentProfileState.setProfileNull();
@@ -99,7 +103,7 @@ const ProfileInfoBurgerMenu = observer(
       >
         {
           currentProfileState.date?.id === authorizationState.data?.id ||
-            currentProfileState.date === null ? (
+            !currentProfileState.date ? (
             <>
               <button
                 className={styles.editAccountButton}
@@ -112,7 +116,7 @@ const ProfileInfoBurgerMenu = observer(
                 className={styles.deleteButton}
                 onClick={onClickLogoutHandler}
               >
-                <LoguoutSvg width={20} />
+                <SearchSvg width={20} />
                 <p>Logout</p>
               </button>
               <button

@@ -7,8 +7,8 @@ import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState
 import { currentChatState } from "../../state/CurrentChatState";
 import { useNavigate } from "react-router-dom";
 import { blackCoverState } from "../../state/BlackCoverState";
-import ModalWindow from "../modalWindow/ModalWindow";
 import ModalWindowEntity from "../../models/entities/ModalWindowEntity";
+import RouteConstants from "../../constants/RouteConstants";
 
 interface ProfileInfoBurgerMenu {
   x: number;
@@ -19,8 +19,8 @@ interface ProfileInfoBurgerMenu {
 
 const ChatInfoBurgerMenu = observer(
   ({ x, y, setShowMenu, setUpdateMode }: ProfileInfoBurgerMenu) => {
-    const [xMousePosition, setXMousePosition] = useState<number>(x - 100);
-    const [yMousePosition, setYMousePosition] = useState<number>(y);
+    const [xMousePosition] = useState<number>(x - 100);
+    const [yMousePosition] = useState<number>(y);
 
     const navigate = useNavigate();
 
@@ -32,11 +32,13 @@ const ChatInfoBurgerMenu = observer(
         try {
           await chatListWithMessagesState.delDeleteChatAsync(currentChatState.chat?.id ?? "");
         } catch (error: any) {
-          alert(error.response.data.message);
+            if (error.response.status !== 401) {
+                alert(error.response.data.message);
+            }
         }
 
         currentChatState.setChatAndMessagesNull();
-        navigate("/", { replace: true });
+        return navigate(RouteConstants.Layout, { replace: true });
       }
 
       const modalWindowEntity = new ModalWindowEntity(text, okFun, blackCoverState.closeBlackCover);

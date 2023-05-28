@@ -6,13 +6,14 @@ import nonAvatar from "../../assets/images/non_avatar.jpg";
 import { authorizationState } from "../../state/AuthorizationState";
 import { currentProfileState } from "../../state/CurrentProfileState";
 import { motion } from "framer-motion";
+import RouteConstants from "../../constants/RouteConstants";
 
-const InfoBar = observer((props) => {
+const InfoBar = observer(() => {
   const navigate = useNavigate();
 
   const showMyProfileHandler = () => {
     currentProfileState.setProfileNull();
-    navigate("/", { replace: true });
+    return navigate(RouteConstants.Layout, { replace: true });
   };
 
   return (
@@ -29,10 +30,7 @@ const InfoBar = observer((props) => {
         </motion.p>
         <img
           className={styles.headerAvatar}
-          src={
-            authorizationState.data?.avatarLink !== null
-              ? authorizationState.data?.avatarLink
-              : nonAvatar
+          src={authorizationState.data?.avatarLink ?? nonAvatar
           }
           alt=""
           onClick={showMyProfileHandler}

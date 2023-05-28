@@ -13,6 +13,7 @@ import { authorizationState } from "../../state/AuthorizationState";
 import { currentProfileState } from "../../state/CurrentProfileState";
 import { useDebouncedCallback } from "use-debounce";
 import { motion } from "framer-motion";
+import RouteConstants from "../../constants/RouteConstants";
 
 const ChatInfo = observer(() => {
   const [updateMode, setUpdateMode] = useState<boolean>(false);
@@ -35,6 +36,8 @@ const ChatInfo = observer(() => {
   const currentChatMemberListPage = currentChatState.chat?.memberListPage;
   const memberListBaseCount = 10;
 
+  const currentChatStateChat = currentChatState.chat;
+
   const mouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
     const localX = event.clientX - event.currentTarget.offsetLeft;
     const localY = event.clientY - event.currentTarget.offsetTop;
@@ -44,17 +47,19 @@ const ChatInfo = observer(() => {
   };
 
   const onClickLeaveChatHandler = async () => {
-    if (currentChatState.chat) {
+    if (currentChatStateChat) {
       try {
-        await chatListWithMessagesState.postLeaveFromChatAsync(currentChatState.chat.id)
+        await chatListWithMessagesState.postLeaveFromChatAsync(currentChatStateChat.id)
       } catch (error: any) {
-        alert(error.response.data.message);
+        if (error.response.status !== 401) {
+          alert(error.response.data.message);
+        }
       }
     }
 
     currentChatState.setChatAndMessagesNull();
 
-    return navigate("/", { replace: true });
+    return navigate(RouteConstants.Layout, { replace: true });
   };
 
   const updateChatHandler = async () => {
@@ -71,43 +76,47 @@ const ChatInfo = observer(() => {
         currentChatState.updateChatByChat(response.data);
       }
     } catch (error: any) {
-      alert(error.response.data.message);
+      if (error.response.status !== 401) {
+        alert(error.response.data.message);
+      }
     }
 
     setUpdateMode(false);
   };
 
-  const onChangeAvatarHandler = async (
-    event: React.FormEvent<HTMLInputElement>
-  ) => {
+  const onChangeAvatarHandler = async (event: React.FormEvent<HTMLInputElement>) => {
     const files = event.currentTarget.files;
     const currentChatId = currentChatState.chat?.id;
 
-    if (currentChatId === undefined) return;
+    if (!currentChatId) return;
 
     if (files && files.length > 0) {
       try {
         await chatListWithMessagesState.putUpdateChatAvatarAsync(currentChatId, files[0]);
       } catch (error: any) {
-        alert(error.response.data.message);
+        if (error.response.status !== 401) {
+          alert(error.response.data.message);
+        }
       }
     }
   };
 
   const onClickJoinChatHandler = async () => {
 
-    if (currentChatId === undefined || currentChatState.chat === null) return;
+    if (!currentChatId || !currentChatStateChat) return;
 
     try {
       await currentChatState.postJoinToChatAsync(currentChatId);
     } catch (error: any) {
-      alert(error.response.data.message);
+      if (error.response.status !== 401) {
+        alert(error.response.data.message);
+      }
     }
 
     chatListWithMessagesState.setSearchInput("");
-    chatListWithMessagesState.addChatInData(currentChatState.chat, currentChatState.messages)
+    chatListWithMessagesState.addChatInData(currentChatStateChat, currentChatState.messages)
     chatListWithMessagesState.resetDataForSearchChats();
-    currentChatState.setChatAndMessages(currentChatState.chat, currentChatState.messages);
+    currentChatState.setChatAndMessages(currentChatStateChat, currentChatState.messages);
   }
 
   const onClickOpenFullSizeAvatar = () => {
@@ -118,28 +127,32 @@ const ChatInfo = observer(() => {
     if (userId === authorizationState.data?.id) {
       currentProfileState.setProfileNull();
 
-      return navigate("/", { replace: true });
+      return navigate(RouteConstants.Layout, { replace: true });
     }
 
     try {
       await currentProfileState.getUserAsync(userId);
     } catch (error: any) {
-      alert(error.response.data.message);
+      if (error.response.status !== 401) {
+        alert(error.response.data.message);
+      }
     }
 
-    return navigate("/", { replace: true });
+    return navigate(RouteConstants.Layout, { replace: true });
   };
 
   const onClickShowMemberListHandler = async () => {
-    if (currentChatState.chat === null) return;
+    if (!currentChatStateChat) return;
 
     setShowMemberList(!showMemberList);
 
-    if (currentChatState.chat.members.length === 0) {
+    if (currentChatStateChat.members.length === 0) {
       try {
-        await currentChatState.getUserListByChatAsync(currentChatState.chat.id, memberListBaseCount, 1);
+        await currentChatState.getUserListByChatAsync(currentChatStateChat.id, memberListBaseCount, 1);
       } catch (error: any) {
-        alert(error.response.data.message);
+        if (error.response.status !== 401) {
+          alert(error.response.data.message);
+        }
       }
     }
   };
@@ -147,16 +160,18 @@ const ChatInfo = observer(() => {
   const getMembers = useDebouncedCallback(async () => {
     const memberListElement = document.getElementById("memberList");
 
-    if (!currentChatState.chat || !memberListElement) return;
+    if (!currentChatStateChat || !memberListElement) return;
 
     if (memberListElement.scrollHeight - memberListElement.scrollTop === memberListElement.clientHeight) {
       if (!currentChatId) return;
 
       try {
-        var response = await currentChatState.getUserListByChatAsync(currentChatState.chat.id, memberListBaseCount, memberListPage);
+        var response = await currentChatState.getUserListByChatAsync(currentChatStateChat.id, memberListBaseCount, memberListPage);
         if (response.data.length === 0) return;
       } catch (error: any) {
-        alert(error.response.data.message);
+        if (error.response.status !== 401) {
+          alert(error.response.data.message);
+        }
       }
 
       setMemberListPage(memberListPage + 1);
@@ -165,17 +180,17 @@ const ChatInfo = observer(() => {
   }, 800);
 
   useEffect(() => {
-    if (currentChatState.chat === null) {
-      return navigate("/", { replace: true });
+    if (!currentChatStateChat) {
+      return navigate(RouteConstants.Layout, { replace: true });
     }
 
-    setInputTitle(currentChatState.chat?.title ?? "");
-    setInputName(currentChatState.chat?.name ?? "");
+    setInputTitle(currentChatStateChat?.title ?? "");
+    setInputName(currentChatStateChat?.name ?? "");
     SetShowMenu(false);
     setShowMemberList(false);
     setUpdateMode(false);
     setMemberListPage(currentChatMemberListPage ?? 2);
-  }, [currentChatState.chat]);
+  }, [currentChatStateChat]);
 
   return (
     <div
@@ -229,7 +244,7 @@ const ChatInfo = observer(() => {
         />
       </div>
       {
-        updateMode === false && <p className={styles.title}>{inputTitle || "------"}</p>
+        !updateMode && <p className={styles.title}>{inputTitle || "------"}</p>
       }
       {
         updateMode && (
@@ -242,7 +257,7 @@ const ChatInfo = observer(() => {
         )
       }
       {
-        updateMode === false && <p className={styles.name}>{inputName || "------"}</p>
+        !updateMode && <p className={styles.name}>{inputName || "------"}</p>
       }
       {
         updateMode && (
@@ -255,7 +270,7 @@ const ChatInfo = observer(() => {
         )
       }
       {
-        chatListWithMessagesState.data.find((x) => x.chat.id === currentChatState.chat?.id) === undefined ? (
+        !chatListWithMessagesState.data.find((x) => x.chat.id === currentChatState.chat?.id) ? (
           <button className={styles.joinChattingButton} onClick={onClickJoinChatHandler}>Join</button>
         ) : (
           <button

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
 import styles from "./MessageBurgerMenu.module.scss";
 import { ReactComponent as EditSvg } from "../../assets/svg/edit_black.svg";
@@ -61,7 +61,9 @@ const MessageBurgerMenu = observer(
       try {
         await chatListWithMessagesState.delDeleteMessageAsync(chatId, messageId);
       } catch (error: any) {
-        alert(error.response.data.message);
+          if (error.response.status !== 401) {
+              alert(error.response.data.message);
+          }
       }
     }
 

@@ -13,6 +13,7 @@ import { ChatType } from "../../models/enum/ChatType";
 import { blackCoverState } from "../../state/BlackCoverState";
 import { ReactComponent as ClockSvg } from "../../assets/svg/clock.svg";
 import { motion } from "framer-motion";
+import RouteConstants from "../../constants/RouteConstants";
 
 const Message = observer((props: IMessageDto) => {
   const [xMousePosition, setXMousePosition] = useState<number>(0);
@@ -42,27 +43,29 @@ const Message = observer((props: IMessageDto) => {
   };
 
   const showProfileByMessage = async () => {
-    if (props.ownerId === null) return;
+    if (!props.ownerId) return;
 
     if (isMessageMine) {
       currentProfileState.setProfileNull();
 
-      return navigate("/", { replace: true });
+      return navigate(RouteConstants.Layout, { replace: true });
     }
 
     try {
       await currentProfileState.getUserAsync(props.ownerId);
     } catch (error: any) {
-      alert(error.response.data.message);
+      if (error.response.status !== 401) {
+        alert(error.response.data.message);
+      }
     }
 
-    return navigate("/", { replace: true });
+    return navigate(RouteConstants.Layout, { replace: true });
   };
 
   const MouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
-    var targetCoords = event.currentTarget.getBoundingClientRect();
-    var localX = event.clientX - targetCoords.left;
-    var localY = event.clientY - targetCoords.top;
+    const targetCoords = event.currentTarget.getBoundingClientRect();
+    const localX = event.clientX - targetCoords.left;
+    const localY = event.clientY - targetCoords.top;
 
     setXMousePosition(localX);
     setYMousePosition(localY);
@@ -112,7 +115,7 @@ const Message = observer((props: IMessageDto) => {
               />
               <div className={styles.myMessageData}>
                 {
-                  props.replyToMessageId !== null && (
+                  props.replyToMessageId && (
                     <div className={styles.myMessageReply}>
                       <p className={styles.myMessageReplyDisplayName}>
                         {
@@ -130,7 +133,11 @@ const Message = observer((props: IMessageDto) => {
                 {props.attachments[0] && <div className={messageAttachmentListStyle}>
                   {
                     props.attachments.map(x =>
-                      <img className={styles.messageAttachment} onClick={() => onClickOpenFullSizeAvatar(x.link)} src={x.link} alt="" />)
+                      <img className={styles.messageAttachment}
+                           onClick={() => onClickOpenFullSizeAvatar(x.link)}
+                           src={x.link}
+                           key={x.id}
+                           alt="" />)
                   }
                 </div>}
                 <p className={styles.myText}>{props.text}</p>
@@ -158,8 +165,8 @@ const Message = observer((props: IMessageDto) => {
             onMouseMove={MouseMoveHandler}
           >
             {
-              (showMenu && isCurrentChatChannel && isCurrentChatMine) ||
-              (showMenu && !isCurrentChatChannel) && (
+              ((showMenu && isCurrentChatChannel && isCurrentChatMine) ||
+              (showMenu && !isCurrentChatChannel)) && (
                 <MessageBurgerMenu
                   x={xMousePosition}
                   y={yMousePosition}

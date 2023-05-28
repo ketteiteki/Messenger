@@ -8,6 +8,8 @@ import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState
 import { sessionsState } from "../../state/SessionsState";
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
 import { currentChatState } from "../../state/CurrentChatState";
+import RouteConstants from "../../constants/RouteConstants";
+import {currentProfileState} from "../../state/CurrentProfileState";
 
 const Registration = observer(() => {
   const [inputDisplayName, setInputDisplayName] = useState<string>("");
@@ -22,20 +24,21 @@ const Registration = observer(() => {
     authorizationState.clearAuthorizationData();
     chatListWithMessagesState.clearChatListWithMessagesData();
     currentChatState.clearChatAndMessages();
+    currentProfileState.setProfileNull()
     sessionsState.clearData();
     signalRConfiguration.connection?.stop();
   }, []);
 
   const registerHandler = async () => {
     try {
-      var response = await authorizationState.postRegistrationAsync(
+      const response = await authorizationState.postRegistrationAsync(
         inputDisplayName,
         inputNickname,
         inputPassword
       );
 
       if (response.status === 200) {
-        return navigate("/", { replace: true });
+        return navigate(RouteConstants.Layout, { replace: true });
       }
     } catch (error: any) {
       alert(error.response.data.message);
@@ -52,7 +55,7 @@ const Registration = observer(() => {
       );
 
       if (response.status === 200) {
-        return navigate("/", { replace: true });
+        return navigate(RouteConstants.Layout, { replace: true });
       }
     }
   };
@@ -94,7 +97,7 @@ const Registration = observer(() => {
           </button>
           <div className={styles.loginPage}>
             Do you already have an account?{" "}
-            <Link className={styles.loginPageLink} to={"/login"}>
+            <Link className={styles.loginPageLink} to={RouteConstants.Login}>
               Login
             </Link>
           </div>

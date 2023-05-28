@@ -8,6 +8,8 @@ import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState
 import { sessionsState } from "../../state/SessionsState";
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
 import { currentChatState } from "../../state/CurrentChatState";
+import RouteConstants from "../../constants/RouteConstants";
+import {currentProfileState} from "../../state/CurrentProfileState";
 
 const Login = observer(() => {
   const [inputNickname, setInputNickname] = useState<string>("");
@@ -21,6 +23,7 @@ const Login = observer(() => {
     authorizationState.clearAuthorizationData();
     chatListWithMessagesState.clearChatListWithMessagesData();
     currentChatState.clearChatAndMessages();
+    currentProfileState.setProfileNull()
     sessionsState.clearData();
     signalRConfiguration.connection?.stop();
   }, []);
@@ -33,7 +36,7 @@ const Login = observer(() => {
       );
 
       if (response.status === 200) {
-        return navigate("/", { replace: true });
+        return navigate(RouteConstants.Layout, { replace: true });
       }
     } catch (error: any) {
       alert(error.response.data.message);
@@ -50,7 +53,7 @@ const Login = observer(() => {
       );
 
       if (response.status === 200) {
-        return navigate("/", { replace: true });
+        return navigate(RouteConstants.Layout, { replace: true });
       }
     }
   };
@@ -81,7 +84,7 @@ const Login = observer(() => {
           </button>
           <div className={styles.registerPage}>
             Don't have an account?{" "}
-            <Link className={styles.registerPageLink} to={"/registration"}>
+            <Link className={styles.registerPageLink} to={RouteConstants.Registration}>
               Register
             </Link>
           </div>

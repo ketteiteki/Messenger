@@ -3,7 +3,7 @@ import ISessionDto from "../../models/interfaces/ISessionDto";
 import api from "./baseAPI";
 
 export default class AuthorizationApi {
-    public static async getAuthorizationAsync(accessToken: string) {
+    public static async getAuthorizationAsync() {
         return await api.get<IAuthorizationResponse>(`/Auth/authorization`);
     }
 

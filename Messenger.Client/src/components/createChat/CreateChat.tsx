@@ -57,7 +57,9 @@ const CreateChat = observer(() => {
         response.data.id
       );
     } catch (error: any) {
-      alert(error.response.data.message);
+      if (error.response.status !== 401) {
+        alert(error.response.data.message);
+      }
     }
   };
 
@@ -76,7 +78,7 @@ const CreateChat = observer(() => {
           name="avatar"
           accept="image/jpeg"
         />
-        <img className={styles.avatar} src={blobUrlFile?.toString() || nonAvatar} />
+        <img className={styles.avatar} src={blobUrlFile?.toString() || nonAvatar}  alt={"avatar"}/>
       </motion.div>
       <div className={styles.createChatContainer}>
         <input

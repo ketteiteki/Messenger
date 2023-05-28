@@ -1,5 +1,4 @@
 import * as signalR from "@microsoft/signalr";
-import AppConstants from "../../constants/AppConstants";
 
 
 class SignalRConfiguration {

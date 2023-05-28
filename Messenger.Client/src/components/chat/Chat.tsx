@@ -48,12 +48,16 @@ const Chat = observer(() => {
     currentChatState.chat?.avatarLink ?? nonAvatar
     : currentChatState.chat.members.find(x => x.id !== authorizationState.data?.id)?.avatarLink ?? nonAvatar;
 
+  const editMessageStateData = editMessageState.data;
+  const currentChatStateMessagesLength = currentChatState.messages.length;
+  const currentChatStateChat = currentChatState.chat;
+
   const sendMessageHandler = async () => {
     await sendMessage();
   };
 
   const sendMessageEnterHandler = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (currentChatState.chat === null) return;
+    if (!currentChatState.chat) return;
     if (e.key === "Enter") {
       e.preventDefault();
 
@@ -63,10 +67,10 @@ const Chat = observer(() => {
 
   const sendMessage = async () => {
     if (
-      currentChatState.chat === null ||
-      authorizationOwnerDisplayName === undefined ||
-      currentChatId === undefined ||
-      authorizationId === undefined ||
+      !currentChatState.chat ||
+      !authorizationOwnerDisplayName ||
+      !currentChatId ||
+      !authorizationId ||
       !inputMessage.trim()
     )
       return;
@@ -80,7 +84,7 @@ const Chat = observer(() => {
       replyState.data?.text ?? null,
       replyState.data?.displayName ?? null,
       currentChatId,
-      attachmentList.map(x => new AttachmentEntity(Math.random().toString(), 1, nonAvatar)),
+      attachmentList.map(_ => new AttachmentEntity(Math.random().toString(), 1, nonAvatar)),
       true
     );
 
@@ -91,7 +95,9 @@ const Chat = observer(() => {
     try {
       await chatListWithMessagesState.postCreateMessageAsync(messageEntity, attachmentList);
     } catch (error: any) {
-      alert(error.response.data.message);
+      if (error.response.status !== 401) {
+        alert(error.response.data.message);
+      }
     }
 
     setAttachmentList([]);
@@ -102,7 +108,7 @@ const Chat = observer(() => {
   };
 
   const editMessageHandler = async () => {
-    if (currentChatState.chat === null || editMessageState.data === null || !inputMessage.trim())
+    if (!currentChatState.chat || !editMessageState.data || !inputMessage.trim())
       return;
 
     try {
@@ -112,20 +118,20 @@ const Chat = observer(() => {
         inputMessage
       );
     } catch (error: any) {
-      alert(error.response.data.message);
+      if (error.response.status !== 401) {
+        alert(error.response.data.message);
+      }
     }
 
     setInputMessage("");
     editMessageState.setEditMessageNull();
   };
 
-  const editMessageEnterHandler = async (
-    e: React.KeyboardEvent<HTMLTextAreaElement>
-  ) => {
+  const editMessageEnterHandler = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
 
-      if (currentChatState.chat === null || editMessageState.data === null || !inputMessage.trim())
+      if (!currentChatState.chat || !editMessageState.data || !inputMessage.trim())
         return;
 
       try {
@@ -135,7 +141,9 @@ const Chat = observer(() => {
           inputMessage
         );
       } catch (error: any) {
-        alert(error.response.data.message);
+        if (error.response.status !== 401) {
+          alert(error.response.data.message);
+        }
       }
 
       setInputMessage("");
@@ -143,23 +151,23 @@ const Chat = observer(() => {
     }
   };
 
-  const onClickGatewayHandler = () => {
-    if (editMessageState.data === null) {
-      sendMessageHandler();
+  const onClickGatewayHandler = async () => {
+    if (!editMessageState.data) {
+      await sendMessageHandler();
     }
 
-    if (editMessageState !== null) {
-      editMessageHandler();
+    if (editMessageState.data) {
+      await editMessageHandler();
     }
   };
 
   const onEnterGatewayHandler = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (editMessageState.data === null) {
-      sendMessageEnterHandler(e);
+    if (!editMessageState.data) {
+      await sendMessageEnterHandler(e);
     }
 
-    if (editMessageState !== null) {
-      editMessageEnterHandler(e);
+    if (editMessageState.data) {
+      await editMessageEnterHandler(e);
     }
   };
 
@@ -173,7 +181,7 @@ const Chat = observer(() => {
 
     if (!files || files.length > 4) return;
 
-    var fileArray = Array.from(files);
+    let fileArray = Array.from(files);
 
     setAttachmentList(fileArray);
 
@@ -206,19 +214,23 @@ const Chat = observer(() => {
       try {
         await chatListWithMessagesState.getMessageListAsync(currentChatId, firstMessageArray.dateOfCreate);
       } catch (error: any) {
-        alert(error.response.data.message);
+        if (error.response.status !== 401) {
+          alert(error.response.data.message);
+        }
       }
     }
   }, 800);
 
-  const joinChatHandler = async () => {
+  const onClickJoinChatHandler = async () => {
 
-    if (currentChatId === undefined || currentChatState.chat === null) return;
+    if (!currentChatId || !currentChatState.chat) return;
 
     try {
       await currentChatState.postJoinToChatAsync(currentChatId);
     } catch (error: any) {
-      alert(error.response.data.message);
+      if (error.response.status !== 401) {
+        alert(error.response.data.message);
+      }
     }
 
     chatListWithMessagesState.setSearchInput("");
@@ -233,10 +245,10 @@ const Chat = observer(() => {
   };
 
   useEffect(() => {
-    if (editMessageState.data === null) return;
+    if (!editMessageState.data) return;
 
     setInputMessage(editMessageState.data.text);
-  }, [editMessageState.data]);
+  }, [editMessageStateData]);
 
   useEffect(() => {
     const messageListElement = document.getElementById("messageList");
@@ -247,19 +259,19 @@ const Chat = observer(() => {
       messageListScrollBottomHandler();
     }
 
-  }, [currentChatState.messages.length]);
+  }, [currentChatStateMessagesLength]);
 
   useEffect(() => {
     setAttachmentList([]);
     setAttachmentListUrlBlob([]);
     setInputMessage("");
     messageListScrollBottomHandler();
-  }, [currentChatState.chat]);
+  }, [currentChatStateChat]);
 
   return (
     <div className={styles.chat}>
       {
-        (banDateOfExpire === null || currentChatState.chat !== null) && (
+        (banDateOfExpire === null || currentChatState.chat) && (
           <div className={styles.header}>
             <p className={styles.chatName}>
               {currentChatState.chat?.type !== ChatType.Dialog
@@ -280,7 +292,7 @@ const Chat = observer(() => {
         )
       }
       {
-        currentChatState.chat === null ? (
+        !currentChatState.chat ? (
           <div className={styles.chooseChat}>
             <motion.p
               initial={{ opacity: 0 }}
@@ -290,7 +302,7 @@ const Chat = observer(() => {
               Choose a chat
             </motion.p>
           </div>
-        ) : banDateOfExpire !== null ? (
+        ) : banDateOfExpire ? (
           <div className={styles.banned}>
             <p className={styles.bannedPage}>
               You are banned. Ban expires:{" "}
@@ -313,13 +325,13 @@ const Chat = observer(() => {
             {
               ((isCurrentChatChannel && isCurrentChatMine) || !isCurrentChatChannel) && <div className={styles.footer}>
                 {
-                  replyState.data !== null &&
-                  banDateOfExpire === null &&
-                  muteDateOfExpire === null &&
+                  replyState.data &&
+                  !banDateOfExpire &&
+                  !muteDateOfExpire &&
                   isMember && (
                     <div className={styles.reply}>
                       <ReplySvg className={styles.replySvg} width={20} />
-                      <div className={styles.replyConstainer}>
+                      <div className={styles.replyContainer}>
                         <p className={styles.replyDisplayName}>
                           {replyState.data.displayName}
                         </p>
@@ -337,13 +349,13 @@ const Chat = observer(() => {
                   )
                 }
                 {
-                  editMessageState.data !== null &&
-                  banDateOfExpire === null &&
-                  muteDateOfExpire === null &&
+                  editMessageState.data &&
+                  !banDateOfExpire &&
+                  !muteDateOfExpire &&
                   isMember && (
                     <div className={styles.editMessage}>
                       <EditSvg className={styles.editMessageSvg} width={20} />
-                      <div className={styles.editMessageConstainer}>
+                      <div className={styles.editMessageContainer}>
                         <p className={styles.editMessagePage}>Edit Message</p>
                         <p className={styles.editMessageText}>
                           {editMessageState.data.text}
@@ -360,12 +372,12 @@ const Chat = observer(() => {
                 }
                 {
                   attachmentList[0] &&
-                  banDateOfExpire === null &&
-                  muteDateOfExpire === null &&
+                  !banDateOfExpire &&
+                  !muteDateOfExpire &&
                   isMember && (
                     <div className={styles.attachmentPanel}>
-                      <div className={styles.attachmentPanelConstainer}>
-                        {attachmentListUrlBlob.map(x => <img className={styles.attachmentPanelItem} src={x?.toString()} />)}
+                      <div className={styles.attachmentPanelContainer}>
+                        {attachmentListUrlBlob.map(x => <img className={styles.attachmentPanelItem} src={x?.toString()}  alt={"attachment"}/>)}
                       </div>
                       <button
                         className={styles.closeAttachmentButton}
@@ -377,8 +389,8 @@ const Chat = observer(() => {
                   )
                 }
                 {
-                  banDateOfExpire === null &&
-                  muteDateOfExpire === null &&
+                  !banDateOfExpire &&
+                  !muteDateOfExpire &&
                   isMember && (
                     <>
                       <input
@@ -411,12 +423,12 @@ const Chat = observer(() => {
                   )
                 }
                 {
-                  isMember === false && (
-                    <button className={styles.JoinChatButton} onClick={joinChatHandler}>Join</button>
+                  !isMember && (
+                    <button className={styles.JoinChatButton} onClick={onClickJoinChatHandler}>Join</button>
                   )
                 }
                 {
-                  muteDateOfExpire !== null && banDateOfExpire === null && (
+                  muteDateOfExpire && !banDateOfExpire && (
                     <div className={styles.muted}>
                       <p className={styles.mutedPage}>
                         You are muted. Mute expires:{" "}

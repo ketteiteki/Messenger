@@ -29,14 +29,14 @@ class CurrentChatState {
   };
 
   public updateChatByChat = (chat: IChatDto) => {
-    if (this.chat !== null) {
+    if (this.chat) {
       this.chat.title = chat.title;
       this.chat.name = chat.name;
     }
   };
 
   public setMemberListPage(value: number) {
-    if (this.chat !== null) {
+    if (this.chat) {
       this.chat.memberListPage = value;
     }
   }
@@ -66,7 +66,7 @@ class CurrentChatState {
   public postJoinToChatAsync = async (chatId: string) => {
     const response = await ChatApi.postJoinToChatAsync(chatId);
 
-    if (response.status === 200 && this.chat !== null) {
+    if (response.status === 200 && this.chat) {
       this.chat.isMember = true;
     }
   }

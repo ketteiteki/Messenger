@@ -15,6 +15,7 @@ import { editMessageState } from "../../state/EditMessageState";
 import { motion } from "framer-motion";
 import { ReactComponent as ConversationLogoSvg } from "../../assets/svg/conversation_logo.svg";
 import { ReactComponent as ChannelLogoSvg } from "../../assets/svg/channel_logo.svg";
+import RouteConstants from "../../constants/RouteConstants";
 
 const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
 
@@ -48,7 +49,9 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
         await chatListWithMessagesState.getMessageListAsync(props.chat.id, firstRealtimeMessage?.dateOfCreate);
       }
     } catch (error: any) {
-      alert(error.response.data.message);
+      if (error.response.status !== 401) {
+        alert(error.response.data.message);
+      }
     }
 
     currentChatState.setChatAndMessages(props.chat, props.messages);
@@ -61,13 +64,15 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
           await currentProfileState.getUserAsync(interlocutorId);
         }
       } catch (error: any) {
-        alert(error.response.data.message);
+        if (error.response.status !== 401) {
+          alert(error.response.data.message);
+        }
       }
 
-      return navigate("/", { replace: true });
+      return navigate(RouteConstants.Layout, { replace: true });
     }
 
-    return navigate("/chatInfo", { replace: true });
+    return navigate(RouteConstants.ChatInfo, { replace: true });
   };
 
   return (
