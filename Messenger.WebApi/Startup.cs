@@ -20,8 +20,9 @@ public class Startup
     {
         serviceCollection.AddControllers();
 
+        var cookieExpireTimeSpan = _configuration.GetValue<int>(AppSettingConstants.CookieExpireTimeSpan);
+        
         var databaseConnectionString = _configuration[AppSettingConstants.DatabaseConnectionString];
-        var signKey = _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
         var allowOrigins = _configuration[AppSettingConstants.AllowedHosts];
         
         var messengerBlobContainerName = _configuration[AppSettingConstants.BlobContainer];
@@ -30,9 +31,15 @@ public class Startup
 
         serviceCollection.AddDatabaseServices(databaseConnectionString);
 
-        serviceCollection.AddInfrastructureServices(signKey);
+        serviceCollection.AddInfrastructureServices(cookieExpireTimeSpan);
 
         serviceCollection.AddMessengerServices(messengerBlobContainerName, messengerBlobAccess, messengerBlobUrl);
+
+        serviceCollection.AddTicketStore();
+
+        serviceCollection.AddHostedServices();
+
+        serviceCollection.ConfigureSameSiteNoneCookiePolicy();
         
         serviceCollection.ConfigureCors(CorsPolicyName, allowOrigins);
 
@@ -55,6 +62,8 @@ public class Startup
 
         applicationBuilder.UseHttpsRedirection();
 
+        applicationBuilder.UseCookiePolicy();
+        
         applicationBuilder.UseRouting();
 
         applicationBuilder.UseCors(CorsPolicyName);

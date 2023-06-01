@@ -33,7 +33,7 @@ public class IntegrationTestBase : IAsyncLifetime
 			.Build();
 
 		var databaseConnectionString = configuration[AppSettingConstants.DatabaseConnectionStringForIntegrationTests];
-		var signKey = configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
+		var cookieExpireTimeSpan = configuration.GetValue<int>(AppSettingConstants.CookieExpireTimeSpan);
 		
 		var messengerBlobContainerName = configuration[AppSettingConstants.BlobContainer];
 		var messengerBlobAccess = configuration[AppSettingConstants.BlobAccess];
@@ -42,7 +42,7 @@ public class IntegrationTestBase : IAsyncLifetime
 		MessengerStartup.Initialize(
 			configuration,
 			databaseConnectionString,
-			signKey,
+			cookieExpireTimeSpan,
 			messengerBlobContainerName,
 			messengerBlobAccess,
 			messengerBlobUrl);

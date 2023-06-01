@@ -1,11 +1,13 @@
 using MediatR;
+using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.ApiCommands.Auth;
-using Messenger.BusinessLogic.ApiQueries.Auth;
-using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Models.Requests;
 using Messenger.BusinessLogic.Models.Responses;
 using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
+using Messenger.WebApi.Extensions;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,75 +15,38 @@ namespace Messenger.WebApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController : ApiControllerBase
+public class AuthController : ControllerBase
 {
-	public AuthController(IMediator mediator) : base(mediator) {}
+	private readonly IMediator _mediator;
+	private readonly IClaimsService _claimsService;
+	
+	public AuthController(IMediator mediator, IClaimsService claimsService)
+	{
+		_mediator = mediator;
+		_claimsService = claimsService;
+	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
-	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(AuthorizationResponse), StatusCodes.Status200OK)]
 	[Authorize]
 	[HttpGet("authorization")]
 	public async Task<IActionResult> Authorization(CancellationToken cancellationToken)
 	{
-		var requesterGuid = new Guid(HttpContext.User.Claims.First(x => x.Type == ClaimConstants.Id).Value);
-		var authorizationToken = HttpContext.Request.Headers
-			.First(x => x.Key == HeadersConstants.Authorization).Value.ToString().Split(" ")[^1];
+		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
+		var sessionId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.SessionId).Value);
 		
-		var query = new AuthorizationCommand(requesterGuid, authorizationToken);
-
-		return await RequestAsync(query, cancellationToken);
-	}
-	
-	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
-	[ProducesResponseType(typeof(SessionDto), StatusCodes.Status200OK)]
-	[Authorize]
-	[HttpGet("sessions/{accessToken}")]
-	public async Task<IActionResult> GetSession(
-		string accessToken,
-		CancellationToken cancellationToken)
-	{
-		var requestId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
-
-		var query = new GetSessionQuery(
-			RequesterId: requestId,
-			AccessToken: accessToken);
-
-		return await RequestAsync(query, cancellationToken);
-	}
-	
-	[ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
-	[ProducesResponseType(typeof(List<SessionDto>), StatusCodes.Status200OK)]
-	[Authorize]
-	[HttpGet("sessions")]
-	public async Task<IActionResult> GetSessionList(
-		CancellationToken cancellationToken)
-	{
-		var requestId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
+		var query = new AuthorizationCommand(requesterId);
 		
-		var query = new GetSessionListQuery(
-			RequesterId: requestId);
+		var result = await _mediator.Send(query, cancellationToken);
 
-		return await RequestAsync(query, cancellationToken);
-	}
-
-	[ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
-	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
-	[ProducesResponseType(typeof(AuthorizationResponse), StatusCodes.Status200OK)]
-	[HttpPost("refresh/{refreshToken:guid}")]
-	public async Task<IActionResult> Refresh(
-		Guid refreshToken,
-		[FromHeader(Name = "User-Agent")] string userAgent,
-		CancellationToken cancellationToken)
-	{
-		var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+		if (!result.IsSuccess)
+		{
+			return result.ToActionResult();
+		}
 		
-		var command = new RefreshCommand(
-			RefreshToken: refreshToken,
-			UserAgent: userAgent,
-			Ip: ip);
+		result.Value.UpdateCurrentSessionId(sessionId);
 		
-		return await RequestAsync(command, cancellationToken);
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
@@ -90,19 +55,33 @@ public class AuthController : ApiControllerBase
 	[HttpPost("registration")]
 	public async Task<IActionResult> Registration(
 		[FromBody] RegistrationRequest request,
-		[FromHeader(Name = "User-Agent")] string userAgent,
 		CancellationToken cancellationToken)
 	{
-		var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+		var sessionId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimConstants.SessionId)?.Value;
 		
-		var command = new RegistrationCommand(
-			DisplayName: request.DisplayName,
-			Nickname: request.Nickname,
-			Password: request.Password,
-			UserAgent: userAgent,
-			Ip: ip);
+		var command = new RegistrationCommand(request.DisplayName, request.Nickname, request.Password);
+
+		var result = await _mediator.Send(command, cancellationToken);
+
+		if (!result.IsSuccess)
+		{
+			return result.ToActionResult();
+		}
+
+		if (sessionId == null)
+		{
+			var claimsPrincipal = _claimsService.CreateSignInClaims(result.Value.Id);
+			var sessionGuid = new Guid(claimsPrincipal.Claims.First(x => x.Type == ClaimConstants.SessionId).Value);
+
+			await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+			
+			result.Value.UpdateCurrentSessionId(sessionGuid);
+			return result.ToActionResult();
+		} 
 		
-		return await RequestAsync(command, cancellationToken);
+		result.Value.UpdateCurrentSessionId(new Guid(sessionId));
+		
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
@@ -110,34 +89,40 @@ public class AuthController : ApiControllerBase
 	[HttpPost("login")]
 	public async Task<IActionResult> Login(
 		[FromBody] LoginRequest request,
-		[FromHeader(Name = "User-Agent")] string userAgent,
 		CancellationToken cancellationToken)
 	{
-		var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+		var sessionId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimConstants.SessionId)?.Value;
 		
-		var command = new LoginCommand(
-			Nickname: request.Nickname,
-			Password: request.Password,
-			Ip: ip,
-			UserAgent: userAgent);
+		var command = new LoginCommand(request.Nickname, request.Password);
+
+		var result = await _mediator.Send(command, cancellationToken);
+
+		if (!result.IsSuccess)
+		{
+			return result.ToActionResult();
+		}
+
+		if (sessionId == null)
+		{
+			var claimsPrincipal = _claimsService.CreateSignInClaims(result.Value.Id);
+			var sessionGuid = new Guid(claimsPrincipal.Claims.First(x => x.Type == ClaimConstants.SessionId).Value);
+
+			await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+			
+			result.Value.UpdateCurrentSessionId(sessionGuid);
+			return result.ToActionResult();
+		} 
 		
-		return await RequestAsync(command, cancellationToken);
+		result.Value.UpdateCurrentSessionId(new Guid(sessionId));
+		
+		return result.ToActionResult();
 	}
 	
-	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
-	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
-	[ProducesResponseType(typeof(SessionDto), StatusCodes.Status200OK)]
-	[HttpDelete("sessions/{sessionId:guid}")]
-	public async Task<IActionResult> RemoveSession(
-		Guid sessionId,
-		CancellationToken cancellationToken)
+	[ProducesResponseType(typeof(AuthorizationResponse), StatusCodes.Status200OK)]
+	[HttpPost("logout")]
+	public async Task<IActionResult> Logout()
 	{
-		var requestId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
-		
-		var command = new RemoveSessionCommand(
-			RequesterId: requestId,
-			SessionId: sessionId);
-		
-		return await RequestAsync(command, cancellationToken);
+		await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+		return Ok();
 	}
 }

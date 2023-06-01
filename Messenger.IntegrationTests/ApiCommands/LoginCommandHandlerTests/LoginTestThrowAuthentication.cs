@@ -12,13 +12,9 @@ public class LoginTestThrowAuthentication : IntegrationTestBase, IIntegrationTes
     [Fact]
     public async Task Test()
     {
-        const string loginIp = "323.432.21.542";
-
         var firstLoginCommand = new LoginCommand(
             CommandHelper.Registration21ThCommand().Nickname,
-            CommandHelper.Registration21ThCommand().Password,
-            loginIp,
-            UserAgent: "Mozilla");
+            CommandHelper.Registration21ThCommand().Password);
         
         var firstLoginResult = await MessengerModule.RequestAsync(firstLoginCommand, CancellationToken.None);
         
@@ -26,9 +22,7 @@ public class LoginTestThrowAuthentication : IntegrationTestBase, IIntegrationTes
 
         var secondLoginCommand = new LoginCommand(
             CommandHelper.Registration21ThCommand().Nickname,
-            Password: "wrong password",
-            UserAgent: "Mozilla",
-            Ip: loginIp);
+            Password: "wrong password");
         
         var secondLoginResult = await MessengerModule.RequestAsync(secondLoginCommand, CancellationToken.None);
 

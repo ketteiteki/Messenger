@@ -14,8 +14,6 @@ public static class MessengerServices
 		string messengerBlobAccess,
 		string messengerBlobUrl)
 	{
-		serviceCollection.AddJwtGeneratorServices();
-
 		serviceCollection.AddPasswordHashServices();
 		
 		serviceCollection.AddSingleton<IBaseDirService, BaseDirService>(_ => new BaseDirService());
@@ -26,7 +24,9 @@ public static class MessengerServices
 		
 		serviceCollection.AddSingleton(_ => blobServiceClient);
 
-		serviceCollection.AddSingleton(_ => new MemoryCache(new MemoryCacheOptions()));
+		serviceCollection.AddSingleton<IMemoryCache>(_ => new MemoryCache(new MemoryCacheOptions()));
+
+		serviceCollection.AddSingleton<IClaimsService, ClaimsService>();
 		
 		serviceCollection.AddSingleton<IBlobServiceSettings, BlobServiceSettings>(_ => blobServiceSettings);
 

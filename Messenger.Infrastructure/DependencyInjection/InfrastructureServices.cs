@@ -9,9 +9,9 @@ public static class InfrastructureServices
 {
 	public static IServiceCollection AddInfrastructureServices(
 		this IServiceCollection serviceCollection, 
-		string sighKey)
+		int cookieExpireTimeSpan)
 	{
-		serviceCollection.AddAppAuthentication(sighKey);
+		serviceCollection.AddAppAuthentication(cookieExpireTimeSpan);
 
 		serviceCollection.AddAppAuthorization();
 		

@@ -3,6 +3,7 @@ using System;
 using Messenger.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Messenger.Services.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20230528063208_AddUserSessionEntity")]
+    partial class AddUserSessionEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -267,56 +269,56 @@ namespace Messenger.Services.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("8f2e54bc-4eec-47d6-a2cb-44fb435a77c7"),
+                            Id = new Guid("4cff8d01-0cd3-40bd-81d1-7039bf99a4ac"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 5, 31, 5, 1, 36, 401, DateTimeKind.Utc).AddTicks(9800),
+                            DateOfCreate = new DateTime(2023, 5, 28, 6, 32, 7, 789, DateTimeKind.Utc).AddTicks(3960),
                             IsEdit = false,
                             OwnerId = new Guid("a85825ba-f99b-4177-a858-96384303ea14"),
                             Text = "привет, какие книжки почитать?"
                         },
                         new
                         {
-                            Id = new Guid("ef65d839-fbe4-4775-b3d2-229ce23c3324"),
+                            Id = new Guid("f4451ec9-f2c6-4c92-9b4a-1c3caadfc8a4"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 5, 31, 5, 1, 36, 402, DateTimeKind.Utc).AddTicks(368),
+                            DateOfCreate = new DateTime(2023, 5, 28, 6, 32, 7, 789, DateTimeKind.Utc).AddTicks(4593),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
-                            ReplyToMessageId = new Guid("8f2e54bc-4eec-47d6-a2cb-44fb435a77c7"),
+                            ReplyToMessageId = new Guid("4cff8d01-0cd3-40bd-81d1-7039bf99a4ac"),
                             Text = "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться..."
                         },
                         new
                         {
-                            Id = new Guid("dd5bfabd-9982-4995-ba70-20c55643a5ab"),
+                            Id = new Guid("eb52fc3b-4e5d-4a81-9c72-43e96a1929d8"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 5, 31, 5, 1, 36, 402, DateTimeKind.Utc).AddTicks(765),
+                            DateOfCreate = new DateTime(2023, 5, 28, 6, 32, 7, 789, DateTimeKind.Utc).AddTicks(5043),
                             IsEdit = false,
                             OwnerId = new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"),
-                            ReplyToMessageId = new Guid("ef65d839-fbe4-4775-b3d2-229ce23c3324"),
+                            ReplyToMessageId = new Guid("f4451ec9-f2c6-4c92-9b4a-1c3caadfc8a4"),
                             Text = "ладно"
                         },
                         new
                         {
-                            Id = new Guid("fe3c2f65-41fc-42a4-903b-52fa3ea1076b"),
+                            Id = new Guid("bb4ab11a-96d4-4504-af65-30720ab90d47"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 5, 31, 5, 1, 36, 402, DateTimeKind.Utc).AddTicks(1153),
+                            DateOfCreate = new DateTime(2023, 5, 28, 6, 32, 7, 789, DateTimeKind.Utc).AddTicks(5458),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "ага"
                         },
                         new
                         {
-                            Id = new Guid("ef0be2a3-74c0-4e82-b56c-562b15440701"),
+                            Id = new Guid("7d052a40-df26-457e-9b4c-2a512b473aa3"),
                             ChatId = new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"),
-                            DateOfCreate = new DateTime(2023, 5, 31, 5, 1, 36, 402, DateTimeKind.Utc).AddTicks(1586),
+                            DateOfCreate = new DateTime(2023, 5, 28, 6, 32, 7, 789, DateTimeKind.Utc).AddTicks(5911),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "привет"
                         },
                         new
                         {
-                            Id = new Guid("1bbb3da1-da30-499e-a866-190d22ab4590"),
+                            Id = new Guid("01348a5c-4807-43f0-874b-fb39f0575f68"),
                             ChatId = new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"),
-                            DateOfCreate = new DateTime(2023, 5, 31, 5, 1, 36, 402, DateTimeKind.Utc).AddTicks(1967),
+                            DateOfCreate = new DateTime(2023, 5, 28, 6, 32, 7, 789, DateTimeKind.Utc).AddTicks(6318),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "привет, как дела?"
@@ -440,9 +442,6 @@ namespace Messenger.Services.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset>("DateOfLastAccess")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset>("ExpiresAt")

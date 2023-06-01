@@ -6,7 +6,5 @@ namespace Messenger.BusinessLogic.ApiCommands.Auth;
 
 public record LoginCommand(
 		string Nickname,
-		string Password,
-		string Ip,
-		string UserAgent) 
+		string Password) 
 	: IRequest<Result<AuthorizationResponse>>;
