@@ -1,6 +1,7 @@
 using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.ApiCommands.Auth;
+using Messenger.BusinessLogic.ApiQueries.Auth;
 using Messenger.BusinessLogic.Models.Requests;
 using Messenger.BusinessLogic.Models.Responses;
 using Messenger.BusinessLogic.Responses.Abstractions;

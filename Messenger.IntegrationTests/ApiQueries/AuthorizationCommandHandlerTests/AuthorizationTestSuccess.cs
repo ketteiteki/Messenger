@@ -1,10 +1,10 @@
 using FluentAssertions;
-using Messenger.BusinessLogic.ApiCommands.Auth;
+using Messenger.BusinessLogic.ApiQueries.Auth;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
 
-namespace Messenger.IntegrationTests.ApiCommands.AuthorizationCommandHandlerTests;
+namespace Messenger.IntegrationTests.ApiQueries.AuthorizationCommandHandlerTests;
 
 public class AuthorizationTestSuccess : IntegrationTestBase, IIntegrationTest
 {

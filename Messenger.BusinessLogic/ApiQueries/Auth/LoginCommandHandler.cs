@@ -5,7 +5,7 @@ using Messenger.BusinessLogic.Responses;
 using Messenger.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace Messenger.BusinessLogic.ApiCommands.Auth;
+namespace Messenger.BusinessLogic.ApiQueries.Auth;
 
 public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<AuthorizationResponse>>
 {
@@ -38,8 +38,6 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<Authoriz
 		{
 			return new Result<AuthorizationResponse>(new AuthenticationError("Password is wrong"));
 		}
-		
-		await _context.SaveChangesAsync(cancellationToken);
 		
 		var avatarLink = requester.AvatarFileName != null
 			? $"{_blobServiceSettings.MessengerBlobAccess}/{requester.AvatarFileName}"

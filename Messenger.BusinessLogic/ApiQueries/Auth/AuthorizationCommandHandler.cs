@@ -5,7 +5,7 @@ using Messenger.BusinessLogic.Responses;
 using Messenger.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace Messenger.BusinessLogic.ApiCommands.Auth;
+namespace Messenger.BusinessLogic.ApiQueries.Auth;
 
 public class AuthorizationCommandHandler : IRequestHandler<AuthorizationCommand, Result<AuthorizationResponse>>
 {
