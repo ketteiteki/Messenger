@@ -11,7 +11,6 @@ import { currentChatState } from "../../state/CurrentChatState";
 import { blackCoverState } from "../../state/BlackCoverState";
 import ModalWindowEntity from "../../models/entities/ModalWindowEntity";
 import { useNavigate } from "react-router-dom";
-import TokenService from "../../services/messenger/TokenService";
 import RouteConstants from "../../constants/RouteConstants";
 
 interface IProfileInfoBurgerMenuProps {
@@ -35,8 +34,7 @@ const ProfileInfoBurgerMenu = observer(({ x, y, setShowMenu, setUpdateMode }: IP
       const text = "Do you want to log out?";
 
       const okFun = async () => {
-        TokenService.deleteLocalAccessToken();
-        TokenService.deleteLocalRefreshToken();
+        
         return navigate(RouteConstants.Login, { replace: true });
       };
 

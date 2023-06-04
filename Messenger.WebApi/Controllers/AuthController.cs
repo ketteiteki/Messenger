@@ -2,8 +2,10 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.ApiCommands.Auth;
 using Messenger.BusinessLogic.ApiQueries.Auth;
+using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Models.Requests;
 using Messenger.BusinessLogic.Models.Responses;
+using Messenger.BusinessLogic.Responses;
 using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
 using Messenger.WebApi.Extensions;
@@ -26,7 +28,21 @@ public class AuthController : ControllerBase
 		_mediator = mediator;
 		_claimsService = claimsService;
 	}
-	
+
+	[ProducesResponseType(typeof(List<UserSessionDto>), StatusCodes.Status200OK)]
+	[Authorize]
+	[HttpGet("sessions")]
+	public async Task<IActionResult> GetSessions(CancellationToken cancellationToken)
+	{
+		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
+
+		var query = new GetSessionsQuery(requesterId);
+
+		var result = await _mediator.Send(query, cancellationToken);
+
+		return result.ToActionResult();
+	}
+
 	[ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(typeof(AuthorizationResponse), StatusCodes.Status200OK)]
 	[Authorize]
@@ -51,7 +67,6 @@ public class AuthController : ControllerBase
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status401Unauthorized)]
-	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(AuthorizationResponse), StatusCodes.Status200OK)]
 	[HttpPost("registration")]
 	public async Task<IActionResult> Registration(
@@ -119,11 +134,26 @@ public class AuthController : ControllerBase
 		return result.ToActionResult();
 	}
 	
-	[ProducesResponseType(typeof(AuthorizationResponse), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status200OK)]
 	[HttpPost("logout")]
 	public async Task<IActionResult> Logout()
 	{
 		await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 		return Ok();
+	}
+
+	[ProducesResponseType(typeof(DbEntityNotFoundError), StatusCodes.Status404NotFound)]
+	[ProducesResponseType(typeof(UserSessionDto), StatusCodes.Status404NotFound)]
+	[Authorize]
+	[HttpDelete("sessions/{sessionId:guid}")]
+	public async Task<IActionResult> TerminateSession(Guid sessionId, CancellationToken cancellationToken)
+	{
+		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
+
+		var command = new TerminateSessionCommand(requesterId, sessionId);
+
+		var result = await _mediator.Send(command, cancellationToken);
+
+		return result.ToActionResult();
 	}
 }

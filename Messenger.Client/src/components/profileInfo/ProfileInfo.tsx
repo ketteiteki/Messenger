@@ -17,7 +17,6 @@ import { blackCoverState } from "../../state/BlackCoverState";
 import { motion } from "framer-motion";
 import { ChatType } from "../../models/enum/ChatType";
 import { currentChatState } from "../../state/CurrentChatState";
-import TokenService from "../../services/messenger/TokenService";
 import { useNavigate } from "react-router-dom";
 import RouteConstants from "../../constants/RouteConstants";
 
@@ -95,8 +94,6 @@ const ProfileInfo = observer(() => {
       await sessionsState.delDeleteSessionAsync(sessionId);
 
       if (sessionId === authorizationState.data?.currentSessionId) {
-        TokenService.deleteLocalAccessToken();
-        TokenService.deleteLocalRefreshToken();
         return navigate(RouteConstants.Login, { replace: true });
       }
     } catch (error: any) {

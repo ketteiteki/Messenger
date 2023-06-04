@@ -11,9 +11,8 @@ public static class AppAuthenticationDependencyInjection
             .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(expireTimeSpan);
                 options.Cookie.IsEssential = true;
-                options.Cookie.MaxAge = TimeSpan.FromDays(3);
+                options.Cookie.MaxAge = TimeSpan.MaxValue;
             });
         
         return serviceCollection;

@@ -1,8 +1,6 @@
 
 
 export default interface IAuthorizationResponse {
-    accessToken: string;
-    refreshToken: string;
     id: string;
     displayName: string;
     nickname: string;

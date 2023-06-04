@@ -2,12 +2,9 @@ import { makeAutoObservable, runInAction } from "mobx";
 import IAuthorizationResponse from "../models/interfaces/IAuthorizationResponse";
 import AuthorizationApi from "../services/api/AuthorizationApi";
 import ProfileApi from "../services/api/ProfileAPI";
-import TokenService from "../services/messenger/TokenService";
 
 class AuthorizationState {
   public data: IAuthorizationResponse | null = null;
-  public countFailRefresh: number = 0;
-  public isRefreshFail: boolean = false;
 
   constructor() {
     makeAutoObservable(
@@ -23,18 +20,6 @@ class AuthorizationState {
     this.data = null;
   };
 
-  public incrementCountFailRefresh = () => {
-    this.countFailRefresh++;
-  }
-
-  public resetCountFailRefresh = () => {
-    this.countFailRefresh = 0;
-  }
-
-  public setIsRefreshFail = () => {
-    this.isRefreshFail = true;
-  }
-
   //api
   public getAuthorizationAsync = async () => {
     const response = await AuthorizationApi.getAuthorizationAsync();
@@ -42,8 +27,6 @@ class AuthorizationState {
     if (response.status === 200) {
       runInAction(() => {
         this.data = response.data;
-        TokenService.setLocalAccessToken(response.data.accessToken!);
-        TokenService.setLocalRefreshToken(response.data.refreshToken);
       });
     }
 
@@ -64,8 +47,6 @@ class AuthorizationState {
     if (response.status === 200) {
       runInAction(() => {
         this.data = response.data;
-        TokenService.setLocalAccessToken(response.data.accessToken!);
-        TokenService.setLocalRefreshToken(response.data.refreshToken);
       });
     }
 
@@ -78,8 +59,6 @@ class AuthorizationState {
     if (response.status === 200) {
       runInAction(() => {
         this.data = response.data;
-        TokenService.setLocalAccessToken(response.data.accessToken!);
-        TokenService.setLocalRefreshToken(response.data.refreshToken);
       });
     }
 

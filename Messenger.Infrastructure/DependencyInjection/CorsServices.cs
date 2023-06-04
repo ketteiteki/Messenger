@@ -11,9 +11,11 @@ public static class CorsServices
         {
             options.AddPolicy(policyName, builder =>
             {
-                builder.WithOrigins(allowOrigins)
+                builder
+                    .WithOrigins("http://localhost:3000", "https://localhost:7400")
                     .AllowAnyMethod()
-                    .AllowAnyHeader();
+                    .AllowAnyHeader()
+                    .AllowCredentials();
             });
         });
 

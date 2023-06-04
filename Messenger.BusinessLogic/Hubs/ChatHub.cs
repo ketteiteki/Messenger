@@ -1,20 +1,18 @@
 using Messenger.Domain.Constants;
 using Messenger.Persistence;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Messenger.BusinessLogic.Hubs;
 
-[Authorize]
 public class ChatHub : Hub<IChatHub>
 {
     private readonly DatabaseContext _context;
-    private readonly MemoryCache _memoryCache;
+    private readonly IMemoryCache _memoryCache;
     private readonly MemoryCacheEntryOptions _memoryCacheEntryOptions;
     
-    public ChatHub(DatabaseContext context, MemoryCache memoryCache)
+    public ChatHub(DatabaseContext context, IMemoryCache memoryCache)
     {
         _context = context;
         _memoryCache = memoryCache;

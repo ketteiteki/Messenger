@@ -87,7 +87,7 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
         alt=""
       />
       <div className={styles.container}>
-        <p className={styles.chatName}>
+        <span className={styles.chatName}>
           {
             props.chat.type === ChatType.Conversation ? <ConversationLogoSvg className={styles.conversationLogoSvg} width={15} /> :
               props.chat.type === ChatType.Channel ? <ChannelLogoSvg className={styles.conversationLogoSvg} width={14} /> : ""
@@ -101,7 +101,7 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
                 : props.chat.title
             }
           </p>
-        </p>
+        </span>
         <p className={styles.lastMessage}>
           {
             props.chat.type === ChatType.Channel ?

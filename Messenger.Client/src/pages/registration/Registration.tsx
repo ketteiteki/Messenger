@@ -3,7 +3,6 @@ import { observer } from "mobx-react-lite";
 import styles from "./Registration.module.scss";
 import { authorizationState } from "../../state/AuthorizationState";
 import { useNavigate, Link } from "react-router-dom";
-import TokenService from "../../services/messenger/TokenService";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
 import { sessionsState } from "../../state/SessionsState";
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
@@ -19,8 +18,6 @@ const Registration = observer(() => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    TokenService.deleteLocalAccessToken();
-    TokenService.deleteLocalRefreshToken();
     authorizationState.clearAuthorizationData();
     chatListWithMessagesState.clearChatListWithMessagesData();
     currentChatState.clearChatAndMessages();

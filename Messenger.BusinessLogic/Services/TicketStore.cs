@@ -29,7 +29,8 @@ public class TicketStore : ITicketStore
         _cookieExpireTimeSpan = cookieExpireTimeSpan;
 
         _memoryCacheEntryOptions = new MemoryCacheEntryOptions()
-            .SetSlidingExpiration(TimeSpan.FromSeconds(15));
+            .SetSlidingExpiration(TimeSpan.FromSeconds(15))
+            .SetAbsoluteExpiration(TimeSpan.FromSeconds(100));
     }
     
     public async Task<string> StoreAsync(AuthenticationTicket ticket)
@@ -38,13 +39,6 @@ public class TicketStore : ITicketStore
         var sessionId = ticket.Principal.Claims.First(x => x.Type == ClaimConstants.SessionId).Value;
       
         var userSession = await _context.UserSessions.FirstOrDefaultAsync(x => x.Id == new Guid(sessionId));
-
-        var ticketExpiresUtc = ticket.Properties.ExpiresUtc;
-        
-        if (ticketExpiresUtc.HasValue == false)
-        {
-            throw new StoreException("Ticket ExpiresUtc value does not exist");
-        }
 
         if (userSession != null)
         {
@@ -61,7 +55,7 @@ public class TicketStore : ITicketStore
             var serializedTicket = _ticketSerializer.Serialize(ticket);
             
             var newUserSession = 
-                new UserSessionEntity(new Guid(sessionId), new Guid(userId), ticketExpiresUtc.Value, serializedTicket);
+                new UserSessionEntity(new Guid(sessionId), new Guid(userId), DateTimeOffset.UtcNow.AddMinutes(_cookieExpireTimeSpan), serializedTicket);
 
             _context.UserSessions.Add(newUserSession);
             await _context.SaveChangesAsync();
@@ -111,7 +105,7 @@ public class TicketStore : ITicketStore
         _context.UserSessions.Update(userSession);
         await _context.SaveChangesAsync();
 
-        _memoryCache.Set(key, deserializedTicket);
+        _memoryCache.Set(key, deserializedTicket, _memoryCacheEntryOptions);
         
         return deserializedTicket;
     }

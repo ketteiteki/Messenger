@@ -18,42 +18,26 @@ import IChatDto from "../../models/interfaces/IChatDto";
 import { currentChatState } from "../../state/CurrentChatState";
 import ModalWindow from "../../components/modalWindow/ModalWindow";
 import RouteConstants from "../../constants/RouteConstants";
-import TokenService from "../../services/messenger/TokenService";
 
 const Layout = observer(() => {
   const navigate = useNavigate();
 
-  const authorizationStateCountFailRefresh = authorizationState.countFailRefresh;
-
   useEffect(() => {
-    if (authorizationState.isRefreshFail) {
-      // authorizationState.resetCountFailRefresh();
-      return navigate(RouteConstants.Login, { replace: true });
-    }
-
-  }, [authorizationState.isRefreshFail]);
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem("AuthorizationToken");
     const fun = async () => {
-      if (accessToken == null) {
-        return navigate(RouteConstants.Registration, { replace: true });
+
+      const authorizationResponse = await authorizationState.getAuthorizationAsync().catch((e) => {});
+
+      if (!authorizationResponse || authorizationResponse.status !== 200) {
+        return navigate(RouteConstants.Login, { replace: true });
       }
-
-      const authorizationResponse = await authorizationState.getAuthorizationAsync();
-
-      if (authorizationResponse.status !== 200) {
-        return navigate(RouteConstants.Registration, { replace: true });
-      }
-
-      TokenService.setLocalAccessToken(authorizationResponse.data.accessToken);
-      TokenService.setLocalRefreshToken(authorizationResponse.data.refreshToken);
 
       const response = await chatListWithMessagesState.getChatListAsync();
 
-      signalRConfiguration.buildConnection(authorizationResponse.data.accessToken);
+      signalRConfiguration.buildConnection();
 
       if (!signalRConfiguration.connection) return;
+      if (authorizationResponse === null) return;
+
       signalRConfiguration.connection.on(SignalRMethodsName.BroadcastMessageAsync, (message: IMessageDto) => {
         if (message.ownerId === authorizationResponse.data.id) return;
 
