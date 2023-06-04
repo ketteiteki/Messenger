@@ -22,124 +22,117 @@ interface IProfileInfoBurgerMenuProps {
 }
 
 const ProfileInfoBurgerMenu = observer(({ x, y, setShowMenu, setUpdateMode }: IProfileInfoBurgerMenuProps) => {
-    const [xMousePosition] = useState<number>(x - 100);
-    const [yMousePosition] = useState<number>(y);
+  const [xMousePosition] = useState<number>(x - 100);
+  const [yMousePosition] = useState<number>(y);
 
-    const authorizationId = authorizationState.data?.id;
+  const authorizationId = authorizationState.data?.id;
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const onClickLogoutHandler = () => {
+  const onClickLogoutHandler = () => {
 
-      const text = "Do you want to log out?";
+    const text = "Do you want to log out?";
 
-      const okFun = async () => {
-        
-        return navigate(RouteConstants.Login, { replace: true });
-      };
+    const okFun = async () => {
 
-      const modalWindowEntity = new ModalWindowEntity(text, okFun, blackCoverState.closeBlackCover);
-
-      blackCoverState.setModalWindow(modalWindowEntity);
+      return navigate(RouteConstants.Login, { replace: true });
     };
 
-    const onClickDeleteProfileHandler = async () => {
-      const text = "Do you want to delete your account?";
+    const modalWindowEntity = new ModalWindowEntity(text, okFun, blackCoverState.closeBlackCover);
 
-      const okFun = async () => {
-        try {
-          await currentProfileState.delDeleteProfileAsync();
-          return navigate(RouteConstants.Registration, { replace: true });
-        } catch (error: any) {
-            if (error.response.status !== 401) {
-                alert(error.response.data.message);
-            }
-        }
-      };
+    blackCoverState.setModalWindow(modalWindowEntity);
+  };
 
-      const modalWindowEntity = new ModalWindowEntity(text, okFun, blackCoverState.closeBlackCover);
+  const onClickDeleteProfileHandler = async () => {
+    const text = "Do you want to delete your account?";
 
-      blackCoverState.setModalWindow(modalWindowEntity);
+    const okFun = async () => {
+      await currentProfileState
+        .delDeleteProfileAsync()
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
+
+      return navigate(RouteConstants.Registration, { replace: true });
     };
 
-    const deleteDialogHandler = async () => {
-      const text = "Do you want to delete the dialog?";
+    const modalWindowEntity = new ModalWindowEntity(text, okFun, blackCoverState.closeBlackCover);
 
-      const okFun = async () => {
-        if (!authorizationId || !currentChatState)
-          return;
+    blackCoverState.setModalWindow(modalWindowEntity);
+  };
 
-        const chatId = chatListWithMessagesState.data.find((x) =>
-          x.chat.members.find((m) => m.id !== authorizationId)?.id ===
-          currentProfileState.date?.id
-        )?.chat.id;
+  const deleteDialogHandler = async () => {
+    const text = "Do you want to delete the dialog?";
 
-        if (chatId) {
-          try {
-            await chatListWithMessagesState.delDeleteDialogAsync(chatId, true);
-          } catch (error: any) {
-              if (error.response.status !== 401) {
-                  alert(error.response.data.message);
-              }
-          }
+    const okFun = async () => {
+      if (!authorizationId || !currentChatState)
+        return;
 
-          currentProfileState.setProfileNull();
-          currentChatState.setChatAndMessagesNull();
-        }
-      };
+      const chatId = chatListWithMessagesState.data.find((x) =>
+        x.chat.members.find((m) => m.id !== authorizationId)?.id ===
+        currentProfileState.date?.id
+      )?.chat.id;
 
-      const modalWindowEntity = new ModalWindowEntity(text, okFun, blackCoverState.closeBlackCover);
+      if (chatId) {
+        await chatListWithMessagesState
+          .delDeleteDialogAsync(chatId, true)
+          .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
-      blackCoverState.setModalWindow(modalWindowEntity);
+        currentProfileState.setProfileNull();
+        currentChatState.setChatAndMessagesNull();
+      }
     };
 
-    return (
-      <div
-        className={styles.profileInfoBurgerMenu}
-        style={{ left: `${xMousePosition + 5}px`, top: `${yMousePosition - 5}px` }}
-        onMouseLeave={() => setShowMenu(false)}
-      >
-        {
-          currentProfileState.date?.id === authorizationState.data?.id ||
-            !currentProfileState.date ? (
-            <>
-              <button
-                className={styles.editAccountButton}
-                onClick={() => setUpdateMode(true)}
-              >
-                <EditSvg width={20} />
-                <p>Edit</p>
-              </button>
-              <button
-                className={styles.deleteButton}
-                onClick={onClickLogoutHandler}
-              >
-                <SearchSvg width={20} />
-                <p>Logout</p>
-              </button>
-              <button
-                className={styles.deleteButton}
-                onClick={onClickDeleteProfileHandler}
-              >
-                <TrashBinSvg width={20} />
-                <p>Delete</p>
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                className={styles.deleteButton}
-                onClick={deleteDialogHandler}
-              >
-                <TrashBinSvg width={20} />
-                <p>Delete</p>
-              </button>
-            </>
-          )
-        }
-      </div>
-    );
-  }
+    const modalWindowEntity = new ModalWindowEntity(text, okFun, blackCoverState.closeBlackCover);
+
+    blackCoverState.setModalWindow(modalWindowEntity);
+  };
+
+  return (
+    <div
+      className={styles.profileInfoBurgerMenu}
+      style={{ left: `${xMousePosition + 5}px`, top: `${yMousePosition - 5}px` }}
+      onMouseLeave={() => setShowMenu(false)}
+    >
+      {
+        currentProfileState.date?.id === authorizationState.data?.id ||
+          !currentProfileState.date ? (
+          <>
+            <button
+              className={styles.editAccountButton}
+              onClick={() => setUpdateMode(true)}
+            >
+              <EditSvg width={20} />
+              <p>Edit</p>
+            </button>
+            <button
+              className={styles.deleteButton}
+              onClick={onClickLogoutHandler}
+            >
+              <SearchSvg width={20} />
+              <p>Logout</p>
+            </button>
+            <button
+              className={styles.deleteButton}
+              onClick={onClickDeleteProfileHandler}
+            >
+              <TrashBinSvg width={20} />
+              <p>Delete</p>
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              className={styles.deleteButton}
+              onClick={deleteDialogHandler}
+            >
+              <TrashBinSvg width={20} />
+              <p>Delete</p>
+            </button>
+          </>
+        )
+      }
+    </div>
+  );
+}
 );
 
 export default ProfileInfoBurgerMenu;

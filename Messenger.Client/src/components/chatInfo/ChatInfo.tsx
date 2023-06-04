@@ -48,13 +48,9 @@ const ChatInfo = observer(() => {
 
   const onClickLeaveChatHandler = async () => {
     if (currentChatStateChat) {
-      try {
-        await chatListWithMessagesState.postLeaveFromChatAsync(currentChatStateChat.id)
-      } catch (error: any) {
-        if (error.response.status !== 401) {
-          alert(error.response.data.message);
-        }
-      }
+      await chatListWithMessagesState
+        .postLeaveFromChatAsync(currentChatStateChat.id)
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     }
 
     currentChatState.setChatAndMessagesNull();
@@ -65,20 +61,14 @@ const ChatInfo = observer(() => {
   const updateChatHandler = async () => {
     const currentChatId = currentChatState.chat?.id;
 
-    try {
-      const response = await chatListWithMessagesState.putUpdateChatDataAsync(
-        currentChatId ?? "",
-        inputName ?? "",
-        inputTitle ?? ""
-      );
+    const response = await chatListWithMessagesState.putUpdateChatDataAsync(
+      currentChatId ?? "",
+      inputName ?? "",
+      inputTitle ?? ""
+    ).catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });;
 
-      if (response.status === 200) {
-        currentChatState.updateChatByChat(response.data);
-      }
-    } catch (error: any) {
-      if (error.response.status !== 401) {
-        alert(error.response.data.message);
-      }
+    if (response && response.status === 200) {
+      currentChatState.updateChatByChat(response.data);
     }
 
     setUpdateMode(false);
@@ -91,13 +81,9 @@ const ChatInfo = observer(() => {
     if (!currentChatId) return;
 
     if (files && files.length > 0) {
-      try {
-        await chatListWithMessagesState.putUpdateChatAvatarAsync(currentChatId, files[0]);
-      } catch (error: any) {
-        if (error.response.status !== 401) {
-          alert(error.response.data.message);
-        }
-      }
+      await chatListWithMessagesState
+        .putUpdateChatAvatarAsync(currentChatId, files[0])
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     }
   };
 
@@ -105,13 +91,10 @@ const ChatInfo = observer(() => {
 
     if (!currentChatId || !currentChatStateChat) return;
 
-    try {
-      await currentChatState.postJoinToChatAsync(currentChatId);
-    } catch (error: any) {
-      if (error.response.status !== 401) {
-        alert(error.response.data.message);
-      }
-    }
+
+    await currentChatState
+      .postJoinToChatAsync(currentChatId)
+      .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
     chatListWithMessagesState.setSearchInput("");
     chatListWithMessagesState.addChatInData(currentChatStateChat, currentChatState.messages)
@@ -130,13 +113,9 @@ const ChatInfo = observer(() => {
       return navigate(RouteConstants.Layout, { replace: true });
     }
 
-    try {
-      await currentProfileState.getUserAsync(userId);
-    } catch (error: any) {
-      if (error.response.status !== 401) {
-        alert(error.response.data.message);
-      }
-    }
+    await currentProfileState
+      .getUserAsync(userId)
+      .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
     return navigate(RouteConstants.Layout, { replace: true });
   };
@@ -147,13 +126,9 @@ const ChatInfo = observer(() => {
     setShowMemberList(!showMemberList);
 
     if (currentChatStateChat.members.length === 0) {
-      try {
-        await currentChatState.getUserListByChatAsync(currentChatStateChat.id, memberListBaseCount, 1);
-      } catch (error: any) {
-        if (error.response.status !== 401) {
-          alert(error.response.data.message);
-        }
-      }
+      await currentChatState
+        .getUserListByChatAsync(currentChatStateChat.id, memberListBaseCount, 1)
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     }
   };
 
@@ -165,14 +140,11 @@ const ChatInfo = observer(() => {
     if (memberListElement.scrollHeight - memberListElement.scrollTop === memberListElement.clientHeight) {
       if (!currentChatId) return;
 
-      try {
-        var response = await currentChatState.getUserListByChatAsync(currentChatStateChat.id, memberListBaseCount, memberListPage);
-        if (response.data.length === 0) return;
-      } catch (error: any) {
-        if (error.response.status !== 401) {
-          alert(error.response.data.message);
-        }
-      }
+      var response = await currentChatState
+        .getUserListByChatAsync(currentChatStateChat.id, memberListBaseCount, memberListPage)
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
+
+      if (response && response.data.length === 0) return;
 
       setMemberListPage(memberListPage + 1);
       currentChatState.setMemberListPage(memberListPage + 1);
@@ -297,7 +269,7 @@ const ChatInfo = observer(() => {
               <motion.div
                 initial={{ opacity: 0.7 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: .1 }}
+                transition={{ type: "Inertia", duration: .15 }}
                 className={styles.memberItem} key={i.id}
                 onClick={() => showProfileByMessage(i.id)}>
                 <img

@@ -51,13 +51,9 @@ const Message = observer((props: IMessageDto) => {
       return navigate(RouteConstants.Layout, { replace: true });
     }
 
-    try {
-      await currentProfileState.getUserAsync(props.ownerId);
-    } catch (error: any) {
-      if (error.response.status !== 401) {
-        alert(error.response.data.message);
-      }
-    }
+    await currentProfileState
+      .getUserAsync(props.ownerId)
+      .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
     return navigate(RouteConstants.Layout, { replace: true });
   };
@@ -81,9 +77,9 @@ const Message = observer((props: IMessageDto) => {
         isMessageMine ? (
           <>
             <motion.div
-              initial={{ opacity: 0.7 }}
+              initial={{ opacity: .5 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: .1 }}
+              transition={{ type: "Inertia", duration: .2 }}
               className={styles.myMessage}
               onContextMenu={showMenuHandler}
               onMouseMove={MouseMoveHandler}
@@ -134,10 +130,10 @@ const Message = observer((props: IMessageDto) => {
                   {
                     props.attachments.map(x =>
                       <img className={styles.messageAttachment}
-                           onClick={() => onClickOpenFullSizeAvatar(x.link)}
-                           src={x.link}
-                           key={x.id}
-                           alt="" />)
+                        onClick={() => onClickOpenFullSizeAvatar(x.link)}
+                        src={x.link}
+                        key={x.id}
+                        alt="" />)
                   }
                 </div>}
                 <p className={styles.myText}>{props.text}</p>
@@ -160,13 +156,14 @@ const Message = observer((props: IMessageDto) => {
           <motion.div
             initial={{ opacity: .5 }}
             animate={{ opacity: 1 }}
+            transition={{ type: "Inertia", duration: .2 }}
             className={styles.message}
             onContextMenu={showMenuHandler}
             onMouseMove={MouseMoveHandler}
           >
             {
               ((showMenu && isCurrentChatChannel && isCurrentChatMine) ||
-              (showMenu && !isCurrentChatChannel)) && (
+                (showMenu && !isCurrentChatChannel)) && (
                 <MessageBurgerMenu
                   x={xMousePosition}
                   y={yMousePosition}

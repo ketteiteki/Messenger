@@ -44,23 +44,19 @@ const CreateChat = observer(() => {
     setFile(null);
     setBlobUrlFile(null);
 
-    try {
-      const response = await chatListWithMessagesState.postCreateChatAsync(
-        inputNameConst,
-        inputTitleConst,
-        selectChatTypeValueConst,
-        fileConst ?? null
-      );
+    const response = await chatListWithMessagesState.postCreateChatAsync(
+      inputNameConst,
+      inputTitleConst,
+      selectChatTypeValueConst,
+      fileConst ?? null
+    ).catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
-      await signalRConfiguration.connection?.invoke(
-        SignalRMethodsName.JoinChat,
-        response.data.id
-      );
-    } catch (error: any) {
-      if (error.response.status !== 401) {
-        alert(error.response.data.message);
-      }
-    }
+    if (!response) return;
+
+    await signalRConfiguration.connection?.invoke(
+      SignalRMethodsName.JoinChat,
+      response.data.id
+    );
   };
 
   return (
@@ -68,6 +64,7 @@ const CreateChat = observer(() => {
       <motion.div
         initial={{ y: -5 }}
         animate={{ y: 0 }}
+        transition={{ type: "Inertia", duration: .2 }}
         className={styles.avatarContainer}>
         <label htmlFor="avatar" className={styles.avatarBlackCover} />
         <input
@@ -78,7 +75,7 @@ const CreateChat = observer(() => {
           name="avatar"
           accept="image/jpeg"
         />
-        <img className={styles.avatar} src={blobUrlFile?.toString() || nonAvatar}  alt={"avatar"}/>
+        <img className={styles.avatar} src={blobUrlFile?.toString() || nonAvatar} alt={"avatar"} />
       </motion.div>
       <div className={styles.createChatContainer}>
         <input

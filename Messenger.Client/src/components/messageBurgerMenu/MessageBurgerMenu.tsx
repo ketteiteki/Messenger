@@ -58,13 +58,9 @@ const MessageBurgerMenu = observer(
     };
 
     const deleteMessage = async () => {
-      try {
-        await chatListWithMessagesState.delDeleteMessageAsync(chatId, messageId);
-      } catch (error: any) {
-          if (error.response.status !== 401) {
-              alert(error.response.data.message);
-          }
-      }
+      await chatListWithMessagesState
+        .delDeleteMessageAsync(chatId, messageId)
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     }
 
     return (

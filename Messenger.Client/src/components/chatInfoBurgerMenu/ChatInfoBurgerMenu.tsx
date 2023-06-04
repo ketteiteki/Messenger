@@ -29,13 +29,9 @@ const ChatInfoBurgerMenu = observer(
       const text = "Are you sure you want to delete the chat?";
 
       const okFun = async () => {
-        try {
-          await chatListWithMessagesState.delDeleteChatAsync(currentChatState.chat?.id ?? "");
-        } catch (error: any) {
-            if (error.response.status !== 401) {
-                alert(error.response.data.message);
-            }
-        }
+        await chatListWithMessagesState
+          .delDeleteChatAsync(currentChatState.chat?.id ?? "")
+          .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
         currentChatState.setChatAndMessagesNull();
         return navigate(RouteConstants.Layout, { replace: true });

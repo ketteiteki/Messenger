@@ -40,18 +40,16 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
       editMessageState.setEditMessageNull();
     }
 
-    try {
-      if (props.messages.length === 0) {
-        await chatListWithMessagesState.getMessageListAsync(props.chat.id, null);
-      } else if (isInChatOnlyRealTimeMessages) {
-        if (!firstRealtimeMessage) return;
+    if (props.messages.length === 0) {
+      await chatListWithMessagesState
+        .getMessageListAsync(props.chat.id, null)
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
+    } else if (isInChatOnlyRealTimeMessages) {
+      if (!firstRealtimeMessage) return;
 
-        await chatListWithMessagesState.getMessageListAsync(props.chat.id, firstRealtimeMessage?.dateOfCreate);
-      }
-    } catch (error: any) {
-      if (error.response.status !== 401) {
-        alert(error.response.data.message);
-      }
+      await chatListWithMessagesState
+        .getMessageListAsync(props.chat.id, firstRealtimeMessage?.dateOfCreate)
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     }
 
     currentChatState.setChatAndMessages(props.chat, props.messages);
@@ -59,14 +57,10 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
     if (props.chat.type === ChatType.Dialog) {
       const interlocutorId = currentChatState.chat?.members.find(m => m.id !== authorizationState.data?.id)?.id;
 
-      try {
-        if (interlocutorId) {
-          await currentProfileState.getUserAsync(interlocutorId);
-        }
-      } catch (error: any) {
-        if (error.response.status !== 401) {
-          alert(error.response.data.message);
-        }
+      if (interlocutorId) {
+        await currentProfileState
+          .getUserAsync(interlocutorId)
+          .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
       }
 
       return navigate(RouteConstants.Layout, { replace: true });

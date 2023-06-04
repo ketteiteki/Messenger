@@ -41,7 +41,7 @@ const ProfileInfo = observer(() => {
   const [yMousePosition, setYMousePosition] = useState<number>(0);
 
   const currentProfileStateDate = currentProfileState.date;
-  const authorizationStateData =  authorizationState.data;
+  const authorizationStateData = authorizationState.data;
 
   const navigate = useNavigate();
 
@@ -61,17 +61,12 @@ const ProfileInfo = observer(() => {
   };
 
   const onClickUpdateProfileDateHandler = async () => {
-    try {
-      await authorizationState.putUpdateProfileAsync(
-        inputDisplayName,
-        inputNickname,
-        inputAdditionalData
-      );
-    } catch (error: any) {
-      if (error.response.status !== 401) {
-        alert(error.response.data.message);
-      }
-    }
+    await authorizationState.putUpdateProfileAsync(
+      inputDisplayName,
+      inputNickname,
+      inputAdditionalData
+    ).catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
+
     setUpdateMode(false);
   };
 
@@ -79,50 +74,40 @@ const ProfileInfo = observer(() => {
     SetShowSessions(!showSessions);
 
     if (sessionsState.data.length === 0) {
-      try {
-        await sessionsState.getSessionListAsync();
-      } catch (error: any) {
-        if (error.response.status !== 401) {
-          alert(error.response.data.message);
-        }
-      }
+      await sessionsState
+        .getSessionListAsync()
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     }
   };
 
   const deleteSessionHandler = async (sessionId: string) => {
-    try {
-      await sessionsState.delDeleteSessionAsync(sessionId);
+    await sessionsState
+      .delDeleteSessionAsync(sessionId)
+      .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
-      if (sessionId === authorizationState.data?.currentSessionId) {
-        return navigate(RouteConstants.Login, { replace: true });
-      }
-    } catch (error: any) {
-      if (error.response.status !== 401) {
-        alert(error.response.data.message);
-      }
+    if (sessionId === authorizationState.data?.currentSessionId) {
+      return navigate(RouteConstants.Login, { replace: true });
     }
   };
 
   const onClickStartChattingHandler = async () => {
     if (!currentProfileId) return;
 
-    try {
-      const response = await chatListWithMessagesState.postCreateDialogAsync(currentProfileId);
+    const response = await chatListWithMessagesState
+      .postCreateDialogAsync(currentProfileId)
+      .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
-      const dialogDataItem = chatListWithMessagesState.data.find(x => x.chat.id === response.data.id);
+    if (!response) return;
 
-      if (!dialogDataItem) return;
+    const dialogDataItem = chatListWithMessagesState.data.find(x => x.chat.id === response.data.id);
 
-      currentChatState.setChatAndMessages(dialogDataItem.chat, dialogDataItem.messages);
-      chatListWithMessagesState.pushChatOnTop(dialogDataItem.chat.id);
+    if (!dialogDataItem) return;
 
-      if (response.status === 200) {
-        await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, response.data.id);
-      }
-    } catch (error: any) {
-      if (error.response.status !== 401) {
-        alert(error.response.data.message);
-      }
+    currentChatState.setChatAndMessages(dialogDataItem.chat, dialogDataItem.messages);
+    chatListWithMessagesState.pushChatOnTop(dialogDataItem.chat.id);
+
+    if (response.status === 200) {
+      await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, response.data.id);
     }
   };
 
@@ -131,14 +116,10 @@ const ProfileInfo = observer(() => {
   ) => {
     const files = event.currentTarget.files;
 
-    try {
-      if (files && files.length > 0) {
-        await authorizationState.putUpdateProfileAvatarAsync(files[0]);
-      }
-    } catch (error: any) {
-      if (error.response.status !== 401) {
-        alert(error.response.data.message);
-      }
+    if (files && files.length > 0) {
+      await authorizationState
+        .putUpdateProfileAvatarAsync(files[0])
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     }
   };
 
@@ -205,7 +186,7 @@ const ProfileInfo = observer(() => {
               : authorizationState.data?.avatarLink || nonAvatar
           }
           onClick={onClickOpenFullSizeAvatar}
-         alt={"avatar"}/>
+          alt={"avatar"} />
       </div>
       {
         !updateMode && (
@@ -268,7 +249,7 @@ const ProfileInfo = observer(() => {
         (currentProfileState.date?.id === authorizationState.data?.id ||
           !currentProfileState.date) && (
           <button
-            className={styles.showMembersButton}
+            className={styles.showSessionsButton}
             onClick={() => setShowSessionsHandler()}
           >
             {showSessions ? "Hide" : "Show"} Sessions
@@ -283,14 +264,14 @@ const ProfileInfo = observer(() => {
                 <motion.div
                   initial={{ opacity: 0.7 }}
                   animate={{ opacity: 1 }}
-                  transition={{ duration: .1 }}
+                  transition={{ type: "Inertia", duration: .1 }}
                   className={i.id === authorizationState.data?.currentSessionId ?
                     styles.currentSessionItem :
                     styles.sessionItem}
                   key={i.id}
                 >
                   <div className={styles.sessionItemRemoveButton} onClick={() => deleteSessionHandler(i.id)}>
-                    <CrossSvg width={20} />
+                    <CrossSvg className={styles.crossSvg} width={20} />
                   </div>
                   <div className={styles.sessionItemContainer}>
                     <p className={styles.sessionId}>Id: {i.id}</p>

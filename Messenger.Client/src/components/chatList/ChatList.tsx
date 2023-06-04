@@ -19,18 +19,14 @@ const ChatList = observer(() => {
     useCallback(async (value) => {
       if (!value) return;
 
-      try {
-        const response = await chatListWithMessagesState.getChatListBySearchAsync(value);
+      const response = await chatListWithMessagesState
+        .getChatListBySearchAsync(value)
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
-        if (response.status === 200) {
-          response.data.forEach((c) => {
-            signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, c.id);
-          });
-        }
-      } catch (error: any) {
-          if (error.response.status !== 401) {
-              alert(error.response.data.message);
-          }
+      if (response && response.status === 200) {
+        response.data.forEach((c) => {
+          signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, c.id);
+        });
       }
     }, []),
     700,

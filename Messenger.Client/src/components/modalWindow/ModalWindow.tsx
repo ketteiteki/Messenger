@@ -7,7 +7,8 @@ const ModalWindow = observer(() => {
   const modelWindowEntity = blackCoverState.modalWindow;
 
   return (
-    <div className={styles.window}>
+    <div
+      className={styles.window}>
       <div className={styles.textContainer}>
         <p className={styles.text}>
           {

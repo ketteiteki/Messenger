@@ -123,18 +123,19 @@
   }
 }
 
-.showMembersButton {
+.showSessionsButton {
   border: none;
   width: 100%;
-  height: 30px;
+  height: 37px;
   cursor: pointer;
-  background-color: $grey;
-  color: $grey-font-page;
+  background-color: $purple-transparent-button;
+  color: white;
   flex-shrink: 0;
   transition: 0.2s;
+  border-radius: 5px;
 
   &:hover {
-    background-color: $greyHover;
+    background-color: $purple-transparent-button-hover;
   }
 }
 
@@ -160,22 +161,35 @@
 
 .currentSessionItem {
   position: relative;
-  border-bottom: 1px solid $grey;
   transition: 0.2s;
-  background-color: $light-blue;
+  background-color: rgb(174, 180, 243);
+  margin-top: 1px;
 
   p {
-    color: $grey-font-page;
+    color: white;
   }
-} 
+
+  .crossSvg {
+    path {
+      stroke: white;
+    }
+  }
+}
 
 .sessionItem {
   position: relative;
-  border-bottom: 2px solid $grey;
   transition: 0.2s;
-
+  background-color: rgb(224, 183, 238);
+  margin-top: 1px;
+  
   p {
-    color: $grey-font-page;
+    color: white;
+  }
+
+  .crossSvg {
+    path {
+      stroke: white;
+    }
   }
 }
 

@@ -92,13 +92,9 @@ const Chat = observer(() => {
     chatListWithMessagesState.setLastMessage(messageEntity);
     chatListWithMessagesState.pushChatOnTop(messageEntity.chatId);
 
-    try {
-      await chatListWithMessagesState.postCreateMessageAsync(messageEntity, attachmentList);
-    } catch (error: any) {
-      if (error.response.status !== 401) {
-        alert(error.response.data.message);
-      }
-    }
+    await chatListWithMessagesState
+      .postCreateMessageAsync(messageEntity, attachmentList)
+      .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
     setAttachmentList([]);
     messageListScrollBottomHandler();
@@ -111,17 +107,11 @@ const Chat = observer(() => {
     if (!currentChatState.chat || !editMessageState.data || !inputMessage.trim())
       return;
 
-    try {
-      await chatListWithMessagesState.putUpdateMessageAsync(
-        currentChatState.chat.id,
-        editMessageState.data.messageId,
-        inputMessage
-      );
-    } catch (error: any) {
-      if (error.response.status !== 401) {
-        alert(error.response.data.message);
-      }
-    }
+    await chatListWithMessagesState.putUpdateMessageAsync(
+      currentChatState.chat.id,
+      editMessageState.data.messageId,
+      inputMessage
+    ).catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
     setInputMessage("");
     editMessageState.setEditMessageNull();
@@ -134,17 +124,11 @@ const Chat = observer(() => {
       if (!currentChatState.chat || !editMessageState.data || !inputMessage.trim())
         return;
 
-      try {
-        await chatListWithMessagesState.putUpdateMessageAsync(
-          currentChatState.chat.id,
-          editMessageState.data.messageId,
-          inputMessage
-        );
-      } catch (error: any) {
-        if (error.response.status !== 401) {
-          alert(error.response.data.message);
-        }
-      }
+      await chatListWithMessagesState.putUpdateMessageAsync(
+        currentChatState.chat.id,
+        editMessageState.data.messageId,
+        inputMessage
+      ).catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
       setInputMessage("");
       editMessageState.setEditMessageNull();
@@ -211,13 +195,9 @@ const Chat = observer(() => {
     const { scrollTop, scrollHeight, clientHeight } = messageListRef.current;
 
     if (-scrollTop + clientHeight >= scrollHeight - 10) {
-      try {
-        await chatListWithMessagesState.getMessageListAsync(currentChatId, firstMessageArray.dateOfCreate);
-      } catch (error: any) {
-        if (error.response.status !== 401) {
-          alert(error.response.data.message);
-        }
-      }
+      await chatListWithMessagesState
+        .getMessageListAsync(currentChatId, firstMessageArray.dateOfCreate)
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     }
   }, 800);
 
@@ -225,13 +205,9 @@ const Chat = observer(() => {
 
     if (!currentChatId || !currentChatState.chat) return;
 
-    try {
-      await currentChatState.postJoinToChatAsync(currentChatId);
-    } catch (error: any) {
-      if (error.response.status !== 401) {
-        alert(error.response.data.message);
-      }
-    }
+    await currentChatState
+      .postJoinToChatAsync(currentChatId)
+      .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
     chatListWithMessagesState.setSearchInput("");
     chatListWithMessagesState.addChatInData(currentChatState.chat, currentChatState.messages)
@@ -377,7 +353,7 @@ const Chat = observer(() => {
                   isMember && (
                     <div className={styles.attachmentPanel}>
                       <div className={styles.attachmentPanelContainer}>
-                        {attachmentListUrlBlob.map(x => <img className={styles.attachmentPanelItem} src={x?.toString()}  alt={"attachment"}/>)}
+                        {attachmentListUrlBlob.map(x => <img className={styles.attachmentPanelItem} src={x?.toString()} alt={"attachment"} />)}
                       </div>
                       <button
                         className={styles.closeAttachmentButton}
