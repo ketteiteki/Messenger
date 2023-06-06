@@ -101,7 +101,7 @@
   margin-bottom: 10px;
 
   &:hover {
-    transition: 0.2;
+    transition: 0.2s;
     color: $blueHover;
     cursor: pointer;
   }
@@ -123,18 +123,19 @@
   }
 }
 
-.showMembersButton {
+.showSessionsButton {
   border: none;
   width: 100%;
-  height: 30px;
+  height: 37px;
   cursor: pointer;
-  background-color: $grey;
-  color: $grey-font-page;
+  background-color: $purple-transparent-button;
+  color: white;
   flex-shrink: 0;
   transition: 0.2s;
+  border-radius: 5px;
 
   &:hover {
-    background-color: $greyHover;
+    background-color: $purple-transparent-button-hover;
   }
 }
 
@@ -158,13 +159,37 @@
   }
 }
 
-.sessionItem {
+.currentSessionItem {
   position: relative;
-  border-bottom: 2px solid $grey;
   transition: 0.2s;
+  background-color: rgb(174, 180, 243);
+  margin-top: 1px;
 
   p {
-    color: $grey-font-page;
+    color: white;
+  }
+
+  .crossSvg {
+    path {
+      stroke: white;
+    }
+  }
+}
+
+.sessionItem {
+  position: relative;
+  transition: 0.2s;
+  background-color: $pink-transparent;
+  margin-top: 1px;
+  
+  p {
+    color: $light-grey-for-session-item;
+  }
+
+  .crossSvg {
+    path {
+      stroke: $light-grey-for-session-item;
+    }
   }
 }
 
@@ -177,7 +202,6 @@
   position: absolute;
   top: 5px;
   right: 5px;
-  background-color: inherit;
   border: none;
   border-radius: 2px;
   cursor: pointer;

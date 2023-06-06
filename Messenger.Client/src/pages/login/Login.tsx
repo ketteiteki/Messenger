@@ -3,8 +3,13 @@ import { observer } from "mobx-react-lite";
 import styles from "./Login.module.scss";
 import { authorizationState } from "../../state/AuthorizationState";
 import { useNavigate, Link } from "react-router-dom";
-import TokenService from "../../services/messenger/TokenService";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
+import { sessionsState } from "../../state/SessionsState";
+import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
+import { currentChatState } from "../../state/CurrentChatState";
+import RouteConstants from "../../constants/RouteConstants";
+import { currentProfileState } from "../../state/CurrentProfileState";
+import AuthorizationApi from "../../services/api/AuthorizationApi";
 
 const Login = observer(() => {
   const [inputNickname, setInputNickname] = useState<string>("");
@@ -13,20 +18,32 @@ const Login = observer(() => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    TokenService.deleteLocalAccessToken();
-    TokenService.deleteLocalRefreshToken();
-    authorizationState.clearAuthorizationData();
-    chatListWithMessagesState.clearChatListWithMessagesData();
+    const fun = async () => {
+      await AuthorizationApi.postLogoutAsync();
+
+      authorizationState.clearAuthorizationData();
+      chatListWithMessagesState.clearChatListWithMessagesData();
+      currentChatState.clearChatAndMessages();
+      currentProfileState.setProfileNull()
+      sessionsState.clearData();
+      signalRConfiguration.connection?.stop();
+    }
+
+    fun();
   }, []);
 
   const loginHandler = async () => {
-    const response = await authorizationState.postLoginAsync(
-      inputNickname,
-      inputPassword
-    );
+    try {
+      const response = await authorizationState.postLoginAsync(
+        inputNickname,
+        inputPassword
+      );
 
-    if (response.status === 200) {
-      return navigate("/", { replace: true });
+      if (response.status === 200) {
+        return navigate(RouteConstants.Layout, { replace: true });
+      }
+    } catch (error: any) {
+      alert(error.response.data.message);
     }
   };
 
@@ -40,7 +57,7 @@ const Login = observer(() => {
       );
 
       if (response.status === 200) {
-        return navigate("/", { replace: true });
+        return navigate(RouteConstants.Layout, { replace: true });
       }
     }
   };
@@ -71,7 +88,7 @@ const Login = observer(() => {
           </button>
           <div className={styles.registerPage}>
             Don't have an account?{" "}
-            <Link className={styles.registerPageLink} to={"/registration"}>
+            <Link className={styles.registerPageLink} to={RouteConstants.Registration}>
               Register
             </Link>
           </div>

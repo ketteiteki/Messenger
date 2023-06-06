@@ -14,7 +14,7 @@ namespace Messenger.IntegrationTests;
 [Collection("Sequential")]
 public class IntegrationTestBase : IAsyncLifetime
 {
-	private DatabaseContext DatabaseContextFixture { get; }
+	protected DatabaseContext DatabaseContextFixture { get; }
 	
 	protected MessengerModule MessengerModule { get; }
 	
@@ -33,7 +33,6 @@ public class IntegrationTestBase : IAsyncLifetime
 			.Build();
 
 		var databaseConnectionString = configuration[AppSettingConstants.DatabaseConnectionStringForIntegrationTests];
-		var signKey = configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
 		
 		var messengerBlobContainerName = configuration[AppSettingConstants.BlobContainer];
 		var messengerBlobAccess = configuration[AppSettingConstants.BlobAccess];
@@ -42,7 +41,6 @@ public class IntegrationTestBase : IAsyncLifetime
 		MessengerStartup.Initialize(
 			configuration,
 			databaseConnectionString,
-			signKey,
 			messengerBlobContainerName,
 			messengerBlobAccess,
 			messengerBlobUrl);
@@ -55,7 +53,7 @@ public class IntegrationTestBase : IAsyncLifetime
 		                         throw new InvalidOperationException("DatabaseContext service is not registered in the DI.");
 
 		BlobService = ServiceProvider.GetRequiredService<IBlobService>() ??
-		              throw new InvalidOperationException("BlobService is not registered in the DI.");;
+		              throw new InvalidOperationException("BlobService is not registered in the DI.");
 	}
 
 	public async Task InitializeAsync()

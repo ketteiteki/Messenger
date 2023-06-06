@@ -13,6 +13,7 @@ import { authorizationState } from "../../state/AuthorizationState";
 import { currentProfileState } from "../../state/CurrentProfileState";
 import { useDebouncedCallback } from "use-debounce";
 import { motion } from "framer-motion";
+import RouteConstants from "../../constants/RouteConstants";
 
 const ChatInfo = observer(() => {
   const [updateMode, setUpdateMode] = useState<boolean>(false);
@@ -35,6 +36,8 @@ const ChatInfo = observer(() => {
   const currentChatMemberListPage = currentChatState.chat?.memberListPage;
   const memberListBaseCount = 10;
 
+  const currentChatStateChat = currentChatState.chat;
+
   const mouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
     const localX = event.clientX - event.currentTarget.offsetLeft;
     const localY = event.clientY - event.currentTarget.offsetTop;
@@ -44,13 +47,15 @@ const ChatInfo = observer(() => {
   };
 
   const onClickLeaveChatHandler = async () => {
-    currentChatState.chat &&
-      (await chatListWithMessagesState.postLeaveFromChatAsync(
-        currentChatState.chat.id
-      ));
+    if (currentChatStateChat) {
+      await chatListWithMessagesState
+        .postLeaveFromChatAsync(currentChatStateChat.id)
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
+    }
+
     currentChatState.setChatAndMessagesNull();
 
-    return navigate("/", { replace: true });
+    return navigate(RouteConstants.Layout, { replace: true });
   };
 
   const updateChatHandler = async () => {
@@ -60,42 +65,41 @@ const ChatInfo = observer(() => {
       currentChatId ?? "",
       inputName ?? "",
       inputTitle ?? ""
-    );
+    ).catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });;
 
-    if (response.status === 200) {
+    if (response && response.status === 200) {
       currentChatState.updateChatByChat(response.data);
     }
 
     setUpdateMode(false);
   };
 
-  const onChangeAvatarHandler = async (
-    event: React.FormEvent<HTMLInputElement>
-  ) => {
+  const onChangeAvatarHandler = async (event: React.FormEvent<HTMLInputElement>) => {
     const files = event.currentTarget.files;
-
     const currentChatId = currentChatState.chat?.id;
 
-    if (currentChatId === undefined) return;
+    if (!currentChatId) return;
 
     if (files && files.length > 0) {
-      await chatListWithMessagesState.putUpdateChatAvatarAsync(
-        currentChatId,
-        files[0]
-      );
+      await chatListWithMessagesState
+        .putUpdateChatAvatarAsync(currentChatId, files[0])
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     }
   };
 
   const onClickJoinChatHandler = async () => {
 
-    if (currentChatId === undefined || currentChatState.chat === null) return;
+    if (!currentChatId || !currentChatStateChat) return;
 
-    await currentChatState.postJoinToChatAsync(currentChatId);
+
+    await currentChatState
+      .postJoinToChatAsync(currentChatId)
+      .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
     chatListWithMessagesState.setSearchInput("");
-    chatListWithMessagesState.addChatInData(currentChatState.chat, currentChatState.messages)
+    chatListWithMessagesState.addChatInData(currentChatStateChat, currentChatState.messages)
     chatListWithMessagesState.resetDataForSearchChats();
-    currentChatState.setChatAndMessages(currentChatState.chat, currentChatState.messages);
+    currentChatState.setChatAndMessages(currentChatStateChat, currentChatState.messages);
   }
 
   const onClickOpenFullSizeAvatar = () => {
@@ -106,34 +110,41 @@ const ChatInfo = observer(() => {
     if (userId === authorizationState.data?.id) {
       currentProfileState.setProfileNull();
 
-      return navigate("/", { replace: true });
+      return navigate(RouteConstants.Layout, { replace: true });
     }
 
-    await currentProfileState.getUserAsync(userId);
-    return navigate("/", { replace: true });
+    await currentProfileState
+      .getUserAsync(userId)
+      .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
+
+    return navigate(RouteConstants.Layout, { replace: true });
   };
 
   const onClickShowMemberListHandler = async () => {
-    if (currentChatState.chat === null) return;
+    if (!currentChatStateChat) return;
 
     setShowMemberList(!showMemberList);
 
-    if (currentChatState.chat.members.length === 0) {
-      await currentChatState.getUserListByChatAsync(currentChatState.chat.id, memberListBaseCount, 1);
+    if (currentChatStateChat.members.length === 0) {
+      await currentChatState
+        .getUserListByChatAsync(currentChatStateChat.id, memberListBaseCount, 1)
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     }
   };
 
   const getMembers = useDebouncedCallback(async () => {
     const memberListElement = document.getElementById("memberList");
 
-    if (!currentChatState.chat || !memberListElement) return;
+    if (!currentChatStateChat || !memberListElement) return;
 
     if (memberListElement.scrollHeight - memberListElement.scrollTop === memberListElement.clientHeight) {
       if (!currentChatId) return;
 
-      var response = await currentChatState.getUserListByChatAsync(currentChatState.chat.id, memberListBaseCount, memberListPage);
+      var response = await currentChatState
+        .getUserListByChatAsync(currentChatStateChat.id, memberListBaseCount, memberListPage)
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
-      if (response.data.length === 0) return;
+      if (response && response.data.length === 0) return;
 
       setMemberListPage(memberListPage + 1);
       currentChatState.setMemberListPage(memberListPage + 1);
@@ -141,46 +152,54 @@ const ChatInfo = observer(() => {
   }, 800);
 
   useEffect(() => {
-    if (currentChatState.chat === null) {
-      return navigate("/", { replace: true });
+    if (!currentChatStateChat) {
+      return navigate(RouteConstants.Layout, { replace: true });
     }
 
-    setInputTitle(currentChatState.chat?.title ?? "");
-    setInputName(currentChatState.chat?.name ?? "");
+    setInputTitle(currentChatStateChat?.title ?? "");
+    setInputName(currentChatStateChat?.name ?? "");
     SetShowMenu(false);
     setShowMemberList(false);
     setUpdateMode(false);
     setMemberListPage(currentChatMemberListPage ?? 2);
-  }, [currentChatState.chat]);
+  }, [currentChatStateChat]);
 
   return (
     <div
       className={styles.chatInfo}
       onMouseMove={(event) => mouseMoveHandler(event)}
     >
-      {updateMode && (
-        <button className={styles.okButton} onClick={updateChatHandler}>
-          <TickSvg width={15} height={23} />
-        </button>
-      )}
-      {showMenu && (
-        <ChatInfoBurgerMenu
-          x={xMousePosition}
-          y={yMousePosition}
-          setShowMenu={SetShowMenu}
-          setUpdateMode={setUpdateMode}
-        />
-      )}
-      {currentChatState.chat?.isOwner && (
-        <button
-          className={styles.settingsButton}
-          onClick={() => SetShowMenu(true)}
-        >
-          <SettingsSvg className={styles.settingsSvg} width={20} />
-        </button>
-      )}
+      {
+        updateMode && (
+          <button className={styles.okButton} onClick={updateChatHandler}>
+            <TickSvg width={15} height={23} />
+          </button>
+        )
+      }
+      {
+        showMenu && (
+          <ChatInfoBurgerMenu
+            x={xMousePosition}
+            y={yMousePosition}
+            setShowMenu={SetShowMenu}
+            setUpdateMode={setUpdateMode}
+          />
+        )
+      }
+      {
+        currentChatState.chat?.isOwner && (
+          <button
+            className={styles.settingsButton}
+            onClick={() => SetShowMenu(true)}
+          >
+            <SettingsSvg className={styles.settingsSvg} width={20} />
+          </button>
+        )
+      }
       <div className={styles.avatarContainer}>
-        {isMyChat && <label htmlFor="avatar" className={styles.avatarBlackCover} />}
+        {
+          isMyChat && <label htmlFor="avatar" className={styles.avatarBlackCover} />
+        }
         <input
           className={styles.avatarInput}
           onChange={onChangeAvatarHandler}
@@ -196,72 +215,84 @@ const ChatInfo = observer(() => {
           onClick={onClickOpenFullSizeAvatar}
         />
       </div>
-      {updateMode === false && <p className={styles.title}>{inputTitle || "------"}</p>}
-      {updateMode && (
-        <input
-          className={styles.inputTitle}
-          type="text"
-          value={inputTitle}
-          onChange={(e) => setInputTitle(e.currentTarget.value)}
-        />
-      )}
-      {updateMode === false && <p className={styles.name}>{inputName || "------"}</p>}
-      {updateMode && (
-        <input
-          className={styles.inputName}
-          type="text"
-          value={inputName}
-          onChange={(e) => setInputName(e.target.value)}
-        />
-      )}
-      {chatListWithMessagesState.data.find(
-        (x) => x.chat.id === currentChatState.chat?.id
-      ) === undefined ? (
-        <button className={styles.joinChattingButton} onClick={onClickJoinChatHandler}>Join</button>
-      ) : (
-        <button
-          className={styles.leaveChattingButton}
-          onClick={onClickLeaveChatHandler}
-        >
-          Leave
-        </button>
-      )}
+      {
+        !updateMode && <p className={styles.title}>{inputTitle || "------"}</p>
+      }
+      {
+        updateMode && (
+          <input
+            className={styles.inputTitle}
+            type="text"
+            value={inputTitle}
+            onChange={(e) => setInputTitle(e.currentTarget.value)}
+          />
+        )
+      }
+      {
+        !updateMode && <p className={styles.name}>{inputName || "------"}</p>
+      }
+      {
+        updateMode && (
+          <input
+            className={styles.inputName}
+            type="text"
+            value={inputName}
+            onChange={(e) => setInputName(e.target.value)}
+          />
+        )
+      }
+      {
+        !chatListWithMessagesState.data.find((x) => x.chat.id === currentChatState.chat?.id) ? (
+          <button className={styles.joinChattingButton} onClick={onClickJoinChatHandler}>Join</button>
+        ) : (
+          <button
+            className={styles.leaveChattingButton}
+            onClick={onClickLeaveChatHandler}
+          >
+            Leave
+          </button>
+        )
+      }
 
       <button
         className={styles.showMembersButton}
         onClick={onClickShowMemberListHandler}
       >
-        {showMemberList ? "Hide" : "Show"} Members
+        {
+          showMemberList ? "Hide" : "Show"
+        } Members
       </button>
-      {showMemberList && (
-        <div className={styles.memberList} id="memberList" onScroll={getMembers}>
-          {currentChatState.chat?.members.map((i) => (
-            <motion.div
-              initial={{ opacity: 0.7 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: .1 }}
-              className={styles.memberItem} key={i.id}
-              onClick={() => showProfileByMessage(i.id)}>
-              <img
-                className={styles.memberItemAvatar}
-                src={i.avatarLink ?? nonAvatar}
-                alt=""
-              />
-              <div className={styles.memberItemContainer}>
-                <p className={styles.memberItemDisplayName}>{i.displayName}</p>
-                <p className={styles.memberItemBio}>{i.bio}</p>
-                <p className={styles.memberItemRole}>
-                  {
-                    currentChatState.chat?.usersWithRole.find(
-                      (u) => u.userId === i.id
-                    )?.roleTitle
-                  }
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      )}
+      {
+        showMemberList && (
+          <div className={styles.memberList} id="memberList" onScroll={getMembers}>
+            {currentChatState.chat?.members.map((i) => (
+              <motion.div
+                initial={{ opacity: 0.7 }}
+                animate={{ opacity: 1 }}
+                transition={{ type: "Inertia", duration: .15 }}
+                className={styles.memberItem} key={i.id}
+                onClick={() => showProfileByMessage(i.id)}>
+                <img
+                  className={styles.memberItemAvatar}
+                  src={i.avatarLink ?? nonAvatar}
+                  alt=""
+                />
+                <div className={styles.memberItemContainer}>
+                  <p className={styles.memberItemDisplayName}>{i.displayName}</p>
+                  <p className={styles.memberItemBio}>{i.bio}</p>
+                  <p className={styles.memberItemRole}>
+                    {
+                      currentChatState.chat?.usersWithRole.find(
+                        (u) => u.userId === i.id
+                      )?.roleTitle
+                    }
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )
+      }
     </div>
   );
 });

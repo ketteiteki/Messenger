@@ -7,7 +7,7 @@ class Program
 		CreateWebHostBuilder(args).Build().Run();
 	}
 
-	public static IHostBuilder CreateWebHostBuilder(string[] arg) =>
+	private static IHostBuilder CreateWebHostBuilder(string[] arg) =>
 		Host.CreateDefaultBuilder(arg).ConfigureWebHostDefaults(webBuilder => 
 			webBuilder.UseStartup<Startup>());
 }

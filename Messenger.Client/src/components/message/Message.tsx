@@ -13,6 +13,7 @@ import { ChatType } from "../../models/enum/ChatType";
 import { blackCoverState } from "../../state/BlackCoverState";
 import { ReactComponent as ClockSvg } from "../../assets/svg/clock.svg";
 import { motion } from "framer-motion";
+import RouteConstants from "../../constants/RouteConstants";
 
 const Message = observer((props: IMessageDto) => {
   const [xMousePosition, setXMousePosition] = useState<number>(0);
@@ -22,13 +23,14 @@ const Message = observer((props: IMessageDto) => {
 
   const navigate = useNavigate();
 
-  const messageAttachmentListStyle = props.attachments[3] ?
-    styles.messageAttachmentListFourAttachment
-    : props.attachments[2]
-      ? styles.messageAttachmentListThreeAttachment
-      : props.attachments[1]
-        ? styles.messageAttachmentListTwoAttachment
-        : styles.messageAttachmentListOneAttachment;
+  const messageAttachmentListStyle =
+    props.attachments[3] ?
+      styles.messageAttachmentListFourAttachment
+      : props.attachments[2]
+        ? styles.messageAttachmentListThreeAttachment
+        : props.attachments[1]
+          ? styles.messageAttachmentListTwoAttachment
+          : styles.messageAttachmentListOneAttachment;
 
   const isMessageMine = props.ownerId === authorizationState.data?.id;
   const isCurrentChatChannel = currentChatState.chat?.type === ChatType.Channel;
@@ -41,23 +43,25 @@ const Message = observer((props: IMessageDto) => {
   };
 
   const showProfileByMessage = async () => {
-    if (props.ownerId === null) return;
+    if (!props.ownerId) return;
 
     if (isMessageMine) {
       currentProfileState.setProfileNull();
 
-      return navigate("/", { replace: true });
+      return navigate(RouteConstants.Layout, { replace: true });
     }
 
-    await currentProfileState.getUserAsync(props.ownerId);
+    await currentProfileState
+      .getUserAsync(props.ownerId)
+      .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
-    return navigate("/", { replace: true });
+    return navigate(RouteConstants.Layout, { replace: true });
   };
 
   const MouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
-    var targetCoords = event.currentTarget.getBoundingClientRect();
-    var localX = event.clientX - targetCoords.left;
-    var localY = event.clientY - targetCoords.top;
+    const targetCoords = event.currentTarget.getBoundingClientRect();
+    const localX = event.clientX - targetCoords.left;
+    const localY = event.clientY - targetCoords.top;
 
     setXMousePosition(localX);
     setYMousePosition(localY);
@@ -69,31 +73,112 @@ const Message = observer((props: IMessageDto) => {
 
   return (
     <>
-      {isMessageMine ? (
-        <>
+      {
+        isMessageMine ? (
+          <>
+            <motion.div
+              initial={{ opacity: .5 }}
+              animate={{ opacity: 1 }}
+              transition={{ type: "Inertia", duration: .2 }}
+              className={styles.myMessage}
+              onContextMenu={showMenuHandler}
+              onMouseMove={MouseMoveHandler}
+            >
+              {
+                showMenu && (
+                  <MessageBurgerMenu
+                    x={xMousePosition}
+                    y={yMousePosition}
+                    messageId={props.id}
+                    chatId={props.chatId}
+                    displayName={props.ownerDisplayName || ""}
+                    text={props.text}
+                    isMyMessage={isMessageMine}
+                    isMessageLast={isMessageLast}
+                    setShowMenu={setShowMenu}
+                  />
+                )
+              }
+              <img
+                className={styles.myAvatar}
+                src={
+                  currentChatState.chat?.type === ChatType.Channel ?
+                    currentChatState.chat.avatarLink ?? nonAvatar
+                    : props.ownerAvatarLink ?? nonAvatar
+                }
+                onClick={showProfileByMessage}
+                alt="avatar"
+              />
+              <div className={styles.myMessageData}>
+                {
+                  props.replyToMessageId && (
+                    <div className={styles.myMessageReply}>
+                      <p className={styles.myMessageReplyDisplayName}>
+                        {
+                          props.replyToMessageAuthorDisplayName
+                        }
+                      </p>
+                      <p className={styles.myMessageReplyText}>
+                        {
+                          props.replyToMessageText || ""
+                        }
+                      </p>
+                    </div>
+                  )
+                }
+                {props.attachments[0] && <div className={messageAttachmentListStyle}>
+                  {
+                    props.attachments.map(x =>
+                      <img className={styles.messageAttachment}
+                        onClick={() => onClickOpenFullSizeAvatar(x.link)}
+                        src={x.link}
+                        key={x.id}
+                        alt="" />)
+                  }
+                </div>}
+                <p className={styles.myText}>{props.text}</p>
+                <p className={styles.myMetaData}>
+                  {
+                    props.loading && <ClockSvg className={styles.clockSvg} width={10} fill={"#fff"} />
+                  }
+                  {
+                    props.isEdit ? "edit" : ""
+                  }
+                  {" "}
+                  {
+                    DateService.getTime(props.dateOfCreate)
+                  }
+                </p>
+              </div>
+            </motion.div>
+          </>
+        ) : (
           <motion.div
-            initial={{ opacity: 0.7 }}
+            initial={{ opacity: .5 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: .1 }}
-            className={styles.myMessage}
+            transition={{ type: "Inertia", duration: .2 }}
+            className={styles.message}
             onContextMenu={showMenuHandler}
             onMouseMove={MouseMoveHandler}
           >
-            {showMenu && (
-              <MessageBurgerMenu
-                x={xMousePosition}
-                y={yMousePosition}
-                messageId={props.id}
-                chatId={props.chatId}
-                displayName={props.ownerDisplayName || ""}
-                text={props.text}
-                isMyMessage={isMessageMine}
-                isMessageLast={isMessageLast}
-                setShowMenu={setShowMenu}
-              />
-            )}
+            {
+              ((showMenu && isCurrentChatChannel && isCurrentChatMine) ||
+                (showMenu && !isCurrentChatChannel)) && (
+                <MessageBurgerMenu
+                  x={xMousePosition}
+                  y={yMousePosition}
+                  messageId={props.id}
+                  chatId={props.chatId}
+                  displayName={props.ownerDisplayName || ""}
+                  text={props.text}
+                  isMyMessage={isMessageMine}
+                  isMessageLast={isMessageLast}
+                  setShowMenu={setShowMenu}
+                />
+              )
+            }
             <img
-              className={styles.myAvatar}
+              className={styles.avatar}
               src={
                 currentChatState.chat?.type === ChatType.Channel ?
                   currentChatState.chat.avatarLink ?? nonAvatar
@@ -102,91 +187,57 @@ const Message = observer((props: IMessageDto) => {
               onClick={showProfileByMessage}
               alt="avatar"
             />
-            <div className={styles.myMessageData}>
-              {props.replyToMessageId !== null && (
-                <div className={styles.myMessageReply}>
-                  <p className={styles.myMessageReplyDisplayName}>
-                    {props.replyToMessageAuthorDisplayName}
-                  </p>
-                  <p className={styles.myMessageReplyText}>
-                    {props.replyToMessageText || ""}
-                  </p>
+            <div className={styles.messageData}>
+              {
+                !props.attachments[0] &&
+                <p className={styles.nickname} onClick={showProfileByMessage}>
+                  {currentChatState.chat?.type !== ChatType.Channel ?
+                    props.ownerDisplayName
+                    : currentChatState.chat.title}</p>
+              }
+              {
+                props.replyToMessageId && (
+                  <div className={styles.messageReply}>
+                    <p className={styles.messageReplyDisplayName}>
+                      {
+                        currentChatState.chat?.type !== ChatType.Channel ?
+                          props.replyToMessageAuthorDisplayName
+                          : currentChatState.chat.title
+                      }
+                    </p>
+                    <p className={styles.messageReplyText}>
+                      {
+                        props.replyToMessageText || ""
+                      }
+                    </p>
+                  </div>
+                )
+              }
+              {
+                props.attachments[0] && <div className={messageAttachmentListStyle}>
+                  {
+                    props.attachments.map(x =>
+                      <img className={styles.messageAttachment} 
+                      onClick={() => onClickOpenFullSizeAvatar(x.link)} src={x.link} 
+                      alt=""
+                      key={x.id} />)
+                  }
                 </div>
-              )}
-              {props.attachments[0] && <div className={messageAttachmentListStyle}>
-                {props.attachments.map(x =>
-                  <img className={styles.messageAttachment} onClick={() => onClickOpenFullSizeAvatar(x.link)} src={x.link} alt="" />)}
-              </div>}
-              <p className={styles.myText}>{props.text}</p>
-              <p className={styles.myMetaData}>
-                {props.loading && <ClockSvg className={styles.clockSvg} width={10} fill={"#fff"} />}
-                {props.isEdit ? "edit" : ""}{" "}
-                {DateService.getTime(props.dateOfCreate)}
+              }
+              <p className={styles.text}>{props.text}</p>
+              <p className={styles.metaData}>
+                {
+                  props.isEdit ? "edit" : ""
+                }
+                {" "}
+                {
+                  DateService.getTime(props.dateOfCreate)
+                }
               </p>
             </div>
           </motion.div>
-        </>
-      ) : (
-        <motion.div
-          initial={{ opacity: .5 }} animate={{ opacity: 1 }}
-          className={styles.message}
-          onContextMenu={showMenuHandler}
-          onMouseMove={MouseMoveHandler}
-        >
-          {(showMenu && isCurrentChatChannel && isCurrentChatMine) ||
-            (showMenu && !isCurrentChatChannel) && (
-              <MessageBurgerMenu
-                x={xMousePosition}
-                y={yMousePosition}
-                messageId={props.id}
-                chatId={props.chatId}
-                displayName={props.ownerDisplayName || ""}
-                text={props.text}
-                isMyMessage={isMessageMine}
-                isMessageLast={isMessageLast}
-                setShowMenu={setShowMenu}
-              />
-            )}
-          <img
-            className={styles.avatar}
-            src={
-              currentChatState.chat?.type === ChatType.Channel ?
-                currentChatState.chat.avatarLink ?? nonAvatar
-                : props.ownerAvatarLink ?? nonAvatar
-            }
-            onClick={showProfileByMessage}
-            alt="avatar"
-          />
-          <div className={styles.messageData}>
-            {!props.attachments[0] &&
-              <p className={styles.nickname} onClick={showProfileByMessage}>
-                {currentChatState.chat?.type !== ChatType.Channel ?
-                  props.ownerDisplayName
-                  : currentChatState.chat.title}</p>}
-            {props.replyToMessageId && (
-              <div className={styles.messageReply}>
-                <p className={styles.messageReplyDisplayName}>
-                  {currentChatState.chat?.type !== ChatType.Channel ?
-                    props.replyToMessageAuthorDisplayName
-                    : currentChatState.chat.title}
-                </p>
-                <p className={styles.messageReplyText}>
-                  {props.replyToMessageText || ""}
-                </p>
-              </div>
-            )}
-            {props.attachments[0] && <div className={messageAttachmentListStyle}>
-              {props.attachments.map(x =>
-                <img className={styles.messageAttachment} onClick={() => onClickOpenFullSizeAvatar(x.link)} src={x.link} alt="" />)}
-            </div>}
-            <p className={styles.text}>{props.text}</p>
-            <p className={styles.metaData}>
-              {props.isEdit ? "edit" : ""}{" "}
-              {DateService.getTime(props.dateOfCreate)}
-            </p>
-          </div>
-        </motion.div>
-      )}
+        )
+      }
     </>
   );
 });

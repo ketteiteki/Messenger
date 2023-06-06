@@ -15,7 +15,7 @@ public class DatabaseContext : DbContext
 	public DbSet<DeletedMessageByUserEntity> DeletedMessageByUsers { get; set; }
 	public DbSet<DeletedDialogByUserEntity> DeletedDialogByUsers { get; set; }
 	public DbSet<BanUserByChatEntity> BanUserByChats { get; set; }
-	public DbSet<SessionEntity> Sessions { get; set; }
+	public DbSet<UserSessionEntity> UserSessions { get; set; }
 
 	public DatabaseContext(DbContextOptions<DatabaseContext> dbContextOptions) : base(dbContextOptions)
 	{

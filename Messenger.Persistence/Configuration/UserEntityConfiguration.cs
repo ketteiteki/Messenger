@@ -10,7 +10,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
     public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
         builder
-            .HasMany(u => u.Sessions)
+            .HasMany(u => u.UserSessions)
             .WithOne(s => s.User)
             .HasForeignKey(s => s.UserId)
             .OnDelete(DeleteBehavior.Cascade);

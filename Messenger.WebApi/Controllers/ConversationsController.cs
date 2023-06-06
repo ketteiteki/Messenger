@@ -3,6 +3,7 @@ using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
+using Messenger.WebApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,11 +12,15 @@ namespace Messenger.WebApi.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 [ApiController]
-public class ConversationsController : ApiControllerBase
+public class ConversationsController : ControllerBase
 {
-	public ConversationsController(IMediator mediator) : base(mediator) {}
+	private readonly IMediator _mediator;
 
-	
+	public ConversationsController(IMediator mediator)
+	{
+		_mediator = mediator;
+	}
+
 	[ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
 	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
 	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
@@ -29,12 +34,11 @@ public class ConversationsController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
-		var command = new AddUserToConversationCommand(
-			RequesterId: requesterId,
-			ChatId: chatId,
-			UserId: userId);
+		var command = new AddUserToConversationCommand(requesterId, chatId, userId);
 
-		return await RequestAsync(command, cancellationToken);
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
@@ -42,18 +46,19 @@ public class ConversationsController : ApiControllerBase
 	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
 	[HttpPost("banUser")]
-	public async Task<IActionResult> BanUser([FromQuery] Guid chatId, [FromQuery] Guid userId, 
-		[FromQuery] int banMinutes, CancellationToken cancellationToken)
+	public async Task<IActionResult> BanUser(
+		[FromQuery] Guid chatId, 
+		[FromQuery] Guid userId, 
+		[FromQuery] int banMinutes,
+		CancellationToken cancellationToken)
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
-		var command = new BanUserInConversationCommand(
-			RequesterId: requesterId,
-			ChatId: chatId,
-			UserId: userId,
-			BanMinutes: banMinutes);
+		var command = new BanUserInConversationCommand(requesterId, chatId, userId, banMinutes);
 
-		return await RequestAsync(command, cancellationToken);
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
@@ -68,12 +73,11 @@ public class ConversationsController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
-		var command = new UnbanUserInConversationCommand(
-			RequesterId: requesterId,
-			ChatId: chatId,
-			UserId: userId);
+		var command = new UnbanUserInConversationCommand(requesterId, chatId, userId);
 
-		return await RequestAsync(command, cancellationToken);
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 
 	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
@@ -88,11 +92,10 @@ public class ConversationsController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
-		var command = new RemoveUserFromConversationCommand(
-			RequesterId: requesterId,
-			ChatId: chatId,
-			UserId: userId);
+		var command = new RemoveUserFromConversationCommand(requesterId, chatId, userId);
 
-		return await RequestAsync(command, cancellationToken);
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 }

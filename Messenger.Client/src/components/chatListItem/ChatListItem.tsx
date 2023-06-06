@@ -15,6 +15,7 @@ import { editMessageState } from "../../state/EditMessageState";
 import { motion } from "framer-motion";
 import { ReactComponent as ConversationLogoSvg } from "../../assets/svg/conversation_logo.svg";
 import { ReactComponent as ChannelLogoSvg } from "../../assets/svg/channel_logo.svg";
+import RouteConstants from "../../constants/RouteConstants";
 
 const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
 
@@ -40,22 +41,32 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
     }
 
     if (props.messages.length === 0) {
-      await chatListWithMessagesState.getMessageListAsync(props.chat.id, null);
+      await chatListWithMessagesState
+        .getMessageListAsync(props.chat.id, null)
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     } else if (isInChatOnlyRealTimeMessages) {
       if (!firstRealtimeMessage) return;
 
-      await chatListWithMessagesState.getMessageListAsync(props.chat.id, firstRealtimeMessage?.dateOfCreate);
+      await chatListWithMessagesState
+        .getMessageListAsync(props.chat.id, firstRealtimeMessage?.dateOfCreate)
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     }
 
     currentChatState.setChatAndMessages(props.chat, props.messages);
 
     if (props.chat.type === ChatType.Dialog) {
       const interlocutorId = currentChatState.chat?.members.find(m => m.id !== authorizationState.data?.id)?.id;
-      interlocutorId && await currentProfileState.getUserAsync(interlocutorId);
-      return navigate("/", { replace: true });
+
+      if (interlocutorId) {
+        await currentProfileState
+          .getUserAsync(interlocutorId)
+          .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
+      }
+
+      return navigate(RouteConstants.Layout, { replace: true });
     }
 
-    return navigate("/chatInfo", { replace: true });
+    return navigate(RouteConstants.ChatInfo, { replace: true });
   };
 
   return (
@@ -70,19 +81,32 @@ const ChatListItem = observer((props: IChatListWithMessagesDataItem) => {
         alt=""
       />
       <div className={styles.container}>
-        <p className={styles.chatName}>
-          {props.chat.type === ChatType.Conversation ? <ConversationLogoSvg className={styles.conversationLogoSvg} width={15} /> :
-            props.chat.type === ChatType.Channel ? <ChannelLogoSvg className={styles.conversationLogoSvg} width={14} /> : ""}
-          <p className={styles.chatNameValue}>{props.chat.type === ChatType.Dialog
-            ? props.chat.members.find(
-              (m) => m.id !== authorizationState.data?.id
-            )?.displayName
-            : props.chat.title}</p>
+        <span className={styles.chatName}>
+          {
+            props.chat.type === ChatType.Conversation ? <ConversationLogoSvg className={styles.conversationLogoSvg} width={15} /> :
+              props.chat.type === ChatType.Channel ? <ChannelLogoSvg className={styles.conversationLogoSvg} width={14} /> : ""
+          }
+          <p className={styles.chatNameValue}>
+            {
+              props.chat.type === ChatType.Dialog
+                ? props.chat.members.find(
+                  (m) => m.id !== authorizationState.data?.id
+                )?.displayName
+                : props.chat.title
+            }
+          </p>
+        </span>
+        <p className={styles.lastMessage}>
+          {
+            props.chat.type === ChatType.Channel ?
+              lastMessageTextForChannel : lastMessageTextForConversationAndDialog
+          }
         </p>
-        <p className={styles.lastMessage}>{
-          props.chat.type === ChatType.Channel ?
-            lastMessageTextForChannel : lastMessageTextForConversationAndDialog}</p>
-        <p className={styles.date}>{props.chat.lastMessageDateOfCreate && DateService.getTime(props.chat.lastMessageDateOfCreate)}</p>
+        <p className={styles.date}>
+          {
+            props.chat.lastMessageDateOfCreate && DateService.getTime(props.chat.lastMessageDateOfCreate)
+          }
+        </p>
       </div>
     </motion.div>
   );

@@ -1,18 +1,14 @@
 import IAuthorizationResponse from "../../models/interfaces/IAuthorizationResponse";
-import ISessionDto from "../../models/interfaces/ISessionDto";
+import IUserSessionDto from "../../models/interfaces/IUserSessionDto";
 import api from "./baseAPI";
 
 export default class AuthorizationApi {
-    public static async getAuthorizationAsync(accessToken: string) {
-        return await api.get<IAuthorizationResponse>(`/Auth/authorization/${accessToken}`);
-    }
-
-    public static async getSessionAsync(accessToken: string) {
-        return await api.get<ISessionDto>(`/Auth/sessions/${accessToken}`);
+    public static async getAuthorizationAsync() {
+        return await api.get<IAuthorizationResponse>(`/Auth/authorization`);
     }
 
     public static async getSessionListAsync() {
-        return await api.get<ISessionDto[]>("/Auth/sessions");
+        return await api.get<IUserSessionDto[]>("/Auth/sessions");
     }
 
     public static async postRegistrationAsync(displayName: string, nickname: string, password: string) {
@@ -34,7 +30,11 @@ export default class AuthorizationApi {
         return await api.post<IAuthorizationResponse>("/Auth/login", data);
     }
 
-    public static async delDeleteSessionAsync(sessionId: string) {
-        return await api.delete<ISessionDto>(`/Auth/sessions/${sessionId}`, );
+    public static async postLogoutAsync() {
+        return await api.post("/Auth/logout");
+    }
+
+    public static async delTerminateSessionAsync(sessionId: string) {
+        return await api.delete<IUserSessionDto>(`/Auth/sessions/${sessionId}`, );
     }
 }

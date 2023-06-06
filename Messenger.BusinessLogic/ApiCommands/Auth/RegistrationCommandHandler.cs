@@ -7,7 +7,6 @@ using Messenger.Domain.Entities;
 using Messenger.Domain.Enums;
 using Messenger.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Messenger.BusinessLogic.ApiCommands.Auth;
 
@@ -15,24 +14,15 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 {
 	private readonly DatabaseContext _context;
 	private readonly IHashService _hashService;
-	private readonly ITokenService _tokenService;
-	private readonly IConfiguration _configuration;
 
-	public RegistrationCommandHandler(DatabaseContext context, IHashService hashService, ITokenService tokenService,
-		IConfiguration configuration)
+	public RegistrationCommandHandler(DatabaseContext context, IHashService hashService)
 	{
 		_context = context;
 		_hashService = hashService;
-		_tokenService = tokenService;
-		_configuration = configuration;
 	}
 	
 	public async Task<Result<AuthorizationResponse>> Handle(RegistrationCommand request, CancellationToken cancellationToken)
 	{
-		var accessTokenSignKey = _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
-		var accessTokenLifeTimeMinutes = _configuration[AppSettingConstants.MessengerAccessTokenLifetimeMinutes];
-		var refreshTokenLifetimeDays = _configuration[AppSettingConstants.MessengerRefreshTokenLifetimeDays];
-		
 		var isUserByNicknameExists = await _context.Users.AnyAsync(u => u.Nickname == request.Nickname, cancellationToken);
 		
 		if (isUserByNicknameExists)
@@ -50,19 +40,7 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 			passwordHash: hmac512CryptoHash,
 			passwordSalt: salt);
 
-		var accessToken = _tokenService.CreateAccessToken(newUser, accessTokenSignKey, int.Parse(accessTokenLifeTimeMinutes));
-
-		var sessionExpiresAt = DateTime.UtcNow.AddDays(int.Parse(refreshTokenLifetimeDays));
-		
-		var session = new SessionEntity(
-			newUser.Id,
-			accessToken,
-			request.Ip,
-			request.UserAgent,
-			sessionExpiresAt);
-
 		_context.Users.Add(newUser);
-		_context.Sessions.Add(session);
 		await _context.SaveChangesAsync(cancellationToken);
 
 		var isDotnetChatCreated = await _context.Chats.AnyAsync(x => x.Id == SeedDataConstants.DotnetChatId, cancellationToken);
@@ -111,8 +89,6 @@ public class RegistrationCommandHandler : IRequestHandler<RegistrationCommand, R
 		await _context.SaveChangesAsync(cancellationToken);
 		
 		var authorizationResponse = new AuthorizationResponse(
-			accessToken,
-			session.RefreshToken,
 			newUser.Id,
 			newUser.DisplayName,
 			newUser.Nickname,

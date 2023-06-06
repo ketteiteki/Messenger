@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
 import styles from "./MessageBurgerMenu.module.scss";
 import { ReactComponent as EditSvg } from "../../assets/svg/edit_black.svg";
@@ -34,8 +34,8 @@ const MessageBurgerMenu = observer(
     isMessageLast,
     setShowMenu,
   }: IMessageBurgerMenu) => {
-    const [xMousePosition, setXMousePosition] = useState<number>(x - 5);
-    const [yMousePosition, setYMousePosition] = useState<number>(y - 5);
+    const [xMousePosition] = useState<number>(x - 5);
+    const [yMousePosition] = useState<number>(y - 5);
 
     const textareaSendMessageElement = document.getElementById("sendMessageTextArea");
 
@@ -58,7 +58,9 @@ const MessageBurgerMenu = observer(
     };
 
     const deleteMessage = async () => {
-      await chatListWithMessagesState.delDeleteMessageAsync(chatId, messageId);
+      await chatListWithMessagesState
+        .delDeleteMessageAsync(chatId, messageId)
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     }
 
     return (
@@ -74,18 +76,20 @@ const MessageBurgerMenu = observer(
           <ReplySvg width={20} />
           <p>Reply</p>
         </button>
-        {isMyMessage && (
-          <>
-            <button className={styles.updateMessageButton} onClick={setEditMessageHandler}>
-              <EditSvg width={20} />
-              <p>Edit</p>
-            </button>
-            <button className={styles.deleteMessageButton} onClick={deleteMessage}>
-              <TrashBinSvg width={20} />
-              <p>Delete</p>
-            </button>
-          </>
-        )}
+        {
+          isMyMessage && (
+            <>
+              <button className={styles.updateMessageButton} onClick={setEditMessageHandler}>
+                <EditSvg width={20} />
+                <p>Edit</p>
+              </button>
+              <button className={styles.deleteMessageButton} onClick={deleteMessage}>
+                <TrashBinSvg width={20} />
+                <p>Delete</p>
+              </button>
+            </>
+          )
+        }
       </div>
     );
   }

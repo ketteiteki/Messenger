@@ -17,38 +17,26 @@ import { motion } from "framer-motion";
 import IChatDto from "../../models/interfaces/IChatDto";
 import { currentChatState } from "../../state/CurrentChatState";
 import ModalWindow from "../../components/modalWindow/ModalWindow";
+import RouteConstants from "../../constants/RouteConstants";
 
 const Layout = observer(() => {
-
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (authorizationState.countFailRefresh >= 2) {
-      authorizationState.resetCountFailRefresh();
-      return navigate("/login", { replace: true });
-    }
-
-  }, [authorizationState.countFailRefresh]);
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem("AuthorizationToken");
-
     const fun = async () => {
-      if (accessToken == null) {
-        return navigate("/registration", { replace: true });
-      }
 
-      const authorizationResponse = await authorizationState.getAuthorizationAsync(accessToken);
+      const authorizationResponse = await authorizationState.getAuthorizationAsync().catch((e) => {});
 
-      if (authorizationResponse.status !== 200) {
-        return navigate("/registration", { replace: true });
+      if (!authorizationResponse || authorizationResponse.status !== 200) {
+        return navigate(RouteConstants.Login, { replace: true });
       }
 
       const response = await chatListWithMessagesState.getChatListAsync();
 
-      signalRConfiguration.buildConnection(accessToken);
+      signalRConfiguration.buildConnection();
 
-      if (signalRConfiguration.connection === null) return;
+      if (!signalRConfiguration.connection) return;
+      if (authorizationResponse === null) return;
 
       signalRConfiguration.connection.on(SignalRMethodsName.BroadcastMessageAsync, (message: IMessageDto) => {
         if (message.ownerId === authorizationResponse.data.id) return;
@@ -77,8 +65,8 @@ const Layout = observer(() => {
         chatListWithMessagesState.pushChatOnTop(chat.id);
       });
 
-      signalRConfiguration.connection.on(SignalRMethodsName.DeleteDialogForInterlocutor, (chatdId: string) => {
-        chatListWithMessagesState.deleteChatInDataById(chatdId);
+      signalRConfiguration.connection.on(SignalRMethodsName.DeleteDialogForInterlocutor, (chatId: string) => {
+        chatListWithMessagesState.deleteChatInDataById(chatId);
         currentChatState.setChatAndMessagesNull();
       });
 

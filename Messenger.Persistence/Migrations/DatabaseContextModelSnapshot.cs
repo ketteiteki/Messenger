@@ -42,7 +42,7 @@ namespace Messenger.Services.Migrations
 
                     b.HasIndex("MessageId");
 
-                    b.ToTable("Attachments", (string)null);
+                    b.ToTable("Attachments");
                 });
 
             modelBuilder.Entity("Messenger.Domain.Entities.BanUserByChatEntity", b =>
@@ -60,7 +60,7 @@ namespace Messenger.Services.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BanUserByChats", (string)null);
+                    b.ToTable("BanUserByChats");
                 });
 
             modelBuilder.Entity("Messenger.Domain.Entities.ChatEntity", b =>
@@ -94,7 +94,7 @@ namespace Messenger.Services.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Chats", (string)null);
+                    b.ToTable("Chats");
 
                     b.HasData(
                         new
@@ -140,7 +140,7 @@ namespace Messenger.Services.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ChatUsers", (string)null);
+                    b.ToTable("ChatUsers");
 
                     b.HasData(
                         new
@@ -211,7 +211,7 @@ namespace Messenger.Services.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("DeletedDialogByUsers", (string)null);
+                    b.ToTable("DeletedDialogByUsers");
                 });
 
             modelBuilder.Entity("Messenger.Domain.Entities.DeletedMessageByUserEntity", b =>
@@ -226,7 +226,7 @@ namespace Messenger.Services.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("DeletedMessageByUsers", (string)null);
+                    b.ToTable("DeletedMessageByUsers");
                 });
 
             modelBuilder.Entity("Messenger.Domain.Entities.MessageEntity", b =>
@@ -262,61 +262,61 @@ namespace Messenger.Services.Migrations
 
                     b.HasIndex("ReplyToMessageId");
 
-                    b.ToTable("Messages", (string)null);
+                    b.ToTable("Messages");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("619186ff-6e99-4b20-94ad-da8595f30e78"),
+                            Id = new Guid("8f2e54bc-4eec-47d6-a2cb-44fb435a77c7"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 28, 19, 16, 7, 863, DateTimeKind.Utc).AddTicks(2954),
+                            DateOfCreate = new DateTime(2023, 5, 31, 5, 1, 36, 401, DateTimeKind.Utc).AddTicks(9800),
                             IsEdit = false,
                             OwnerId = new Guid("a85825ba-f99b-4177-a858-96384303ea14"),
                             Text = "привет, какие книжки почитать?"
                         },
                         new
                         {
-                            Id = new Guid("eae466b7-b0ed-480b-93c0-d19a54847714"),
+                            Id = new Guid("ef65d839-fbe4-4775-b3d2-229ce23c3324"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 28, 19, 16, 7, 863, DateTimeKind.Utc).AddTicks(3908),
+                            DateOfCreate = new DateTime(2023, 5, 31, 5, 1, 36, 402, DateTimeKind.Utc).AddTicks(368),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
-                            ReplyToMessageId = new Guid("619186ff-6e99-4b20-94ad-da8595f30e78"),
+                            ReplyToMessageId = new Guid("8f2e54bc-4eec-47d6-a2cb-44fb435a77c7"),
                             Text = "Книги в айтишке это как предметы в школе, созданы что б отбить у тебя желание учиться..."
                         },
                         new
                         {
-                            Id = new Guid("16028929-a50c-4ac0-b8c3-16e112da134b"),
+                            Id = new Guid("dd5bfabd-9982-4995-ba70-20c55643a5ab"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 28, 19, 16, 7, 864, DateTimeKind.Utc).AddTicks(449),
+                            DateOfCreate = new DateTime(2023, 5, 31, 5, 1, 36, 402, DateTimeKind.Utc).AddTicks(765),
                             IsEdit = false,
                             OwnerId = new Guid("ee677bde-c6e6-40b3-8294-5fb5e913202a"),
-                            ReplyToMessageId = new Guid("eae466b7-b0ed-480b-93c0-d19a54847714"),
+                            ReplyToMessageId = new Guid("ef65d839-fbe4-4775-b3d2-229ce23c3324"),
                             Text = "ладно"
                         },
                         new
                         {
-                            Id = new Guid("af60db06-0111-4bd6-94bf-7ce6c7309acd"),
+                            Id = new Guid("fe3c2f65-41fc-42a4-903b-52fa3ea1076b"),
                             ChatId = new Guid("2975dbfe-bc05-4962-ba85-e4d1b4e8f7a8"),
-                            DateOfCreate = new DateTime(2023, 3, 28, 19, 16, 7, 864, DateTimeKind.Utc).AddTicks(1114),
+                            DateOfCreate = new DateTime(2023, 5, 31, 5, 1, 36, 402, DateTimeKind.Utc).AddTicks(1153),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "ага"
                         },
                         new
                         {
-                            Id = new Guid("10b80560-3742-4564-b8b0-42c98af17bfc"),
+                            Id = new Guid("ef0be2a3-74c0-4e82-b56c-562b15440701"),
                             ChatId = new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"),
-                            DateOfCreate = new DateTime(2023, 3, 28, 19, 16, 7, 864, DateTimeKind.Utc).AddTicks(1788),
+                            DateOfCreate = new DateTime(2023, 5, 31, 5, 1, 36, 402, DateTimeKind.Utc).AddTicks(1586),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "привет"
                         },
                         new
                         {
-                            Id = new Guid("0a0abd9e-e759-4ec3-ad17-5d3c5f1b2e51"),
+                            Id = new Guid("1bbb3da1-da30-499e-a866-190d22ab4590"),
                             ChatId = new Guid("f69acb05-018c-4626-9e70-46fbb5dfde6f"),
-                            DateOfCreate = new DateTime(2023, 3, 28, 19, 16, 7, 864, DateTimeKind.Utc).AddTicks(2375),
+                            DateOfCreate = new DateTime(2023, 5, 31, 5, 1, 36, 402, DateTimeKind.Utc).AddTicks(1967),
                             IsEdit = false,
                             OwnerId = new Guid("5aef3c7f-8040-4a99-9a3d-388695e55763"),
                             Text = "привет, как дела?"
@@ -357,44 +357,7 @@ namespace Messenger.Services.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RoleUserByChats", (string)null);
-                });
-
-            modelBuilder.Entity("Messenger.Domain.Entities.SessionEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("AccessToken")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Ip")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("RefreshToken")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("UserAgent")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Sessions", (string)null);
+                    b.ToTable("RoleUserByChats");
                 });
 
             modelBuilder.Entity("Messenger.Domain.Entities.UserEntity", b =>
@@ -427,7 +390,7 @@ namespace Messenger.Services.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
 
                     b.HasData(
                         new
@@ -468,6 +431,38 @@ namespace Messenger.Services.Migrations
                             PasswordHash = "gzF/n+F8YPd/IvNrALE/XtGhhoJhtRs+PP3eco6JYzB36pVy2TGyj/4+68GXGws4EiIjSAkPKutdJuj6tb0d7A==",
                             PasswordSalt = "fh1cbqngj2gJnAoolbwi6e6tPVGwUnrLVsCX1l7UbD+Nxz72Y8F4ucWNaBa0kLopPAyFWHesvCfZX7OSlqG3ZVAjYTUIa+YCV3TXwgNnQARH0KptctnRHczMzlk5D0bmHra29Zc3rGkWpsxtVGhuayb/FIUGPG92Md0G8d6v2GI="
                         });
+                });
+
+            modelBuilder.Entity("Messenger.Domain.Entities.UserSessionEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("DateOfLastAccess")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<byte[]>("Value")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserSessions");
                 });
 
             modelBuilder.Entity("Messenger.Domain.Entities.AttachmentEntity", b =>
@@ -618,10 +613,10 @@ namespace Messenger.Services.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Messenger.Domain.Entities.SessionEntity", b =>
+            modelBuilder.Entity("Messenger.Domain.Entities.UserSessionEntity", b =>
                 {
                     b.HasOne("Messenger.Domain.Entities.UserEntity", "User")
-                        .WithMany("Sessions")
+                        .WithMany("UserSessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -668,7 +663,7 @@ namespace Messenger.Services.Migrations
 
                     b.Navigation("Messages");
 
-                    b.Navigation("Sessions");
+                    b.Navigation("UserSessions");
                 });
 #pragma warning restore 612, 618
         }

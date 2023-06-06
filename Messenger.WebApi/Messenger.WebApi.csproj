@@ -43,6 +43,9 @@
       <_ContentIncludedByDefault Remove="wwwroot\static\media\three_dots.b161863d423efa99ec2c5d7a03695c0b.svg" />
       <_ContentIncludedByDefault Remove="wwwroot\static\media\tick_white.33bfc99a43deea56d74b824a5771fc6d.svg" />
       <_ContentIncludedByDefault Remove="wwwroot\static\media\trash_bin_black.f93124fb4281eb7bde5a52db77f996c4.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\js\main.81d9da26.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\js\main.81d9da26.js.LICENSE.txt" />
+      <_ContentIncludedByDefault Remove="wwwroot\static\js\main.81d9da26.js.map" />
     </ItemGroup>
 
     <ItemGroup>

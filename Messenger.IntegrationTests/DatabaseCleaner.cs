@@ -15,7 +15,7 @@ public static class DatabaseCleaner
 		                   "TRUNCATE TABLE \"RoleUserByChats\" CASCADE;" +
 		                   "TRUNCATE TABLE \"DeletedMessageByUsers\" CASCADE;" + 
 		                   "TRUNCATE TABLE \"DeletedDialogByUsers\" CASCADE;" +
-		                   "TRUNCATE TABLE \"Sessions\" CASCADE;" +
+		                   "TRUNCATE TABLE \"UserSessions\" CASCADE;" +
 		                   "TRUNCATE TABLE \"BanUserByChats\" CASCADE;";
 
 		await databaseContext.Database.ExecuteSqlRawAsync(sql);

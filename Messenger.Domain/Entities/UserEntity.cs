@@ -32,7 +32,7 @@ public class UserEntity : IBaseEntity
 	
 	public List<BanUserByChatEntity> BanUserByChats { get; set; } = new();
 
-	public List<SessionEntity> Sessions { get; set; } = new();
+	public List<UserSessionEntity> UserSessions { get; set; } = new();
 
 	public UserEntity(string displayName, string nickname, string bio, string avatarFileName, string passwordHash, string passwordSalt)
 	{

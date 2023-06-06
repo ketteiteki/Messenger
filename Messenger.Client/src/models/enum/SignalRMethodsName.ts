@@ -1,6 +1,5 @@
 
 
-
 export enum SignalRMethodsName {
   JoinChat = "JoinChat",
   LeaveChat = "LeaveChat",
