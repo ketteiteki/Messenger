@@ -217,7 +217,11 @@ const Message = observer((props: IMessageDto) => {
                 props.attachments[0] && <div className={messageAttachmentListStyle}>
                   {
                     props.attachments.map(x =>
-                      <img className={styles.messageAttachment} onClick={() => onClickOpenFullSizeAvatar(x.link)} src={x.link} alt="" />)
+                      <img className={styles.messageAttachment} 
+                      onClick={() => onClickOpenFullSizeAvatar(x.link)} 
+                      src={x.link} 
+                      alt=""
+                      key={x.id} />)
                   }
                 </div>
               }

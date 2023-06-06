@@ -8,7 +8,8 @@ import { sessionsState } from "../../state/SessionsState";
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
 import { currentChatState } from "../../state/CurrentChatState";
 import RouteConstants from "../../constants/RouteConstants";
-import {currentProfileState} from "../../state/CurrentProfileState";
+import { currentProfileState } from "../../state/CurrentProfileState";
+import AuthorizationApi from "../../services/api/AuthorizationApi";
 
 const Login = observer(() => {
   const [inputNickname, setInputNickname] = useState<string>("");
@@ -17,12 +18,18 @@ const Login = observer(() => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    authorizationState.clearAuthorizationData();
-    chatListWithMessagesState.clearChatListWithMessagesData();
-    currentChatState.clearChatAndMessages();
-    currentProfileState.setProfileNull()
-    sessionsState.clearData();
-    signalRConfiguration.connection?.stop();
+    const fun = async () => {
+      await AuthorizationApi.postLogoutAsync();
+
+      authorizationState.clearAuthorizationData();
+      chatListWithMessagesState.clearChatListWithMessagesData();
+      currentChatState.clearChatAndMessages();
+      currentProfileState.setProfileNull()
+      sessionsState.clearData();
+      signalRConfiguration.connection?.stop();
+    }
+
+    fun();
   }, []);
 
   const loginHandler = async () => {

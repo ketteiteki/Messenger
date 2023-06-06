@@ -66,7 +66,6 @@ const ChatList = observer(() => {
         <input
           type="text"
           placeholder="Search"
-          defaultValue={""}
           value={searchInput}
           onChange={(e) => searchChatListHandler(e.currentTarget.value)}
         />

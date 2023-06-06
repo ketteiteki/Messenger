@@ -37,9 +37,20 @@ public class TicketStore : ITicketStore
     {
         var userId = ticket.Principal.Claims.First(x => x.Type == ClaimConstants.Id).Value;
         var sessionId = ticket.Principal.Claims.First(x => x.Type == ClaimConstants.SessionId).Value;
-      
+
+        var countUserSession = await _context.UserSessions.Where(x => x.UserId == new Guid(userId)).CountAsync();
         var userSession = await _context.UserSessions.FirstOrDefaultAsync(x => x.Id == new Guid(sessionId));
 
+        if (countUserSession > 6)
+        {
+            var longUnusedUserSession = await _context.UserSessions
+                .Where(x => x.UserId == new Guid(userId))
+                .OrderBy(x => x.DateOfLastAccess)
+                .FirstAsync();
+
+            _context.UserSessions.Remove(longUnusedUserSession);
+        }
+        
         if (userSession != null)
         {
             userSession.UpdateExpiresAt(DateTimeOffset.UtcNow.AddMinutes(_cookieExpireTimeSpan));
@@ -112,7 +123,12 @@ public class TicketStore : ITicketStore
 
     public async Task RemoveAsync(string key)
     {
-        var userSession = await _context.UserSessions.FirstAsync(x => x.Id == new Guid(key));
+        var userSession = await _context.UserSessions.FirstOrDefaultAsync(x => x.Id == new Guid(key));
+
+        if (userSession == null)
+        {
+            return;
+        }
         
         _context.UserSessions.Remove(userSession);
         await _context.SaveChangesAsync();

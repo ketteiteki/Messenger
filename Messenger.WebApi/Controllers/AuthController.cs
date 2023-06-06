@@ -73,6 +73,7 @@ public class AuthController : ControllerBase
 		[FromBody] RegistrationRequest request,
 		CancellationToken cancellationToken)
 	{
+		var requesterId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimConstants.Id)?.Value;
 		var sessionId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimConstants.SessionId)?.Value;
 		
 		var command = new RegistrationCommand(request.DisplayName, request.Nickname, request.Password);
@@ -84,12 +85,20 @@ public class AuthController : ControllerBase
 			return result.ToActionResult();
 		}
 
-		if (sessionId == null)
+		if (sessionId == null || (requesterId != null && result.Value.Id != new Guid(requesterId)))
 		{
 			var claimsPrincipal = _claimsService.CreateSignInClaims(result.Value.Id);
 			var sessionGuid = new Guid(claimsPrincipal.Claims.First(x => x.Type == ClaimConstants.SessionId).Value);
 
-			await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+			var authenticationProperties = new AuthenticationProperties
+			{
+				IsPersistent = true
+			};
+			
+			await HttpContext.SignInAsync(
+				CookieAuthenticationDefaults.AuthenticationScheme,
+				claimsPrincipal, 
+				authenticationProperties);
 			
 			result.Value.UpdateCurrentSessionId(sessionGuid);
 			return result.ToActionResult();
@@ -107,6 +116,7 @@ public class AuthController : ControllerBase
 		[FromBody] LoginRequest request,
 		CancellationToken cancellationToken)
 	{
+		var requesterId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimConstants.Id)?.Value;
 		var sessionId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimConstants.SessionId)?.Value;
 		
 		var command = new LoginCommand(request.Nickname, request.Password);
@@ -118,12 +128,20 @@ public class AuthController : ControllerBase
 			return result.ToActionResult();
 		}
 
-		if (sessionId == null)
+		if (sessionId == null || (requesterId != null && result.Value.Id != new Guid(requesterId)))
 		{
 			var claimsPrincipal = _claimsService.CreateSignInClaims(result.Value.Id);
 			var sessionGuid = new Guid(claimsPrincipal.Claims.First(x => x.Type == ClaimConstants.SessionId).Value);
 
-			await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+			var authenticationProperties = new AuthenticationProperties
+			{
+				IsPersistent = true
+			};
+
+			await HttpContext.SignInAsync(
+				CookieAuthenticationDefaults.AuthenticationScheme,
+				claimsPrincipal, 
+				authenticationProperties);
 			
 			result.Value.UpdateCurrentSessionId(sessionGuid);
 			return result.ToActionResult();

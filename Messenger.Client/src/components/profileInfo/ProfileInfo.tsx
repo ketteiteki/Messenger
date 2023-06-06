@@ -268,8 +268,7 @@ const ProfileInfo = observer(() => {
                   className={i.id === authorizationState.data?.currentSessionId ?
                     styles.currentSessionItem :
                     styles.sessionItem}
-                  key={i.id}
-                >
+                  key={i.id}>
                   <div className={styles.sessionItemRemoveButton} onClick={() => deleteSessionHandler(i.id)}>
                     <CrossSvg className={styles.crossSvg} width={20} />
                   </div>

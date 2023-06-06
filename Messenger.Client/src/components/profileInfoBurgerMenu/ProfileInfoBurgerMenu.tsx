@@ -12,6 +12,8 @@ import { blackCoverState } from "../../state/BlackCoverState";
 import ModalWindowEntity from "../../models/entities/ModalWindowEntity";
 import { useNavigate } from "react-router-dom";
 import RouteConstants from "../../constants/RouteConstants";
+import AuthorizationApi from "../../services/api/AuthorizationApi";
+import axios from "axios";
 
 interface IProfileInfoBurgerMenuProps {
   x: number;
@@ -34,7 +36,7 @@ const ProfileInfoBurgerMenu = observer(({ x, y, setShowMenu, setUpdateMode }: IP
     const text = "Do you want to log out?";
 
     const okFun = async () => {
-
+      await AuthorizationApi.postLogoutAsync();
       return navigate(RouteConstants.Login, { replace: true });
     };
 

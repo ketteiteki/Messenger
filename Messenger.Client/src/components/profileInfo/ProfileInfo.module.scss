@@ -179,16 +179,16 @@
 .sessionItem {
   position: relative;
   transition: 0.2s;
-  background-color: rgb(224, 183, 238);
+  background-color: $pink-transparent;
   margin-top: 1px;
   
   p {
-    color: white;
+    color: $light-grey-for-session-item;
   }
 
   .crossSvg {
     path {
-      stroke: white;
+      stroke: $light-grey-for-session-item;
     }
   }
 }

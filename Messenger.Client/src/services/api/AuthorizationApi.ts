@@ -31,7 +31,7 @@ export default class AuthorizationApi {
     }
 
     public static async postLogoutAsync() {
-        return await api.post("/logout");
+        return await api.post("/Auth/logout");
     }
 
     public static async delTerminateSessionAsync(sessionId: string) {
