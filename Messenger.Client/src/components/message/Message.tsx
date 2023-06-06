@@ -218,8 +218,7 @@ const Message = observer((props: IMessageDto) => {
                   {
                     props.attachments.map(x =>
                       <img className={styles.messageAttachment} 
-                      onClick={() => onClickOpenFullSizeAvatar(x.link)} 
-                      src={x.link} 
+                      onClick={() => onClickOpenFullSizeAvatar(x.link)} src={x.link} 
                       alt=""
                       key={x.id} />)
                   }

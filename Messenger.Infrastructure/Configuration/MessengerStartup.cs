@@ -11,7 +11,6 @@ public static class MessengerStartup
 	public static void Initialize(
 		IConfigurationRoot configuration,
 		string databaseConnectionString,
-		int cookieExpireTimeSpan,
 		string messengerBlobContainerName,
 		string messengerBlobAccess,
 		string messengerBlobUrl)
@@ -22,7 +21,7 @@ public static class MessengerStartup
 		
 		serviceCollection.AddDatabaseServices(databaseConnectionString);
 		
-		serviceCollection.AddInfrastructureServices(cookieExpireTimeSpan);
+		serviceCollection.AddInfrastructureServices(false);
 	
 		serviceCollection.AddMessengerServices(messengerBlobContainerName, messengerBlobAccess, messengerBlobUrl);
 

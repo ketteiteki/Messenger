@@ -9,6 +9,10 @@
   z-index: 2;
   border-radius: 5px;
   box-shadow: 0 0 5px $grey;
+
+  svg {
+    margin-top: 6px;
+  }
 }
 
 .deleteMessageButton {

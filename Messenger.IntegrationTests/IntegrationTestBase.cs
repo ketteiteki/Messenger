@@ -33,7 +33,6 @@ public class IntegrationTestBase : IAsyncLifetime
 			.Build();
 
 		var databaseConnectionString = configuration[AppSettingConstants.DatabaseConnectionStringForIntegrationTests];
-		var cookieExpireTimeSpan = configuration.GetValue<int>(AppSettingConstants.CookieExpireTimeSpan);
 		
 		var messengerBlobContainerName = configuration[AppSettingConstants.BlobContainer];
 		var messengerBlobAccess = configuration[AppSettingConstants.BlobAccess];
@@ -42,7 +41,6 @@ public class IntegrationTestBase : IAsyncLifetime
 		MessengerStartup.Initialize(
 			configuration,
 			databaseConnectionString,
-			cookieExpireTimeSpan,
 			messengerBlobContainerName,
 			messengerBlobAccess,
 			messengerBlobUrl);
@@ -55,7 +53,7 @@ public class IntegrationTestBase : IAsyncLifetime
 		                         throw new InvalidOperationException("DatabaseContext service is not registered in the DI.");
 
 		BlobService = ServiceProvider.GetRequiredService<IBlobService>() ??
-		              throw new InvalidOperationException("BlobService is not registered in the DI.");;
+		              throw new InvalidOperationException("BlobService is not registered in the DI.");
 	}
 
 	public async Task InitializeAsync()

@@ -10,18 +10,18 @@ public class Startup
 {
     private const string CorsPolicyName = "DefaultCors";
     private readonly IConfiguration _configuration;
-
-    public Startup(IConfiguration configuration)
+    private readonly IHostEnvironment _environment;
+    
+    public Startup(IConfiguration configuration, IHostEnvironment environment)
     {
         _configuration = configuration;
+        _environment = environment;
     }
 
     public void ConfigureServices(IServiceCollection serviceCollection)
     {
         serviceCollection.AddControllers();
 
-        var cookieExpireTimeSpan = _configuration.GetValue<int>(AppSettingConstants.CookieExpireTimeSpan);
-        
         var databaseConnectionString = _configuration[AppSettingConstants.DatabaseConnectionString];
         var allowOrigins = _configuration[AppSettingConstants.AllowedHosts];
         
@@ -31,7 +31,7 @@ public class Startup
 
         serviceCollection.AddDatabaseServices(databaseConnectionString);
 
-        serviceCollection.AddInfrastructureServices(cookieExpireTimeSpan);
+        serviceCollection.AddInfrastructureServices(_environment.IsProduction());
 
         serviceCollection.AddMessengerServices(messengerBlobContainerName, messengerBlobAccess, messengerBlobUrl);
 
@@ -50,14 +50,14 @@ public class Startup
         });
     }
 
-    public void Configure(IApplicationBuilder applicationBuilder, IHostEnvironment environment)
+    public void Configure(IApplicationBuilder applicationBuilder)
     {
         applicationBuilder.UseSwagger();
         applicationBuilder.UseSwaggerUI(options =>
         {
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "Messenger Api v1");
         });
-        
+
         applicationBuilder.UseStaticFiles();
 
         applicationBuilder.UseHttpsRedirection();

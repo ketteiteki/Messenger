@@ -8,10 +8,9 @@ namespace Messenger.Infrastructure.DependencyInjection;
 public static class InfrastructureServices
 {
 	public static IServiceCollection AddInfrastructureServices(
-		this IServiceCollection serviceCollection, 
-		int cookieExpireTimeSpan)
+		this IServiceCollection serviceCollection, bool isProduction)
 	{
-		serviceCollection.AddAppAuthentication(cookieExpireTimeSpan);
+		serviceCollection.AddAppAuthentication(isProduction);
 
 		serviceCollection.AddAppAuthorization();
 		

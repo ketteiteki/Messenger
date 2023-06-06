@@ -132,8 +132,8 @@
   height: 100%;
   margin-bottom: 5px;
   gap: 2px;
-  grid-template-columns: auto;
-  grid-template-rows: 220px 130px;
+  grid-template-columns: repeat(2, 150px);
+  grid-template-rows: 300px 130px;
   grid-template-areas:
     "block-1 block-1"
     "block-2 block-3";
