@@ -28,7 +28,7 @@ jobs:
           - ubuntu-latest
     
     env:
-      dockerRepository: 'kaminome/messenger-api'
+      dockerRepository: 'messenger-api'
       dockerImage: 'messenger-api'
       dockerUser: 'kaminome'
     
