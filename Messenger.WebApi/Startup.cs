@@ -31,7 +31,7 @@ public class Startup
 
         serviceCollection.AddDatabaseServices(databaseConnectionString);
 
-        serviceCollection.AddInfrastructureServices(_environment.IsProduction());
+        serviceCollection.AddInfrastructureServices(_environment.IsDevelopment());
 
         serviceCollection.AddMessengerServices(messengerBlobContainerName, messengerBlobAccess, messengerBlobUrl);
 

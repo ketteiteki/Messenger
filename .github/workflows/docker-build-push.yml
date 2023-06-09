@@ -1,0 +1,164 @@
+﻿name: Docker Build Push
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - develop
+
+  pull_request:
+    branches:
+      - master
+      - main
+      - develop
+
+  workflow_dispatch:
+
+#  schedule:
+#    - cron: '0 0 * * 0'
+
+jobs:
+  build-test-drop-artifacts:
+    name: Build Test & Drop artifacts
+    runs-on: ${{ matrix.environment }}
+    strategy:
+      matrix:
+        environment:
+          - ubuntu-latest
+    
+    env:
+      dockerRepository: 'kaminome/messenger-api'
+      dockerImage: 'messenger-api'
+      dockerUser: 'kaminome'
+    
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.15
+        with:
+          versionSpec: '5.x'
+
+      - name: Determine Version
+        uses: gittools/actions/gitversion/execute@v0.9.15
+
+      - name: Docker Login
+        run: echo "$DOCKER_PASSWORD" | docker login docker.io -u "$DOCKER_USERNAME" --password-stdin
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_LOGIN }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Print SemVer
+        run: echo ${{ env.GITVERSION_SEMVER }}
+
+      - name: Docker Build
+        run: |
+          IMAGE_FULL_NAME="$USER/$REPOSITORY:$VERSION"
+          echo "Image full name: $IMAGE_FULL_NAME"
+          docker build -t "$IMAGE_FULL_NAME" .
+        env:
+          REPOSITORY: ${{ env.dockerRepository }}
+          VERSION: ${{ env.GITVERSION_SEMVER }}
+          USER: ${{ env.dockerUser }}
+
+      - name: List Images
+        run: docker images
+
+      - name: Docker Push
+        run: |
+          IMAGE_FULL_NAME="$USER/$REPOSITORY:$VERSION"
+          echo "Image full name: $IMAGE_FULL_NAME"
+          docker push "$IMAGE_FULL_NAME"
+        env:
+          REPOSITORY: ${{ env.dockerRepository }}
+          VERSION: ${{ env.GITVERSION_SEMVER }}
+          USER: ${{ env.dockerUser }}
+
+      - name: Write Version
+        run: echo ${{ env.GITVERSION_SEMVER }} > version.txt
+
+      - name: Drop Artifact Version
+        uses: actions/upload-artifact@v3
+        with:
+          name: version
+          path: version.txt
+  
+#  deploy:
+#    name: Deploy
+#    needs: build-test-drop-artifacts
+#    runs-on: ubuntu-latest
+#    environment: dev
+#    
+#    steps:
+#      - name: Fetch Sources
+#        uses: actions/checkout@v3
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Download Artifact
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: version
+#          path: './'
+#
+#      - name: 'Configure SSH'
+#        run: |
+#          mkdir -p ~/.ssh/
+#          echo "$SSH_KEY" > ~/.ssh/id_rsa
+#          chmod 600 ~/.ssh/id_rsa
+#          cat >>~/.ssh/config <<END
+#          Host staging
+#            HostName $SSH_ADDRESS
+#            User $SSH_USER
+#            IdentityFile ~/.ssh/id_rsa
+#            StrictHostKeyChecking no
+#          END
+#        env:
+#          SSH_KEY: ${{ secrets.UBUNTU_SSH_KEY }}
+#          SSH_USER: ${{ secrets.UBUNTU_SSH_USER }}
+#          SSH_ADDRESS: ${{ secrets.UBUNTU_SSH_ADDRESS }}
+#
+#      - name: 'Test SSH'
+#        run: ssh staging -v "hostname"
+#
+#      - name: 'List directory'
+#        run: |
+#          ls -lsa
+#          cat version.txt
+#
+#      - name: 'Update compose version'
+#        shell: bash
+#        run: |
+#          VERSION=$(cat version.txt)
+#          echo "Version: $VERSION"
+#          chmod u+x ./scripts/sed_docker_compose.sh
+#          ./scripts/sed_docker_compose.sh "./prod-compose/docker-compose.yml" "$VERSION"
+#
+#      - name: 'Copy compose to VM'
+#        shell: bash
+#        run: |
+#          chmod 600 ~/.ssh/id_rsa
+#          scp -r -i "~/.ssh/id_rsa" "./prod-compose/docker-compose.yml" \
+#            $SSH_USER@$SSH_ADDRESS:/home/$SSH_USER/ComposeCopyTest/docker-compose.yml
+#        env:
+#          SSH_KEY: ${{ secrets.UBUNTU_SSH_KEY }}
+#          SSH_USER: ${{ secrets.UBUNTU_SSH_USER }}
+#          SSH_ADDRESS: ${{ secrets.UBUNTU_SSH_ADDRESS }}
+#
+#      - name: 'Deploy compose'
+#        shell: bash
+#        run: |
+#          echo "Stop service"
+#          ssh staging "sudo systemctl stop moviesapi.service"
+#          sleep 10
+#          echo "Copy compose"
+#          ssh staging "cp ~/ComposeCopyTest/docker-compose.yml ~/RiderProjects/MoviesAPI/docker-compose.yml"
+#          ssh staging "cd ~/RiderProjects/MoviesAPI && sudo docker-compose build"
+#          ssh staging "sudo systemctl start moviesapi.service"
+#        env:
+#          SSH_USER: ${{ secrets.UBUNTU_SSH_USER }}
+#          SSH_ADDRESS: ${{ secrets.UBUNTU_SSH_ADDRESS }}

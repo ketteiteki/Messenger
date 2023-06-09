@@ -8,9 +8,9 @@ namespace Messenger.Infrastructure.DependencyInjection;
 public static class InfrastructureServices
 {
 	public static IServiceCollection AddInfrastructureServices(
-		this IServiceCollection serviceCollection, bool isProduction)
+		this IServiceCollection serviceCollection, bool isDevelopment)
 	{
-		serviceCollection.AddAppAuthentication(isProduction);
+		serviceCollection.AddAppAuthentication(isDevelopment);
 
 		serviceCollection.AddAppAuthorization();
 		
