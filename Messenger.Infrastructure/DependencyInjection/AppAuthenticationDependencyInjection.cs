@@ -6,14 +6,15 @@ namespace Messenger.Infrastructure.DependencyInjection;
 
 public static class AppAuthenticationDependencyInjection
 {
-    public static IServiceCollection AddAppAuthentication(this IServiceCollection serviceCollection, bool isProduction)
+    public static IServiceCollection AddAppAuthentication(this IServiceCollection serviceCollection, bool isDevelopment)
     {
         serviceCollection
             .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
-                if (!isProduction) options.Cookie.SameSite = SameSiteMode.None;
+                if (isDevelopment) options.Cookie.SameSite = SameSiteMode.None;
 
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.IsEssential = true;
                 options.Cookie.MaxAge = TimeSpan.MaxValue;
             });
