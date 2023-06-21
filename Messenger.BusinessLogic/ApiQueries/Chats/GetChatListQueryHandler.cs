@@ -62,6 +62,7 @@ public class GetChatListQueryHandler : IRequestHandler<GetChatListQuery, Result<
 						LastMessageDateOfCreate = chat.LastMessage != null ? chat.LastMessage.DateOfCreate : null,
 						MembersCount = chat.ChatUsers.Count,
 						CanSendMedia = chatUsersItem.CanSendMedia,
+						OwnerId = chat.OwnerId,
 						IsOwner = chat.OwnerId == request.RequesterId,
 						IsMember = chatUsersItem != null,
 						MuteDateOfExpire = chatUsersItem != null ? chatUsersItem.MuteDateOfExpire : null,

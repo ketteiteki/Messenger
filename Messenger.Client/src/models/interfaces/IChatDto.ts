@@ -15,6 +15,7 @@ export default interface IChatDto {
     lastMessageDateOfCreate: string | null;
     membersCount: number;
     canSendMedia: boolean;
+    ownerId: string;
     isOwner: boolean;
     isMember: boolean;
     muteDateOfExpire: string | null;

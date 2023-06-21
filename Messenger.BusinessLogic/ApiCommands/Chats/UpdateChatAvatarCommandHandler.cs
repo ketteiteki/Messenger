@@ -83,6 +83,7 @@ public class UpdateChatAvatarCommandHandler : IRequestHandler<UpdateChatAvatarCo
 				? chatUserByRequester.Chat.LastMessage.Owner.DisplayName
 				: null,
 			LastMessageDateOfCreate = chatUserByRequester.Chat.LastMessage?.DateOfCreate,
+			OwnerId = chatUserByRequester.Chat.OwnerId,
 			IsOwner = chatUserByRequester.Chat.OwnerId == request.RequesterId,
 			IsMember = true,
 			MuteDateOfExpire = chatUserByRequester.MuteDateOfExpire,

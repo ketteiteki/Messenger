@@ -70,7 +70,7 @@ public class GetChatListTestSuccess : IntegrationTestBase, IIntegrationTest
 			thirdCreateConversationResult.Value.Id,
 			alice.Value.Id,
 			RoleTitle: "qwerty",
-			RoleColor.Black,
+			RoleColor.Cyan,
 			CanBanUser: true,
 			CanChangeChatData: false,
 			CanAddAndRemoveUserToConversation: true,

@@ -4,12 +4,18 @@ namespace Messenger.BusinessLogic.Models;
 
 public class PermissionDto
 {
-	public bool CanSendMedia { get; set; }
+	public Guid UserId { get; private set; }
 
-	public DateTime? MuteDateOfExpire { get; set; }
+	public Guid ChatId { get; private set; }
+	
+	public bool CanSendMedia { get; private set; }
+
+	public DateTime? MuteDateOfExpire { get; private set; }
 
 	public PermissionDto(ChatUserEntity chatUser)
 	{
+		UserId = chatUser.UserId;
+		ChatId = chatUser.ChatId;
 		CanSendMedia = chatUser.CanSendMedia;
 		MuteDateOfExpire = chatUser.MuteDateOfExpire;
 	}

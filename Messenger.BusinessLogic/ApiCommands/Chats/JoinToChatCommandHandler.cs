@@ -79,6 +79,7 @@ public class JoinToChatCommandHandler : IRequestHandler<JoinToChatCommand, Resul
 				? chat.LastMessage.Owner.DisplayName
 				: null,
 			LastMessageDateOfCreate = chat.LastMessage?.DateOfCreate,
+			OwnerId = chat.OwnerId,
 			IsOwner = chat.OwnerId == request.RequesterId,
 			IsMember = true,
 			MembersCount = memberCount,

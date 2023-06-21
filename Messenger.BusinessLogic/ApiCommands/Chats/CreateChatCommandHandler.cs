@@ -75,6 +75,7 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Resul
             AvatarLink = avatarLink,
             MembersCount = 1,
             CanSendMedia = true,
+            OwnerId = requester.Id,
             IsOwner = true,
             IsMember = true
         };

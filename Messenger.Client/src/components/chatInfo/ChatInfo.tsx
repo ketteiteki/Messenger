@@ -9,11 +9,10 @@ import { currentChatState } from "../../state/CurrentChatState";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
 import { useNavigate } from "react-router-dom";
 import { blackCoverState } from "../../state/BlackCoverState";
-import { authorizationState } from "../../state/AuthorizationState";
-import { currentProfileState } from "../../state/CurrentProfileState";
 import { useDebouncedCallback } from "use-debounce";
 import { motion } from "framer-motion";
 import RouteConstants from "../../constants/RouteConstants";
+import MemberListItem from "../memberListItem/MemberListItem";
 
 const ChatInfo = observer(() => {
   const [updateMode, setUpdateMode] = useState<boolean>(false);
@@ -104,20 +103,6 @@ const ChatInfo = observer(() => {
 
   const onClickOpenFullSizeAvatar = () => {
     blackCoverState.setImage(currentChatState.chat?.avatarLink ?? nonAvatar);
-  };
-
-  const showProfileByMessage = async (userId: string) => {
-    if (userId === authorizationState.data?.id) {
-      currentProfileState.setProfileNull();
-
-      return navigate(RouteConstants.Layout, { replace: true });
-    }
-
-    await currentProfileState
-      .getUserAsync(userId)
-      .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
-
-    return navigate(RouteConstants.Layout, { replace: true });
   };
 
   const onClickShowMemberListHandler = async () => {
@@ -266,29 +251,7 @@ const ChatInfo = observer(() => {
         showMemberList && (
           <div className={styles.memberList} id="memberList" onScroll={getMembers}>
             {currentChatState.chat?.members.map((i) => (
-              <motion.div
-                initial={{ opacity: 0.7 }}
-                animate={{ opacity: 1 }}
-                transition={{ type: "Inertia", duration: .15 }}
-                className={styles.memberItem} key={i.id}
-                onClick={() => showProfileByMessage(i.id)}>
-                <img
-                  className={styles.memberItemAvatar}
-                  src={i.avatarLink ?? nonAvatar}
-                  alt=""
-                />
-                <div className={styles.memberItemContainer}>
-                  <p className={styles.memberItemDisplayName}>{i.displayName}</p>
-                  <p className={styles.memberItemBio}>{i.bio}</p>
-                  <p className={styles.memberItemRole}>
-                    {
-                      currentChatState.chat?.usersWithRole.find(
-                        (u) => u.userId === i.id
-                      )?.roleTitle
-                    }
-                  </p>
-                </div>
-              </motion.div>
+              <MemberListItem {...i} />
             ))}
           </div>
         )
