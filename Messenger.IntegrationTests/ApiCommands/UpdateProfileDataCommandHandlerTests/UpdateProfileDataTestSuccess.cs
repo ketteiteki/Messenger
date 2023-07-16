@@ -11,7 +11,7 @@ public class UpdateProfileDataTestSuccess : IntegrationTestBase, IIntegrationTes
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var updateProfileCommand = new UpdateProfileDataCommand(
             user21Th.Value.Id,
@@ -19,7 +19,7 @@ public class UpdateProfileDataTestSuccess : IntegrationTestBase, IIntegrationTes
             Nickname: "liza",
             Bio: "i love your mom");
         
-        var updatedProfileResult = await MessengerModule.RequestAsync(updateProfileCommand, CancellationToken.None);
+        var updatedProfileResult = await RequestAsync(updateProfileCommand, CancellationToken.None);
 
         updatedProfileResult.Value.DisplayName.Should().Be(updateProfileCommand.DisplayName);
         updatedProfileResult.Value.Nickname.Should().Be(updateProfileCommand.Nickname);

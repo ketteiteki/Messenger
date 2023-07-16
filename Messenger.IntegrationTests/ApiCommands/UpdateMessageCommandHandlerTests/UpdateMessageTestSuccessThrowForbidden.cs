@@ -14,8 +14,8 @@ public class UpdateMessageTestSuccessThrowForbidden : IntegrationTestBase, IInte
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var bob = await RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
         
         var createConversationCommand = new CreateChatCommand(
             user21Th.Value.Id,
@@ -24,11 +24,11 @@ public class UpdateMessageTestSuccessThrowForbidden : IntegrationTestBase, IInte
             ChatType.Conversation,
             AvatarFile: null);
 
-        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await RequestAsync(createConversationCommand, CancellationToken.None);
 
         var bobJoinChatCommand = new JoinToChatCommand(bob.Value.Id, createConversationResult.Value.Id);
         
-        await MessengerModule.RequestAsync(bobJoinChatCommand, CancellationToken.None);
+        await RequestAsync(bobJoinChatCommand, CancellationToken.None);
 
         var createMessageBy21ThCommand = new CreateMessageCommand(
             user21Th.Value.Id,
@@ -37,7 +37,7 @@ public class UpdateMessageTestSuccessThrowForbidden : IntegrationTestBase, IInte
             createConversationResult.Value.Id,
             Files: null);
         
-        var createdMessageBy21ThResult = await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
+        var createdMessageBy21ThResult = await RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
 
         var updateMessage21ThByBobCommand = new UpdateMessageCommand(
             bob.Value.Id,
@@ -45,7 +45,7 @@ public class UpdateMessageTestSuccessThrowForbidden : IntegrationTestBase, IInte
             Text: "hello bro23");
         
         var updateMessageByBobResult = 
-            await MessengerModule.RequestAsync(updateMessage21ThByBobCommand, CancellationToken.None);
+            await RequestAsync(updateMessage21ThByBobCommand, CancellationToken.None);
         
         updateMessageByBobResult.Error.Should().BeOfType<ForbiddenError>();
     }

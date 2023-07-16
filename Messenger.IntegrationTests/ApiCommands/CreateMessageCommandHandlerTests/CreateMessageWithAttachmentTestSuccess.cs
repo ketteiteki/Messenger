@@ -14,7 +14,7 @@ public class CreateMessageWithAttachmentTestSuccess : IntegrationTestBase, IInte
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
             user21Th.Value.Id,
@@ -23,7 +23,7 @@ public class CreateMessageWithAttachmentTestSuccess : IntegrationTestBase, IInte
             ChatType.Conversation,
             AvatarFile: null);
 		
-        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await RequestAsync(createConversationCommand, CancellationToken.None);
 
         var createMessageBy21ThCommand = new CreateMessageCommand(
             user21Th.Value.Id,
@@ -36,7 +36,7 @@ public class CreateMessageWithAttachmentTestSuccess : IntegrationTestBase, IInte
                 FilesHelper.GetFile()
             });
 
-        var createMessageBy21ThResult = await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
+        var createMessageBy21ThResult = await RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
 
         createMessageBy21ThResult.Value.Attachments.Count.Should().Be(2);
 

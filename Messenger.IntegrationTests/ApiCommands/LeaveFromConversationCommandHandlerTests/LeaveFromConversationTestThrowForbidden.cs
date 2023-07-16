@@ -13,8 +13,8 @@ public class LeaveFromConversationTestThrowForbidden : IntegrationTestBase, IInt
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var alice = await RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		
         var createConversationCommand = new CreateChatCommand(
             user21Th.Value.Id,
@@ -23,12 +23,12 @@ public class LeaveFromConversationTestThrowForbidden : IntegrationTestBase, IInt
             ChatType.Conversation,
             AvatarFile: null);
 
-        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await RequestAsync(createConversationCommand, CancellationToken.None);
 
         var aliceLeaveConversationCommand = new LeaveFromChatCommand(alice.Value.Id, createConversationResult.Value.Id);
         
         var aliceLeaveConversationResult = 
-            await MessengerModule.RequestAsync(aliceLeaveConversationCommand, CancellationToken.None);
+            await RequestAsync(aliceLeaveConversationCommand, CancellationToken.None);
 
         aliceLeaveConversationResult.Error.Should().BeOfType<ForbiddenError>();
     }

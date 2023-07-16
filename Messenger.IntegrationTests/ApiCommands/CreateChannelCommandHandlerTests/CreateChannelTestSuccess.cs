@@ -12,7 +12,7 @@ public class CreateChannelTestSuccess : IntegrationTestBase, IIntegrationTest
 	[Fact]
 	public async Task Test()
 	{
-		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+		var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		
 		var createChannelCommand = new CreateChatCommand(
 			user21Th.Value.Id,
@@ -21,7 +21,7 @@ public class CreateChannelTestSuccess : IntegrationTestBase, IIntegrationTest
 			ChatType.Channel,
 			AvatarFile: null);
 		
-		var createChannelResult = await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
+		var createChannelResult = await RequestAsync(createChannelCommand, CancellationToken.None);
 
 		createChannelResult.IsSuccess.Should().BeTrue();
 		createChannelResult.Value.IsOwner.Should().BeTrue();

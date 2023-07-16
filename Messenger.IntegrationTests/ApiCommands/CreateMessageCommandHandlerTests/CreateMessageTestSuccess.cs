@@ -13,8 +13,8 @@ public class CreateMessageTestSuccess : IntegrationTestBase, IIntegrationTest
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var alice = await RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
             user21Th.Value.Id,
@@ -23,12 +23,12 @@ public class CreateMessageTestSuccess : IntegrationTestBase, IIntegrationTest
             ChatType.Conversation,
             AvatarFile: null);
 		
-        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await RequestAsync(createConversationCommand, CancellationToken.None);
 
         var userAliceJoinToConversationCommand =
             new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
         
-        await MessengerModule.RequestAsync(userAliceJoinToConversationCommand, CancellationToken.None);
+        await RequestAsync(userAliceJoinToConversationCommand, CancellationToken.None);
 
         var createMessageBy21ThCommand = new CreateMessageCommand(
             user21Th.Value.Id,
@@ -38,7 +38,7 @@ public class CreateMessageTestSuccess : IntegrationTestBase, IIntegrationTest
             Files: null);
 
         var createMessageBy21ThResult = 
-            await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
+            await RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
         
         var createFirstMessageByAliceCommand = new CreateMessageCommand(
             alice.Value.Id,
@@ -48,7 +48,7 @@ public class CreateMessageTestSuccess : IntegrationTestBase, IIntegrationTest
             Files: null);
 
         var createFirstMessageByAliceResult = 
-            await MessengerModule.RequestAsync(createFirstMessageByAliceCommand , CancellationToken.None);
+            await RequestAsync(createFirstMessageByAliceCommand , CancellationToken.None);
         
         var createSecondMessageByAliceCommand = new CreateMessageCommand(
             alice.Value.Id,
@@ -58,7 +58,7 @@ public class CreateMessageTestSuccess : IntegrationTestBase, IIntegrationTest
             Files: null);
 
         var createSecondMessageByAliceResult = 
-            await MessengerModule.RequestAsync(createSecondMessageByAliceCommand , CancellationToken.None);
+            await RequestAsync(createSecondMessageByAliceCommand , CancellationToken.None);
         
         createMessageBy21ThResult.Value.Text.Should().Be(createMessageBy21ThCommand.Text);
         createMessageBy21ThResult.Value.ChatId.Should().Be(createMessageBy21ThCommand.ChatId);

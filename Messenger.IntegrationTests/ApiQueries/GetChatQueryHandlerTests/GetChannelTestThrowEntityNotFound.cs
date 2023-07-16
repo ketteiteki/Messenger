@@ -14,8 +14,8 @@ public class GetChannelTestThrowEntityNotFound : IntegrationTestBase, IIntegrati
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var bob = await RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
         var createChannelCommand = new CreateChatCommand(
             user21Th.Value.Id,
@@ -24,11 +24,11 @@ public class GetChannelTestThrowEntityNotFound : IntegrationTestBase, IIntegrati
             ChatType.Channel,
             AvatarFile: null);
 
-        await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
+        await RequestAsync(createChannelCommand, CancellationToken.None);
 
         var getChannelByBobQuery = new GetChatQuery(bob.Value.Id, new Guid());
 
-        var getChannelByBobResult = await MessengerModule.RequestAsync(getChannelByBobQuery, CancellationToken.None);
+        var getChannelByBobResult = await RequestAsync(getChannelByBobQuery, CancellationToken.None);
 
         getChannelByBobResult.Error.Should().BeOfType<DbEntityNotFoundError>();
     }

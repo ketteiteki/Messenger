@@ -15,7 +15,7 @@ public class RegistrationTestSuccess : IntegrationTestBase
 			CommandHelper.Registration21ThCommand().Nickname,
 			CommandHelper.Registration21ThCommand().Password);
 		
-		var registrationResult = await MessengerModule.RequestAsync(registrationCommand, CancellationToken.None);
+		var registrationResult = await RequestAsync(registrationCommand, CancellationToken.None);
 		
 		registrationResult.IsSuccess.Should().BeTrue();
 	}

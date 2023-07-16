@@ -11,11 +11,11 @@ public class AuthorizationTestSuccess : IntegrationTestBase, IIntegrationTest
 	[Fact]
 	public async Task Test()
 	{
-		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+		var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 		
 		var authorizationCommand = new AuthorizationCommand(user21Th.Value.Id);
 		
-		var authorizationResult = await MessengerModule.RequestAsync(authorizationCommand, CancellationToken.None);
+		var authorizationResult = await RequestAsync(authorizationCommand, CancellationToken.None);
 		
 		authorizationResult.IsSuccess.Should().BeTrue();
 	}

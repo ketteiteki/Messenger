@@ -11,10 +11,10 @@ public class GetUserListTestSuccess : IntegrationTestBase, IIntegrationTest
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
-        await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
-        await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        await RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+        await RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
+        await RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
         var getUserListLimit2Page1Query = new GetUserListBySearchQuery(
             user21Th.Value.Id,
@@ -23,7 +23,7 @@ public class GetUserListTestSuccess : IntegrationTestBase, IIntegrationTest
             Page: 1);
         
         var getUserListLimit2Page1Result = 
-            await MessengerModule.RequestAsync(getUserListLimit2Page1Query, CancellationToken.None);
+            await RequestAsync(getUserListLimit2Page1Query, CancellationToken.None);
 
         var getUserListLimit2Page2Query = new GetUserListBySearchQuery(
             RequesterId: user21Th.Value.Id,
@@ -32,7 +32,7 @@ public class GetUserListTestSuccess : IntegrationTestBase, IIntegrationTest
             Page: 2);
         
         var getUserListLimit2Page2Result = 
-            await MessengerModule.RequestAsync(getUserListLimit2Page2Query, CancellationToken.None);
+            await RequestAsync(getUserListLimit2Page2Query, CancellationToken.None);
 
         var getUserListLimit2Page3Query = new GetUserListBySearchQuery(
             RequesterId: user21Th.Value.Id,
@@ -41,7 +41,7 @@ public class GetUserListTestSuccess : IntegrationTestBase, IIntegrationTest
             Page: 3);
         
         var getUserListLimit2Page3Result =
-            await MessengerModule.RequestAsync(getUserListLimit2Page3Query, CancellationToken.None);
+            await RequestAsync(getUserListLimit2Page3Query, CancellationToken.None);
 
         var getUserListBySearchQuery = new GetUserListBySearchQuery(
             RequesterId: user21Th.Value.Id,
@@ -50,7 +50,7 @@ public class GetUserListTestSuccess : IntegrationTestBase, IIntegrationTest
             Page: 1);
         
         var getUserListBySearchResult = 
-            await MessengerModule.RequestAsync(getUserListBySearchQuery, CancellationToken.None);
+            await RequestAsync(getUserListBySearchQuery, CancellationToken.None);
         
         for (var i = 0; i < getUserListLimit2Page1Result.Value.Count; i++)
         {
