@@ -12,7 +12,7 @@ public class DeleteChannelWithAvatarTestSuccess : IntegrationTestBase, IIntegrat
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var createChannelCommand = new CreateChatCommand(
             user21Th.Value.Id,
@@ -21,13 +21,13 @@ public class DeleteChannelWithAvatarTestSuccess : IntegrationTestBase, IIntegrat
             ChatType.Channel,
             AvatarFile: FilesHelper.GetFile());
 		
-        var createChannelResult = await MessengerModule.RequestAsync(createChannelCommand, CancellationToken.None);
+        var createChannelResult = await RequestAsync(createChannelCommand, CancellationToken.None);
 
         createChannelResult.Value.AvatarLink.Should().NotBeNull();
         
         var deleteChannelCommand = new DeleteChatCommand(user21Th.Value.Id, createChannelResult.Value.Id);
 		
-        var deletedChannelResult = await MessengerModule.RequestAsync(deleteChannelCommand, CancellationToken.None);
+        var deletedChannelResult = await RequestAsync(deleteChannelCommand, CancellationToken.None);
 
         deletedChannelResult.IsSuccess.Should().BeTrue();
     }

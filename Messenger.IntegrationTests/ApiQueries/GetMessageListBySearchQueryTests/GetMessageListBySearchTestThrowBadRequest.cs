@@ -14,7 +14,7 @@ public class GetMessageListBySearchTestThrowBadRequest : IntegrationTestBase, II
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
             user21Th.Value.Id,
@@ -23,7 +23,7 @@ public class GetMessageListBySearchTestThrowBadRequest : IntegrationTestBase, II
             ChatType.Conversation,
             AvatarFile: null);
         
-        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await RequestAsync(createConversationCommand, CancellationToken.None);
 
         var getMessageListBySearchQuery = new GetMessageListBySearchQuery(
             user21Th.Value.Id,
@@ -33,7 +33,7 @@ public class GetMessageListBySearchTestThrowBadRequest : IntegrationTestBase, II
             string.Empty);
         
         var getMessageListResult = 
-            await MessengerModule.RequestAsync(getMessageListBySearchQuery, CancellationToken.None);
+            await RequestAsync(getMessageListBySearchQuery, CancellationToken.None);
 
         getMessageListResult.Error.Should().BeOfType<BadRequestError>();
     }

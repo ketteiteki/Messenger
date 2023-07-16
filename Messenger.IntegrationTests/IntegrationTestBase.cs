@@ -1,8 +1,8 @@
+using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.Application.Services;
 using Messenger.Domain.Constants;
-using Messenger.Infrastructure;
-using Messenger.Infrastructure.Configuration;
+using Messenger.IntegrationTests.Configuration;
 using Messenger.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,8 +15,6 @@ namespace Messenger.IntegrationTests;
 public class IntegrationTestBase : IAsyncLifetime
 {
 	protected DatabaseContext DatabaseContextFixture { get; }
-	
-	protected MessengerModule MessengerModule { get; }
 	
 	private IServiceProvider ServiceProvider { get; }
 
@@ -38,16 +36,14 @@ public class IntegrationTestBase : IAsyncLifetime
 		var messengerBlobAccess = configuration[AppSettingConstants.BlobAccess];
 		var messengerBlobUrl = configuration[AppSettingConstants.BlobUrl];
 
-		MessengerStartup.Initialize(
+		var serviceProvider = MessengerStartup.Initialize(
 			configuration,
 			databaseConnectionString,
 			messengerBlobContainerName,
 			messengerBlobAccess,
 			messengerBlobUrl);
 
-		ServiceProvider = MessengerCompositionRoot.Provider;
-
-		MessengerModule = new MessengerModule();
+		ServiceProvider = serviceProvider;
 		
 		DatabaseContextFixture = ServiceProvider.GetRequiredService<DatabaseContext>() ??
 		                         throw new InvalidOperationException("DatabaseContext service is not registered in the DI.");
@@ -56,6 +52,18 @@ public class IntegrationTestBase : IAsyncLifetime
 		              throw new InvalidOperationException("BlobService is not registered in the DI.");
 	}
 
+	protected async Task<TResult> RequestAsync<TResult>(IRequest<TResult> request, CancellationToken cancellationToken)
+	{
+		if (ServiceProvider == null)
+		{
+			throw new Exception("ServiceProvider is null");
+		}
+		
+		var mediator = ServiceProvider.GetRequiredService<IMediator>();
+
+		return await mediator.Send(request, cancellationToken);
+	}
+	
 	public async Task InitializeAsync()
 	{
 		await DatabaseContextFixture.Database.MigrateAsync();

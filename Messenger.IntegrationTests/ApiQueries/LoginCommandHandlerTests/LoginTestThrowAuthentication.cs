@@ -16,15 +16,15 @@ public class LoginTestThrowAuthentication : IntegrationTestBase, IIntegrationTes
             CommandHelper.Registration21ThCommand().Nickname,
             CommandHelper.Registration21ThCommand().Password);
         
-        var firstLoginResult = await MessengerModule.RequestAsync(firstLoginCommand, CancellationToken.None);
+        var firstLoginResult = await RequestAsync(firstLoginCommand, CancellationToken.None);
         
-        await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var secondLoginCommand = new LoginCommand(
             CommandHelper.Registration21ThCommand().Nickname,
             Password: "wrong password");
         
-        var secondLoginResult = await MessengerModule.RequestAsync(secondLoginCommand, CancellationToken.None);
+        var secondLoginResult = await RequestAsync(secondLoginCommand, CancellationToken.None);
 
         firstLoginResult.Error.Should().BeOfType<AuthenticationError>();
         secondLoginResult.Error.Should().BeOfType<AuthenticationError>();

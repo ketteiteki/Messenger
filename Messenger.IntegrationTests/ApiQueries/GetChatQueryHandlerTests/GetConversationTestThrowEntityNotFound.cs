@@ -12,11 +12,11 @@ public class GetConversationTestThrowEntityNotFound : IntegrationTestBase, IInte
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var getChatQuery = new GetChatQuery(user21Th.Value.Id, Guid.NewGuid());
         
-        var getConversationResult = await MessengerModule.RequestAsync(getChatQuery, CancellationToken.None);
+        var getConversationResult = await RequestAsync(getChatQuery, CancellationToken.None);
 
         getConversationResult.Error.Should().BeOfType<DbEntityNotFoundError>();
     }

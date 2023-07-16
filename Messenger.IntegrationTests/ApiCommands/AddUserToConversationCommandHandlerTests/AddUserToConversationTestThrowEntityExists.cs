@@ -14,8 +14,8 @@ public class AddUserToConversationTestThrowEntityExists : IntegrationTestBase, I
 	[Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+		var alice = await RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateChatCommand(
 			user21Th.Value.Id,
@@ -24,17 +24,17 @@ public class AddUserToConversationTestThrowEntityExists : IntegrationTestBase, I
 			ChatType.Conversation,
 			AvatarFile: null);
 		
-		var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var createConversationResult = await RequestAsync(createConversationCommand, CancellationToken.None);
 
 		var addUserAliceToConversationBy21ThCommand = new AddUserToConversationCommand(
 			user21Th.Value.Id,
 			createConversationResult.Value.Id,
 			alice.Value.Id);
 		
-	    await MessengerModule.RequestAsync(addUserAliceToConversationBy21ThCommand, CancellationToken.None);
+	    await RequestAsync(addUserAliceToConversationBy21ThCommand, CancellationToken.None);
 		
 		var secondAddUserAliceToConversationBy21ThResult = 
-			await MessengerModule.RequestAsync(addUserAliceToConversationBy21ThCommand, CancellationToken.None);
+			await RequestAsync(addUserAliceToConversationBy21ThCommand, CancellationToken.None);
 
 		secondAddUserAliceToConversationBy21ThResult.Error.Should().BeOfType<DbEntityExistsError>();
     }

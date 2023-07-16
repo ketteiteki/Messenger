@@ -11,9 +11,9 @@ public class GetUserListBySearchTestSuccess : IntegrationTestBase, IIntegrationT
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
-        var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        await RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+        var bob = await RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
         var getUserListBySearchStringEmptyQuery = new GetUserListBySearchQuery(
             user21Th.Value.Id,
@@ -22,7 +22,7 @@ public class GetUserListBySearchTestSuccess : IntegrationTestBase, IIntegrationT
             Page: 1);
         
         var getUserListBySearchStringEmptyResult = 
-            await MessengerModule.RequestAsync(getUserListBySearchStringEmptyQuery, CancellationToken.None);
+            await RequestAsync(getUserListBySearchStringEmptyQuery, CancellationToken.None);
 
         var getUserListBySearchBobNicknameQuery = new GetUserListBySearchQuery(
             user21Th.Value.Id,
@@ -31,7 +31,7 @@ public class GetUserListBySearchTestSuccess : IntegrationTestBase, IIntegrationT
             Page: 1);
         
         var getUserListBySearchBobNicknameResult =
-            await MessengerModule.RequestAsync(getUserListBySearchBobNicknameQuery, CancellationToken.None);
+            await RequestAsync(getUserListBySearchBobNicknameQuery, CancellationToken.None);
         
         getUserListBySearchStringEmptyResult.Value.Count.Should().Be(2);
         getUserListBySearchStringEmptyResult.Value.FirstOrDefault(u => u.Id == user21Th.Value.Id).Should().BeNull();

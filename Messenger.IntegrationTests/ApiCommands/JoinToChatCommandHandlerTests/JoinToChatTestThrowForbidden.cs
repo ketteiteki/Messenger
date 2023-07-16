@@ -14,8 +14,8 @@ public class JoinToChatTestThrowForbidden : IntegrationTestBase, IIntegrationTes
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var alice = await RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 		
         var createConversationCommand = new CreateChatCommand(
             user21Th.Value.Id,
@@ -24,11 +24,11 @@ public class JoinToChatTestThrowForbidden : IntegrationTestBase, IIntegrationTes
             ChatType.Conversation,
             AvatarFile: null);
 
-        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await RequestAsync(createConversationCommand, CancellationToken.None);
 
         var firstAliceJoinToConversationCommand = new JoinToChatCommand(alice.Value.Id,createConversationResult.Value.Id);
 
-        await MessengerModule.RequestAsync(firstAliceJoinToConversationCommand, CancellationToken.None);
+        await RequestAsync(firstAliceJoinToConversationCommand, CancellationToken.None);
 
         var banAliceInConversationBy21ThCommand = new BanUserInConversationCommand(
             user21Th.Value.Id,
@@ -36,12 +36,12 @@ public class JoinToChatTestThrowForbidden : IntegrationTestBase, IIntegrationTes
             alice.Value.Id,
             BanMinutes: 15);
 
-        await MessengerModule.RequestAsync(banAliceInConversationBy21ThCommand, CancellationToken.None);
+        await RequestAsync(banAliceInConversationBy21ThCommand, CancellationToken.None);
         
         var secondAliceJoinToConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
 
         var secondAliceJoinToConversationResult = 
-            await MessengerModule.RequestAsync(secondAliceJoinToConversationCommand, CancellationToken.None);
+            await RequestAsync(secondAliceJoinToConversationCommand, CancellationToken.None);
 
         secondAliceJoinToConversationResult.Error.Should().BeOfType<ForbiddenError>();
     }

@@ -14,10 +14,10 @@ public class BanUserInConversationTestThrowForbidden : IntegrationTestBase, IInt
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
-        var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
-        var alex = await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var alice = await RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+        var bob = await RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
+        var alex = await RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
             user21Th.Value.Id,
@@ -26,13 +26,13 @@ public class BanUserInConversationTestThrowForbidden : IntegrationTestBase, IInt
             ChatType.Conversation,
             AvatarFile: null);
 		
-        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await RequestAsync(createConversationCommand, CancellationToken.None);
 
         var userAliceJoinToConversation = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
         var userAlexJoinToConversation = new JoinToChatCommand(alex.Value.Id, createConversationResult.Value.Id);
         
-        await MessengerModule.RequestAsync(userAliceJoinToConversation, CancellationToken.None);
-        await MessengerModule.RequestAsync(userAlexJoinToConversation, CancellationToken.None);
+        await RequestAsync(userAliceJoinToConversation, CancellationToken.None);
+        await RequestAsync(userAlexJoinToConversation, CancellationToken.None);
 
         var banUserAliceInConversationByBobCommand = new BanUserInConversationCommand(
             bob.Value.Id,
@@ -47,9 +47,9 @@ public class BanUserInConversationTestThrowForbidden : IntegrationTestBase, IInt
             BanMinutes: 15);
         
         var banUserAliceInConversationByBobResult =
-            await MessengerModule.RequestAsync(banUserAliceInConversationByBobCommand, CancellationToken.None);
+            await RequestAsync(banUserAliceInConversationByBobCommand, CancellationToken.None);
         var banUserAlexInConversationByAliceResult =
-            await MessengerModule.RequestAsync(banUserAlexInConversationByAliceCommand, CancellationToken.None);
+            await RequestAsync(banUserAlexInConversationByAliceCommand, CancellationToken.None);
 
         banUserAliceInConversationByBobResult.Error.Should().BeOfType<ForbiddenError>();
         banUserAlexInConversationByAliceResult.Error.Should().BeOfType<ForbiddenError>();

@@ -12,12 +12,12 @@ public class GetDialogTestThrowEntityNotFound : IntegrationTestBase, IIntegratio
     [Fact]
     public async Task Test()
     {
-        var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
-        var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
+        var alice = await RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+        var bob = await RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
         var getDialogQuery = new GetDialogQuery(bob.Value.Id, alice.Value.Id);
         
-        var getDialogResult = await MessengerModule.RequestAsync(getDialogQuery, CancellationToken.None);
+        var getDialogResult = await RequestAsync(getDialogQuery, CancellationToken.None);
 
         getDialogResult.Error.Should().BeOfType<DbEntityNotFoundError>();
     }

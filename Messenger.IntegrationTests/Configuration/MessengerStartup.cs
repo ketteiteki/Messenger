@@ -3,12 +3,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Messenger.Infrastructure.Configuration;
+namespace Messenger.IntegrationTests.Configuration;
 
 public static class MessengerStartup
 {
-
-	public static void Initialize(
+	public static ServiceProvider Initialize(
 		IConfigurationRoot configuration,
 		string databaseConnectionString,
 		string messengerBlobContainerName,
@@ -31,7 +30,6 @@ public static class MessengerStartup
 			builder.AddConsole();
 		});
 		
-		var provider = serviceCollection.BuildServiceProvider();
-		MessengerCompositionRoot.SetProvider(provider);
+		return serviceCollection.BuildServiceProvider();
 	}
 }

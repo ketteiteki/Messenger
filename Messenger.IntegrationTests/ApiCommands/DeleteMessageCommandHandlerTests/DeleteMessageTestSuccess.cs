@@ -13,9 +13,9 @@ public class DeleteMessageTestSuccess : IntegrationTestBase, IIntegrationTest
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
-        var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var alice = await RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+        var bob = await RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
             user21Th.Value.Id,
@@ -24,13 +24,13 @@ public class DeleteMessageTestSuccess : IntegrationTestBase, IIntegrationTest
             ChatType.Conversation,
             AvatarFile: null);
 
-        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await RequestAsync(createConversationCommand, CancellationToken.None);
 
         var aliceJoinToConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id); 
         var bobJoinToConversationCommand = new JoinToChatCommand(bob.Value.Id, createConversationResult.Value.Id); 
         
-        await MessengerModule.RequestAsync(aliceJoinToConversationCommand, CancellationToken.None);
-        await MessengerModule.RequestAsync(bobJoinToConversationCommand, CancellationToken.None);
+        await RequestAsync(aliceJoinToConversationCommand, CancellationToken.None);
+        await RequestAsync(bobJoinToConversationCommand, CancellationToken.None);
 
         var firstCreateMessageByAliceCommand = new CreateMessageCommand(
             alice.Value.Id,
@@ -40,7 +40,7 @@ public class DeleteMessageTestSuccess : IntegrationTestBase, IIntegrationTest
             Files: null);
         
         var firstCreateMessageByAliceResult = 
-            await MessengerModule.RequestAsync(firstCreateMessageByAliceCommand, CancellationToken.None);
+            await RequestAsync(firstCreateMessageByAliceCommand, CancellationToken.None);
 
         var secondCreateMessageByAliceCommand = new CreateMessageCommand(
             alice.Value.Id,
@@ -50,7 +50,7 @@ public class DeleteMessageTestSuccess : IntegrationTestBase, IIntegrationTest
             Files: null);
 
         var secondCreateMessageByAliceResult = 
-            await MessengerModule.RequestAsync(secondCreateMessageByAliceCommand, CancellationToken.None);
+            await RequestAsync(secondCreateMessageByAliceCommand, CancellationToken.None);
 
         var deleteFirstMessageByAliceCommand = new DeleteMessageCommand(
             user21Th.Value.Id,
@@ -58,7 +58,7 @@ public class DeleteMessageTestSuccess : IntegrationTestBase, IIntegrationTest
             IsDeleteForAll: true);
         
         var deleteFirstMessageByAliceResult = 
-            await MessengerModule.RequestAsync(deleteFirstMessageByAliceCommand, CancellationToken.None);
+            await RequestAsync(deleteFirstMessageByAliceCommand, CancellationToken.None);
 
         var deleteSecondMessageByAliceCommand = new DeleteMessageCommand(
             user21Th.Value.Id,
@@ -66,7 +66,7 @@ public class DeleteMessageTestSuccess : IntegrationTestBase, IIntegrationTest
             IsDeleteForAll: true);
         
         var deleteSecondMessageByAliceResult = 
-            await MessengerModule.RequestAsync(deleteSecondMessageByAliceCommand, CancellationToken.None);
+            await RequestAsync(deleteSecondMessageByAliceCommand, CancellationToken.None);
 
         deleteFirstMessageByAliceResult.IsSuccess.Should().BeTrue();
         deleteSecondMessageByAliceResult.IsSuccess.Should().BeTrue();

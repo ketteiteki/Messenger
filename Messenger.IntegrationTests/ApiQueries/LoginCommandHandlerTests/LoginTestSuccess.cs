@@ -11,13 +11,13 @@ public class LoginTestSuccess : IntegrationTestBase, IIntegrationTest
 	[Fact]
 	public async Task Test()
 	{
-		await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+		await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
 		var loginCommand = new LoginCommand(
 			CommandHelper.Registration21ThCommand().Nickname,
 			CommandHelper.Registration21ThCommand().Password);
 		
-		var loginResult = await MessengerModule.RequestAsync(loginCommand, CancellationToken.None);
+		var loginResult = await RequestAsync(loginCommand, CancellationToken.None);
 
 		loginResult.IsSuccess.Should().BeTrue();
 	}

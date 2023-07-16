@@ -17,7 +17,7 @@ public class RegistrationTestThrowAuthentication : IntegrationTestBase, IIntegra
             CommandHelper.Registration21ThCommand().Nickname,
             CommandHelper.Registration21ThCommand().Password);
         
-        await MessengerModule.RequestAsync(firstRegistrationCommand, CancellationToken.None);
+        await RequestAsync(firstRegistrationCommand, CancellationToken.None);
         
         var secondRegistrationCommand = new RegistrationCommand(
             CommandHelper.Registration21ThCommand().DisplayName,
@@ -25,7 +25,7 @@ public class RegistrationTestThrowAuthentication : IntegrationTestBase, IIntegra
             CommandHelper.Registration21ThCommand().Password);
         
         var secondRegistrationResult = 
-            await MessengerModule.RequestAsync(secondRegistrationCommand, CancellationToken.None);
+            await RequestAsync(secondRegistrationCommand, CancellationToken.None);
 
         secondRegistrationResult.Error.Should().BeOfType<AuthenticationError>();
     }

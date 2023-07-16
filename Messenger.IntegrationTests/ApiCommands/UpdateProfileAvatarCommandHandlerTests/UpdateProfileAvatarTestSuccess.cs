@@ -11,12 +11,12 @@ public class UpdateProfileAvatarTestSuccess : IntegrationTestBase, IIntegrationT
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var updateProfileAvatarCommand = new UpdateProfileAvatarCommand(user21Th.Value.Id, FilesHelper.GetFile());
         
         var updateProfileAvatarResult = 
-            await MessengerModule.RequestAsync(updateProfileAvatarCommand, CancellationToken.None);
+            await RequestAsync(updateProfileAvatarCommand, CancellationToken.None);
 
         updateProfileAvatarResult.IsSuccess.Should().BeTrue();
         updateProfileAvatarResult.Value.AvatarLink.Should().NotBeNull();

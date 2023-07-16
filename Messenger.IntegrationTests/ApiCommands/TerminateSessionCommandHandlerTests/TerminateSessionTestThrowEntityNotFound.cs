@@ -13,14 +13,14 @@ public class TerminateSessionTestThrowEntityNotFound : IntegrationTestBase, IInt
     public async Task Test()
     {
         var firstTerminateSessionCommand = new TerminateSessionCommand(Guid.NewGuid(), Guid.NewGuid());
-        var firstTerminateSessionResult = await MessengerModule.RequestAsync(firstTerminateSessionCommand, CancellationToken.None);
+        var firstTerminateSessionResult = await RequestAsync(firstTerminateSessionCommand, CancellationToken.None);
         
         firstTerminateSessionResult.Error.Should().BeOfType<DbEntityNotFoundError>();
         
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var secondTerminateSessionCommand = new TerminateSessionCommand(user21Th.Value.Id, Guid.NewGuid());
-        var secondTerminateSessionResult = await MessengerModule.RequestAsync(secondTerminateSessionCommand, CancellationToken.None);
+        var secondTerminateSessionResult = await RequestAsync(secondTerminateSessionCommand, CancellationToken.None);
 
         secondTerminateSessionResult.Error.Should().BeOfType<DbEntityNotFoundError>();
     }

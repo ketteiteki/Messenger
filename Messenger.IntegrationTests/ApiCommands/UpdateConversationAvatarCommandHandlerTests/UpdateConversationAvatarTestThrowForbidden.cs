@@ -13,8 +13,8 @@ public class UpdateConversationAvatarTestThrowForbidden : IntegrationTestBase, I
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+		var alice = await RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateChatCommand(
 			RequesterId: user21Th.Value.Id,
@@ -23,9 +23,9 @@ public class UpdateConversationAvatarTestThrowForbidden : IntegrationTestBase, I
 			Type: ChatType.Conversation,
 			AvatarFile: null);
 
-		var conversation = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var conversation = await RequestAsync(createConversationCommand, CancellationToken.None);
 		
-		await MessengerModule.RequestAsync(
+		await RequestAsync(
 			new JoinToChatCommand(
 			RequesterId: alice.Value.Id,
 			ChatId: conversation.Value.Id), CancellationToken.None);
@@ -36,7 +36,7 @@ public class UpdateConversationAvatarTestThrowForbidden : IntegrationTestBase, I
 			AvatarFile: FilesHelper.GetFile());
 
 		var updateAvatarConversationByAliceResult = 
-			await MessengerModule.RequestAsync(updateAvatarConversationByAliceCommand, CancellationToken.None);
+			await RequestAsync(updateAvatarConversationByAliceCommand, CancellationToken.None);
 
 		updateAvatarConversationByAliceResult.Error.Should().BeOfType<ForbiddenError>();
     }

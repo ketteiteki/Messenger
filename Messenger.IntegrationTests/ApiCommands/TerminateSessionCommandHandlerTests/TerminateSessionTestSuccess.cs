@@ -12,7 +12,7 @@ public class TerminateSessionTestSuccess : IntegrationTestBase, IIntegrationTest
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var userSessionGuid = Guid.NewGuid();
         
@@ -23,7 +23,7 @@ public class TerminateSessionTestSuccess : IntegrationTestBase, IIntegrationTest
 
         var terminateSessionCommand = new TerminateSessionCommand(user21Th.Value.Id, userSessionGuid);
         
-        var terminateSessionResult = await MessengerModule.RequestAsync(terminateSessionCommand, CancellationToken.None);
+        var terminateSessionResult = await RequestAsync(terminateSessionCommand, CancellationToken.None);
 
         terminateSessionResult.IsSuccess.Should().BeTrue();
     }
