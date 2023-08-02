@@ -1,6 +1,5 @@
 using MediatR;
 using Messenger.Application.Interfaces;
-using Messenger.Application.Services;
 using Messenger.Domain.Constants;
 using Messenger.IntegrationTests.Configuration;
 using Messenger.Persistence;
@@ -18,16 +17,13 @@ public class IntegrationTestBase : IAsyncLifetime
 	
 	private IServiceProvider ServiceProvider { get; }
 
-	protected readonly IBaseDirService BaseDirService = new BaseDirService();
-
 	protected readonly IBlobService BlobService;
 	
 	protected IntegrationTestBase()
 	{
-		var pathAppSettings = BaseDirService.GetPathAppSettingsJson(false);
-
 		var configuration = new ConfigurationBuilder()
-			.AddJsonFile(pathAppSettings)
+			.SetBasePath(Directory.GetCurrentDirectory())
+			.AddJsonFile("appsettings.json")
 			.Build();
 
 		var databaseConnectionString = configuration[AppSettingConstants.DatabaseConnectionStringForIntegrationTests];

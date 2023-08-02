@@ -1,4 +1,3 @@
-using Messenger.Application.Services;
 using Messenger.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -10,12 +9,9 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<DatabaseCo
 {
     public DatabaseContext CreateDbContext(string[] args)
     {
-        var baseDirService = new BaseDirService();
-
-        var appSettingsPath = baseDirService.GetPathAppSettingsJson(false);
-        
         var configuration = new ConfigurationBuilder()
-            .AddJsonFile(appSettingsPath)
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json")
             .Build();
 
         var databaseConnectionString =

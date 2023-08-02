@@ -16,8 +16,6 @@ public static class MessengerServices
 	{
 		serviceCollection.AddPasswordHashServices();
 		
-		serviceCollection.AddSingleton<IBaseDirService, BaseDirService>(_ => new BaseDirService());
-
 		var blobServiceSettings = new BlobServiceSettings(messengerBlobContainerName, messengerBlobAccess);
 
 		var blobServiceClient = new BlobServiceClient(messengerBlobUrl);
