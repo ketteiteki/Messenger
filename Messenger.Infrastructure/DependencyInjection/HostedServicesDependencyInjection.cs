@@ -15,6 +15,7 @@ public static class HostedServicesDependencyInjection
         var serviceProvider = serviceCollection.BuildServiceProvider();
 
         var dbContext = serviceProvider.GetService<DatabaseContext>();
+        var serviceScopeFactory = serviceProvider.GetService<IServiceScopeFactory>();
         var ticketSerializer = new TicketSerializer();
         var memoryCache = serviceProvider.GetService<IMemoryCache>();
         var configuration = serviceProvider.GetService<IConfiguration>();
@@ -23,7 +24,7 @@ public static class HostedServicesDependencyInjection
         var cookieExpireTimeSpan = configuration.GetValue<int>(AppSettingConstants.CookieExpireTimeSpan);
         
         var ticketStore = new TicketStore(
-            dbContext,
+            serviceScopeFactory,
             ticketSerializer,
             memoryCache,
             cookieExpireTimeSpan);

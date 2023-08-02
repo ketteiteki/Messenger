@@ -1,6 +1,5 @@
 using Messenger.BusinessLogic.Services;
 using Messenger.Domain.Constants;
-using Messenger.Persistence;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Caching.Memory;
@@ -15,14 +14,14 @@ public static class TicketStoreDependencyInjection
     {
         var serviceProvider = serviceCollection.BuildServiceProvider();
         
-        var dbContext = serviceProvider.GetService<DatabaseContext>();
+        var serviceScopeFactory = serviceProvider.GetService<IServiceScopeFactory>();
         var ticketSerializer = new TicketSerializer();
         var memoryCache = serviceProvider.GetService<IMemoryCache>();
         var configuration = serviceProvider.GetService<IConfiguration>();
         var cookieExpireTimeSpan = configuration.GetValue<int>(AppSettingConstants.CookieExpireTimeSpan);
             
         var ticketStore = new TicketStore(
-            dbContext, 
+            serviceScopeFactory, 
             ticketSerializer, 
             memoryCache, 
             cookieExpireTimeSpan);
