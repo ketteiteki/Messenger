@@ -251,7 +251,7 @@ const ChatInfo = observer(() => {
         showMemberList && (
           <div className={styles.memberList} id="memberList" onScroll={getMembers}>
             {currentChatState.chat?.members.map((i) => (
-              <MemberListItem {...i} />
+              <MemberListItem {...i} key={i.id}/>
             ))}
           </div>
         )

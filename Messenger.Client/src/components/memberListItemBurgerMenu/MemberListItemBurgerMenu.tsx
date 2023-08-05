@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { MouseEvent, useState } from "react";
 import { observer } from "mobx-react-lite";
 import styles from "./MemberListItemBurgerMenu.module.scss";
 import IRoleUserByChatDto from "../../models/interfaces/IRoleUserByChatDto";
+import { currentChatState } from "../../state/CurrentChatState";
 
 interface IMemberListItemBurgerMenuProps {
   x: number;
@@ -10,19 +11,31 @@ interface IMemberListItemBurgerMenuProps {
   areYouOwner: boolean;
   yourRole: IRoleUserByChatDto | null;
   isMemberListItemLast: boolean;
+  memberListUserId: string;
   setShowMenu: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MemberListItemBurgerMenu = observer(({
-  x,
-  y,
-  isMemberListItemMine,
-  areYouOwner,
-  yourRole,
-  isMemberListItemLast,
-  setShowMenu }: IMemberListItemBurgerMenuProps) => {
+const MemberListItemBurgerMenu = observer((
+  { x,
+    y,
+    isMemberListItemMine,
+    areYouOwner,
+    yourRole,
+    isMemberListItemLast,
+    memberListUserId,
+    setShowMenu }: IMemberListItemBurgerMenuProps) => {
   const [xMousePosition] = useState<number>(x - 7);
   const [yMousePosition] = useState<number>(y - 7);
+
+  const banUser = async (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    await currentChatState.banUserAsync(memberListUserId, 20);
+  }
+
+  const kickUser = async (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    await currentChatState.kickUserAsync(memberListUserId);
+  }
 
   return (
     <>
@@ -42,10 +55,10 @@ const MemberListItemBurgerMenu = observer(({
               <button className={styles.updateMessageButton}>
                 <p>Create Role For User</p>
               </button>
-              <button className={styles.updateMessageButton}>
+              <button className={styles.updateMessageButton} onClick={banUser}>
                 <p>Ban User</p>
               </button>
-              <button className={styles.updateMessageButton}>
+              <button className={styles.updateMessageButton} onClick={kickUser}>
                 <p>Kick User</p>
               </button>
             </>
@@ -61,13 +74,13 @@ const MemberListItemBurgerMenu = observer(({
               }
               {
                 yourRole.canBanUser &&
-                <button className={styles.updateMessageButton}>
+                <button className={styles.updateMessageButton} onClick={banUser}>
                   <p>Ban User</p>
                 </button>
               }
               {
                 yourRole.canAddAndRemoveUserToConversation &&
-                <button className={styles.updateMessageButton}>
+                <button className={styles.updateMessageButton} onClick={kickUser}>
                   <p>Kick User</p>
                 </button>
               }

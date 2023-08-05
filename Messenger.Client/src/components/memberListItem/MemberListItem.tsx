@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { MouseEvent, useState } from "react";
 import { motion } from "framer-motion";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
@@ -64,7 +64,7 @@ const MemberListItem = observer((props: IUserDto) => {
     }
   }
 
-  const showProfileByMessage = async (userId: string) => {
+  const showProfile = async (userId: string) => {
     if (userId === authorizationState.data?.id) {
       currentProfileState.setProfileNull();
 
@@ -83,7 +83,7 @@ const MemberListItem = observer((props: IUserDto) => {
     animate={{ opacity: 1 }}
     transition={{ type: "Inertia", duration: .15 }}
     className={getMemberItemById(props.id)} key={props.id}
-    onClick={() => showProfileByMessage(props.id)}
+    onClick={() => showProfile(props.id)}
     onMouseMove={MouseMoveHandler}
     onContextMenu={showMenuHandler}>
     <img
@@ -100,6 +100,7 @@ const MemberListItem = observer((props: IUserDto) => {
           isMemberListItemLast={isLastItem(memberListItem)}
           yourRole={youRole}
           areYouOwner={areYouOwner}
+          memberListUserId={props.id}
           setShowMenu={setShowMenu} />
       )
     }
