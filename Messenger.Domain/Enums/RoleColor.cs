@@ -7,6 +7,5 @@ public enum RoleColor
 	Cyan,
 	Red,
 	Yellow,
-	Black,
 	Orange
 }

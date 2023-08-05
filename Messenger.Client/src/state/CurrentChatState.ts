@@ -2,6 +2,7 @@ import { makeAutoObservable, runInAction } from "mobx";
 import IChatDto from "../models/interfaces/IChatDto";
 import IMessageDto from "../models/interfaces/IMessageDto";
 import ChatApi from "../services/api/ChatApi";
+import ConversationApi from "../services/api/ConversationApi";
 import UsersApi from "../services/api/UserApi";
 
 class CurrentChatState {
@@ -47,6 +48,32 @@ class CurrentChatState {
   };
 
   //api
+  public banUserAsync = async (userId: string, banMinutes: number) => {
+    if (!this.chat) return;
+    
+    this.chat.members = this.chat.members.filter(x => x.id !== userId);
+
+    const response = await ConversationApi.postConversationBanUserAsync(
+      this.chat.id,
+      userId,
+      banMinutes
+    );
+
+    return response;
+  };
+
+  public kickUserAsync = async (userId: string) => {
+    if (!this.chat) return;
+    
+    this.chat.members = this.chat.members.filter(x => x.id !== userId);
+
+    const response = await ConversationApi.postConversationRemoveUserAsync(
+      this.chat.id,
+      userId);
+
+    return response;
+  };
+
   public getUserListByChatAsync = async (
     chatId: string,
     limit: number,

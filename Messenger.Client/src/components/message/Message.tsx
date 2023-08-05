@@ -82,8 +82,7 @@ const Message = observer((props: IMessageDto) => {
               transition={{ type: "Inertia", duration: .2 }}
               className={styles.myMessage}
               onContextMenu={showMenuHandler}
-              onMouseMove={MouseMoveHandler}
-            >
+              onMouseMove={MouseMoveHandler}>
               {
                 showMenu && (
                   <MessageBurgerMenu
@@ -95,8 +94,7 @@ const Message = observer((props: IMessageDto) => {
                     text={props.text}
                     isMyMessage={isMessageMine}
                     isMessageLast={isMessageLast}
-                    setShowMenu={setShowMenu}
-                  />
+                    setShowMenu={setShowMenu} />
                 )
               }
               <img
@@ -190,10 +188,17 @@ const Message = observer((props: IMessageDto) => {
             <div className={styles.messageData}>
               {
                 !props.attachments[0] &&
-                <p className={styles.nickname} onClick={showProfileByMessage}>
-                  {currentChatState.chat?.type !== ChatType.Channel ?
-                    props.ownerDisplayName
-                    : currentChatState.chat.title}</p>
+                <span className={styles.nicknameAndRole}>
+                  <p className={styles.nickname} onClick={showProfileByMessage}>
+                    {currentChatState.chat?.type !== ChatType.Channel ?
+                      props.ownerDisplayName
+                      : currentChatState.chat.title}
+                  </p>
+                  <p className={styles.role}>{currentChatState.chat?.ownerId === props.ownerId ?
+                    "owner" :
+                    currentChatState.chat?.usersWithRole.find(x => x.userId === props.ownerId)?.roleTitle || ""}
+                  </p>
+                </span>
               }
               {
                 props.replyToMessageId && (
@@ -217,10 +222,10 @@ const Message = observer((props: IMessageDto) => {
                 props.attachments[0] && <div className={messageAttachmentListStyle}>
                   {
                     props.attachments.map(x =>
-                      <img className={styles.messageAttachment} 
-                      onClick={() => onClickOpenFullSizeAvatar(x.link)} src={x.link} 
-                      alt=""
-                      key={x.id} />)
+                      <img className={styles.messageAttachment}
+                        onClick={() => onClickOpenFullSizeAvatar(x.link)} src={x.link}
+                        alt=""
+                        key={x.id} />)
                   }
                 </div>
               }

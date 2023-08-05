@@ -26,6 +26,8 @@ public class ChatDto
 	
 	public bool CanSendMedia { get; init; }
 	
+	public Guid? OwnerId { get; set; }
+	
 	public bool IsOwner { get; init; }
 	
 	public bool IsMember { get; init; }

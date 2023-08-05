@@ -84,6 +84,7 @@ public class UpdateChatDataCommandHandler : IRequestHandler<UpdateChatDataComman
 				LastMessageDateOfCreate = chatUserByRequester.Chat.LastMessage?.DateOfCreate,
 				MembersCount =  chatUserByRequester.Chat.ChatUsers.Count,
 				CanSendMedia = chatUserByRequester.CanSendMedia,
+				OwnerId = chatUserByRequester.Chat.OwnerId,
 				IsOwner =  chatUserByRequester.Chat.OwnerId == request.RequesterId,
 				IsMember = true,
 				MuteDateOfExpire = chatUserByRequester.MuteDateOfExpire,

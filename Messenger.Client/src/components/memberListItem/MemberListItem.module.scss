@@ -1,0 +1,120 @@
+@import "../../App.scss";
+
+.memberItem {
+  position: relative;
+  display: flex;
+  border-bottom: 1px solid $grey;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $light-grey
+  }
+}
+
+.memberItemGreenBackground {
+  position: relative;
+  display: flex;
+  border-bottom: 2px solid $grey;
+  cursor: pointer;
+  background-color: $role-color-green;
+
+  &:hover {
+    background-color: $role-color-green-hover;
+  }
+}
+
+.memberItemBlueBackground {
+  position: relative;
+  display: flex;
+  border-bottom: 2px solid $grey;
+  cursor: pointer;
+  background-color: $role-color-blue;
+
+  &:hover {
+    background-color: $role-color-blue-hover;
+  }
+}
+
+.memberItemCyanBackground {
+  position: relative;
+  display: flex;
+  border-bottom: 2px solid $grey;
+  cursor: pointer;
+  background-color: $role-color-cyan;
+
+  &:hover {
+    background-color: $role-color-cyan-hover;
+  }
+}
+
+.memberItemRedBackground {
+  position: relative;
+  display: flex;
+  border-bottom: 2px solid $grey;
+  cursor: pointer;
+  background-color: $role-color-red;
+
+  &:hover {
+    background-color: $role-color-red-hover;
+  }
+}
+
+.memberItemYellowBackground {
+  position: relative;
+  display: flex;
+  border-bottom: 2px solid $grey;
+  cursor: pointer;
+  background-color: $role-color-yellow;
+
+  &:hover {
+    background-color: $role-color-yellow-hover;
+  }
+}
+
+.memberItemOrangeBackground {
+  position: relative;
+  display: flex;
+  border-bottom: 2px solid $grey;
+  cursor: pointer;
+  background-color: $role-color-orange;
+
+  &:hover {
+    background-color: $role-color-orange-hover;
+  }
+}
+
+.memberItemAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  margin: 5px;
+  margin-left: 10px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.memberItemContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin-left: 5px;
+}
+
+.memberItemDisplayName {
+  font-size: 15px;
+  margin-top: 5px;
+}
+
+.memberItemBio {
+  font-size: 12px;
+  margin-top: 5px;
+  color: $light-grey-font-page;
+}
+
+.memberItemRole {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  font-size: 13px;
+  color: $grey-font-page;
+}

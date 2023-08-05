@@ -23,6 +23,7 @@
 }
 
 .messageData {
+  position: relative;
   font-size: 17px;
   max-width: 400px;
   min-width: 120px;
@@ -53,9 +54,18 @@
   font-size: 14px;
 }
 
+.nicknameAndRole {
+  display: flex;
+  justify-content: space-between;
+}
+
 .nickname {
   cursor: pointer;
   margin-bottom: 3px;
+}
+
+.role {
+  font-size: 12px;
 }
 
 .text {
@@ -209,5 +219,3 @@
   font-size: 13px;
   text-align: right;
 }
-
-.clockSvg {}

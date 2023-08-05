@@ -40,7 +40,7 @@ public class BanUserInConversationTestSuccess : IntegrationTestBase, IIntegratio
 			createConversationResult.Value.Id,
 			bob.Value.Id,
 			RoleTitle: "moderator",
-			RoleColor.Black,
+			RoleColor.Cyan,
 			CanBanUser: true,
 			CanChangeChatData: false,
 			CanAddAndRemoveUserToConversation: false,

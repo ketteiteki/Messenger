@@ -53,6 +53,7 @@ public class GetChatListBySearchQueryHandler : IRequestHandler<GetChatListBySear
                         LastMessageDateOfCreate = chat.LastMessage != null ? chat.LastMessage.DateOfCreate : null,
                         MembersCount = chat.ChatUsers.Count,
                         CanSendMedia = chatUsersItem != null && chatUsersItem.CanSendMedia,
+                        OwnerId = chat.OwnerId,
                         IsOwner = chat.OwnerId == request.RequesterId,
                         IsMember = chatUsersItem != null,
                         MuteDateOfExpire = chatUsersItem != null ? chatUsersItem.MuteDateOfExpire : null,
