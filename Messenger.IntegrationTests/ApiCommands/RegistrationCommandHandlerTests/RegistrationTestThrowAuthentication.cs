@@ -15,21 +15,17 @@ public class RegistrationTestThrowAuthentication : IntegrationTestBase, IIntegra
         var firstRegistrationCommand = new RegistrationCommand(
             CommandHelper.Registration21ThCommand().DisplayName,
             CommandHelper.Registration21ThCommand().Nickname,
-            CommandHelper.Registration21ThCommand().Password,
-            UserAgent: "Mozilla",
-            Ip: "323.432.21.542");
-
-        await MessengerModule.RequestAsync(firstRegistrationCommand, CancellationToken.None);
+            CommandHelper.Registration21ThCommand().Password);
+        
+        await RequestAsync(firstRegistrationCommand, CancellationToken.None);
         
         var secondRegistrationCommand = new RegistrationCommand(
             CommandHelper.Registration21ThCommand().DisplayName,
             CommandHelper.Registration21ThCommand().Nickname,
-            CommandHelper.Registration21ThCommand().Password,
-            UserAgent: "Mozilla",
-            Ip: "428.764.324.653");
-
+            CommandHelper.Registration21ThCommand().Password);
+        
         var secondRegistrationResult = 
-            await MessengerModule.RequestAsync(secondRegistrationCommand, CancellationToken.None);
+            await RequestAsync(secondRegistrationCommand, CancellationToken.None);
 
         secondRegistrationResult.Error.Should().BeOfType<AuthenticationError>();
     }

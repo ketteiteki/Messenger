@@ -2,8 +2,7 @@ using Messenger.BusinessLogic.Hubs;
 using Messenger.Domain.Constants;
 using Messenger.Infrastructure.DependencyInjection;
 using Messenger.Infrastructure.Middlewares;
-using Messenger.Services;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 namespace Messenger.WebApi;
 
@@ -11,10 +10,12 @@ public class Startup
 {
     private const string CorsPolicyName = "DefaultCors";
     private readonly IConfiguration _configuration;
-
-    public Startup(IConfiguration configuration)
+    private readonly IHostEnvironment _environment;
+    
+    public Startup(IConfiguration configuration, IHostEnvironment environment)
     {
         _configuration = configuration;
+        _environment = environment;
     }
 
     public void ConfigureServices(IServiceCollection serviceCollection)
@@ -22,7 +23,6 @@ public class Startup
         serviceCollection.AddControllers();
 
         var databaseConnectionString = _configuration[AppSettingConstants.DatabaseConnectionString];
-        var signKey = _configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
         var allowOrigins = _configuration[AppSettingConstants.AllowedHosts];
         
         var messengerBlobContainerName = _configuration[AppSettingConstants.BlobContainer];
@@ -31,35 +31,39 @@ public class Startup
 
         serviceCollection.AddDatabaseServices(databaseConnectionString);
 
-        serviceCollection.AddInfrastructureServices(signKey);
+        serviceCollection.AddInfrastructureServices(_environment.IsDevelopment());
 
         serviceCollection.AddMessengerServices(messengerBlobContainerName, messengerBlobAccess, messengerBlobUrl);
+
+        serviceCollection.AddTicketStore();
+
+        serviceCollection.AddHostedServices();
+
+        serviceCollection.ConfigureSameSiteNoneCookiePolicy();
         
         serviceCollection.ConfigureCors(CorsPolicyName, allowOrigins);
 
-        serviceCollection.AddSwagger();
-
-        var databaseContext = serviceCollection.BuildServiceProvider().GetService<DatabaseContext>();
-        
-        databaseContext?.Database.Migrate();
+        serviceCollection.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1",
+                new OpenApiInfo { Title = "Messenger API", Version = "v1" });
+        });
     }
 
-    public void Configure(IApplicationBuilder applicationBuilder, IHostEnvironment environment)
+    public void Configure(IApplicationBuilder applicationBuilder)
     {
-        if (environment.IsDevelopment())
+        applicationBuilder.UseSwagger();
+        applicationBuilder.UseSwaggerUI(options =>
         {
-            applicationBuilder.UseSwagger();
-            applicationBuilder.UseSwaggerUI(options =>
-            {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Messenger Api v1");
-                options.RoutePrefix = "";
-            });
-        }
-        
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Messenger Api v1");
+        });
+
         applicationBuilder.UseStaticFiles();
 
         applicationBuilder.UseHttpsRedirection();
 
+        applicationBuilder.UseCookiePolicy();
+        
         applicationBuilder.UseRouting();
 
         applicationBuilder.UseCors(CorsPolicyName);
@@ -74,5 +78,20 @@ public class Startup
             options.MapHub<ChatHub>("/notification").RequireCors(CorsPolicyName);
             options.MapControllers();
         });
+        
+        applicationBuilder.Map(SpaConstants.Layout, builder => builder.UseSpa(spa => spa.Options.SourcePath = "/wwwroot"));
+        applicationBuilder.Map(SpaConstants.ChatInfo, builder => builder.UseSpa(spa => spa.Options.SourcePath = "/wwwroot"));
+        applicationBuilder.Map(SpaConstants.CreateChat, builder => builder.UseSpa(spa => spa.Options.SourcePath = "/wwwroot"));
+        applicationBuilder.Map(SpaConstants.Login, builder => builder.UseSpa(spa => spa.Options.SourcePath = "/wwwroot"));
+        applicationBuilder.Map(SpaConstants.Registration, builder => builder.UseSpa(spa => spa.Options.SourcePath = "/wwwroot"));
+        
+        applicationBuilder.MigrateDatabase();
+
+        var shouldMigrate = _configuration.GetValue<bool>("ShouldMigrateBlob");
+        
+        if (shouldMigrate)
+        {
+            applicationBuilder.InitializeAzureBlob(_configuration);
+        }
     }
 }

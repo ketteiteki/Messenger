@@ -1,9 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import IChatDto from "../models/interfaces/IChatDto";
 import IMessageDto from "../models/interfaces/IMessageDto";
-import IUserDto from "../models/interfaces/IUserDto";
 import ChatApi from "../services/api/ChatApi";
-import MessagesApi from "../services/api/MessageApi";
 import UsersApi from "../services/api/UserApi";
 
 class CurrentChatState {
@@ -31,10 +29,21 @@ class CurrentChatState {
   };
 
   public updateChatByChat = (chat: IChatDto) => {
-    if (this.chat !== null) {
+    if (this.chat) {
       this.chat.title = chat.title;
       this.chat.name = chat.name;
     }
+  };
+
+  public setMemberListPage(value: number) {
+    if (this.chat) {
+      this.chat.memberListPage = value;
+    }
+  }
+
+  public clearChatAndMessages() {
+    this.chat = null;
+    this.messages = [];
   };
 
   //api
@@ -57,7 +66,7 @@ class CurrentChatState {
   public postJoinToChatAsync = async (chatId: string) => {
     const response = await ChatApi.postJoinToChatAsync(chatId);
 
-    if (response.status === 200 && this.chat !== null) {
+    if (response.status === 200 && this.chat) {
       this.chat.isMember = true;
     }
   }

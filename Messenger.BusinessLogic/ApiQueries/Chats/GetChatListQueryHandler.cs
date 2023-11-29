@@ -2,8 +2,8 @@ using MediatR;
 using Messenger.Application.Interfaces;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.Domain.Enum;
-using Messenger.Services;
+using Messenger.Domain.Enums;
+using Messenger.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.BusinessLogic.ApiQueries.Chats;
@@ -24,7 +24,10 @@ public class GetChatListQueryHandler : IRequestHandler<GetChatListQuery, Result<
 	public async Task<Result<List<ChatDto>>> Handle(GetChatListQuery request, CancellationToken cancellationToken)
 	{
 		var chatList = 
-			await (from chat in _context.Chats.AsNoTracking().Include(c => c.ChatUsers).ThenInclude(cu => cu.Role)
+			await (from chat in _context.Chats.AsNoTracking()
+						.Include(c => c.LastMessage)
+						.Include(c => c.ChatUsers)
+						.ThenInclude(cu => cu.Role)
 					join chatUsers in _context.ChatUsers.AsNoTracking()
 						on new {x1 = request.RequesterId, x2 = chat.Id} 
 						equals new {x1 = chatUsers.UserId, x2 = chatUsers.ChatId }
@@ -40,6 +43,7 @@ public class GetChatListQueryHandler : IRequestHandler<GetChatListQuery, Result<
 						equals new {x1 = banUserByChat.UserId, x2 = banUserByChat.ChatId }
 						into banUserByChatEnumerable
 					from banUserByChatItem in banUserByChatEnumerable.DefaultIfEmpty()
+					orderby chat.LastMessage.DateOfCreate descending 
 					where chatUsersItem.UserId == request.RequesterId
 					where deletedDialogByUsersItem == null
 					select new ChatDto

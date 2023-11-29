@@ -3,6 +3,7 @@ using Messenger.BusinessLogic.ApiQueries.Users;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
+using Messenger.WebApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +12,15 @@ namespace Messenger.WebApi.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 [ApiController]
-public class UsersController : ApiControllerBase
+public class UsersController : ControllerBase
 {
-	public UsersController(IMediator mediator) : base(mediator) {}
-	
+	private readonly IMediator _mediator;
+
+	public UsersController(IMediator mediator)
+	{
+		_mediator = mediator;
+	}
+
 	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
 	[HttpGet("search")]
@@ -26,13 +32,11 @@ public class UsersController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
-		var query = new GetUserListBySearchQuery(
-			RequesterId: requesterId,
-			SearchText: search,
-			Limit: limit,
-			Page: page);
-		
-		return await RequestAsync(query, cancellationToken);
+		var query = new GetUserListBySearchQuery(requesterId, search, limit, page);
+
+		var result = await _mediator.Send(query, cancellationToken);
+
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
@@ -47,13 +51,11 @@ public class UsersController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
-		var query = new GetUserListByChatQuery(
-			RequesterId: requesterId,
-			ChatId: chatId,
-			Limit: limit,
-			Page: page);
+		var query = new GetUserListByChatQuery(requesterId, chatId, limit, page);
 		
-		return await RequestAsync(query, cancellationToken);
+		var result = await _mediator.Send(query, cancellationToken);
+
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status404NotFound)]
@@ -64,9 +66,10 @@ public class UsersController : ApiControllerBase
 		Guid userId,
 		CancellationToken cancellationToken)
 	{
-		var query = new GetUserQuery(
-			UserId: userId);
+		var query = new GetUserQuery(userId);
 		
-		return await RequestAsync(query, cancellationToken);
+		var result = await _mediator.Send(query, cancellationToken);
+
+		return result.ToActionResult();
 	}
 }

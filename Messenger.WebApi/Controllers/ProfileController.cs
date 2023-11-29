@@ -4,6 +4,7 @@ using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Models.Requests;
 using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
+using Messenger.WebApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +13,15 @@ namespace Messenger.WebApi.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 [ApiController]
-public class ProfileController : ApiControllerBase
+public class ProfileController : ControllerBase
 {
-	public ProfileController(IMediator mediator) : base(mediator) {}
-	
+	private readonly IMediator _mediator;
+
+	public ProfileController(IMediator mediator)
+	{
+		_mediator = mediator;
+	}
+
 	[ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
 	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
@@ -27,12 +33,14 @@ public class ProfileController : ApiControllerBase
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
 		var command = new UpdateProfileDataCommand(
-			RequesterId: requesterId,
-			DisplayName: request.DisplayName,
-			Nickname: request.NickName,
-			Bio: request.Bio);
-			
-		return await RequestAsync(command, cancellationToken);
+			requesterId,
+			request.DisplayName,
+			request.NickName,
+			request.Bio);
+
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 
 	[ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
@@ -45,11 +53,11 @@ public class ProfileController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
-		var command = new UpdateProfileAvatarCommand(
-			RequesterId: requesterId,
-			AvatarFile: request.Avatar);
+		var command = new UpdateProfileAvatarCommand(requesterId, request.Avatar);
 			
-		return await RequestAsync(command, cancellationToken);
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 
 	[ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
@@ -58,9 +66,10 @@ public class ProfileController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
-		var command = new DeleteProfileCommand(
-			RequesterId: requesterId);
+		var command = new DeleteProfileCommand(requesterId);
 			
-		return await RequestAsync(command, cancellationToken);
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 }

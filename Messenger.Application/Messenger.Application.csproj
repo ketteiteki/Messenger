@@ -6,13 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Messenger.Domain\Messenger.Domain.csproj" />
-      <ProjectReference Include="..\Messenger.Persistence\Messenger.Persistence.csproj" />
+        <ProjectReference Include="..\Messenger.Domain\Messenger.Domain.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Azure.Storage.Blobs" Version="12.15.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.8" />
-    </ItemGroup>
-
 </Project>

@@ -5,6 +5,7 @@ using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Models.Requests;
 using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
+using Messenger.WebApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,10 +14,15 @@ namespace Messenger.WebApi.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 [ApiController]
-public class MessagesController : ApiControllerBase
+public class MessagesController : ControllerBase
 {
-	public MessagesController(IMediator mediator) : base(mediator) {}
-	
+	private readonly IMediator _mediator;
+
+	public MessagesController(IMediator mediator)
+	{
+		_mediator = mediator;
+	}
+
 	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
 	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(List<MessageDto>), StatusCodes.Status200OK)]
@@ -29,13 +35,11 @@ public class MessagesController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
-		var query = new GetMessageListQuery(
-			RequesterId: requesterId,
-			ChatId: chatId,
-			FromMessageDateTime: fromMessageDateTime,
-			Limit: limit);
-			
-		return await RequestAsync(query, cancellationToken);
+		var query = new GetMessageListQuery(requesterId, chatId, limit, fromMessageDateTime);
+
+		var result = await _mediator.Send(query, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
@@ -51,13 +55,15 @@ public class MessagesController : ApiControllerBase
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
 		var query = new GetMessageListBySearchQuery(
-			RequesterId: requesterId,
-			ChatId: chatId,
-			FromMessageDateTime: fromMessageDateTime,
-			Limit: limit,
-			SearchText: searchText);
-			
-		return await RequestAsync(query, cancellationToken);
+			requesterId,
+			chatId,
+			limit,
+			fromMessageDateTime,
+			searchText);
+
+		var result = await _mediator.Send(query, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status403Forbidden)]
@@ -71,13 +77,15 @@ public class MessagesController : ApiControllerBase
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
 		var command = new CreateMessageCommand(
-			RequesterId: requesterId,
-			Text: request.Text,
-			ChatId: request.ChatId,
-			ReplyToId: request.ReplyToId,
-			Files: request.Files);
-			
-		return await RequestAsync(command, cancellationToken);
+			requesterId,
+			request.Text,
+			request.ReplyToId,
+			request.ChatId,
+			request.Files);
+
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
@@ -91,12 +99,11 @@ public class MessagesController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
-		var command = new UpdateMessageCommand(
-			RequesterId: requesterId,
-			MessageId: request.Id,
-			Text: request.Text);
-			
-		return await RequestAsync(command, cancellationToken);
+		var command = new UpdateMessageCommand(requesterId, request.Id, request.Text);
+
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
@@ -111,11 +118,10 @@ public class MessagesController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
-		var command = new DeleteMessageCommand(
-			RequesterId: requesterId,
-			MessageId: messageId,
-			IsDeleteForAll: isDeleteForAll);
+		var command = new DeleteMessageCommand(requesterId, messageId, isDeleteForAll);
 
-		return await RequestAsync(command, cancellationToken);
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 }

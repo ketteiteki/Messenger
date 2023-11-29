@@ -13,8 +13,21 @@ import nonAvatar from "../../assets/images/non_avatar.jpg";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
 import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
+import { blackCoverState } from "../../state/BlackCoverState";
+import { motion } from "framer-motion";
+import { ChatType } from "../../models/enum/ChatType";
+import { currentChatState } from "../../state/CurrentChatState";
+import { useNavigate } from "react-router-dom";
+import RouteConstants from "../../constants/RouteConstants";
 
 const ProfileInfo = observer(() => {
+
+  const isMyProfile = !currentProfileState.date;
+
+  const displayName = isMyProfile ? authorizationState.data?.displayName ?? "" : currentProfileState.date?.displayName ?? "";
+  const nickname = isMyProfile ? authorizationState.data?.nickname ?? "" : currentProfileState.date?.nickname ?? "";
+  const bio = isMyProfile ? authorizationState.data?.bio ?? "" : currentProfileState.date?.bio ?? "";
+
   const [updateMode, setUpdateMode] = useState<boolean>(false);
 
   const [inputDisplayName, setInputDisplayName] = useState<string>("");
@@ -27,10 +40,16 @@ const ProfileInfo = observer(() => {
   const [xMousePosition, setXMousePosition] = useState<number>(0);
   const [yMousePosition, setYMousePosition] = useState<number>(0);
 
+  const currentProfileStateDate = currentProfileState.date;
+  const authorizationStateData = authorizationState.data;
+
+  const navigate = useNavigate();
+
   const currentProfileId = currentProfileState.date?.id;
-  const chatWithThisUser =
+  const dialogWithThisUser =
     chatListWithMessagesState.data.find(
-      (x) => x.chat.members.find(m => m.id !== authorizationState.data?.id)?.id === currentProfileId
+      (x) => x.chat.type === ChatType.Dialog
+        && x.chat.members.find(m => m.id !== authorizationState.data?.id)?.id === currentProfileId
     );
 
   const MouseMoveHandler = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -41,12 +60,13 @@ const ProfileInfo = observer(() => {
     setYMousePosition(localY);
   };
 
-  const updateProfileDateHandler = async () => {
+  const onClickUpdateProfileDateHandler = async () => {
     await authorizationState.putUpdateProfileAsync(
       inputDisplayName,
       inputNickname,
       inputAdditionalData
-    );
+    ).catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
+
     setUpdateMode(false);
   };
 
@@ -54,86 +74,105 @@ const ProfileInfo = observer(() => {
     SetShowSessions(!showSessions);
 
     if (sessionsState.data.length === 0) {
-      sessionsState.getSessionListAsync();
+      await sessionsState
+        .getSessionListAsync()
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     }
   };
 
   const deleteSessionHandler = async (sessionId: string) => {
-    await sessionsState.delDeleteSessionAsync(sessionId);
-  };
+    await sessionsState
+      .delDeleteSessionAsync(sessionId)
+      .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
 
-  const startChattingHandler = async () => {
-    if (currentProfileId === undefined) return;
-
-    const response = await chatListWithMessagesState.postCreateDialogAsync(
-      currentProfileId
-    );
-
-    if (response.status === 200) {
-      await signalRConfiguration.connection?.invoke(
-        SignalRMethodsName.JoinChat,
-        response.data.id
-      );
+    if (sessionId === authorizationState.data?.currentSessionId) {
+      return navigate(RouteConstants.Login, { replace: true });
     }
   };
 
-  useEffect(() => {
-    setInputDisplayName(
-      currentProfileState.date?.displayName ||
-        authorizationState.data?.displayName ||
-        ""
-    );
-    setInputNickname(
-      currentProfileState.date?.nickname ||
-        authorizationState.data?.nickName ||
-        ""
-    );
-    setInputAdditionalData(
-      currentProfileState.date?.bio || authorizationState.data?.bio || ""
-    );
-  }, [currentProfileState.date, authorizationState.data]);
+  const onClickStartChattingHandler = async () => {
+    if (!currentProfileId) return;
 
-  const changeAvatarHandler = async (
+    const response = await chatListWithMessagesState
+      .postCreateDialogAsync(currentProfileId)
+      .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
+
+    if (!response) return;
+
+    const dialogDataItem = chatListWithMessagesState.data.find(x => x.chat.id === response.data.id);
+
+    if (!dialogDataItem) return;
+
+    currentChatState.setChatAndMessages(dialogDataItem.chat, dialogDataItem.messages);
+    chatListWithMessagesState.pushChatOnTop(dialogDataItem.chat.id);
+
+    if (response.status === 200) {
+      await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, response.data.id);
+    }
+  };
+
+  const onChangeAvatarHandler = async (
     event: React.FormEvent<HTMLInputElement>
   ) => {
     const files = event.currentTarget.files;
 
     if (files && files.length > 0) {
-      await authorizationState.putUpdateProfileAvatarAsync(files[0]);
+      await authorizationState
+        .putUpdateProfileAvatarAsync(files[0])
+        .catch((error: any) => { if (error.response.status !== 401) alert(error.response.data.message); });
     }
   };
+
+  const onClickOpenFullSizeAvatar = () => {
+    blackCoverState.setImage(currentProfileState.date?.avatarLink ?? nonAvatar);
+  };
+
+  useEffect(() => {
+    setInputDisplayName(displayName);
+    setInputNickname(nickname);
+    setInputAdditionalData(bio);
+    SetShowSessions(false);
+  }, [currentProfileStateDate, authorizationStateData]);
 
   return (
     <div
       className={styles.profileInfo}
       onMouseMove={(event) => MouseMoveHandler(event)}
     >
-      {updateMode && (
-        <button className={styles.okButton} onClick={updateProfileDateHandler}>
-          <TickSvg width={15} height={23} />
-        </button>
-      )}
+      {
+        updateMode && (
+          <button className={styles.okButton} onClick={onClickUpdateProfileDateHandler}>
+            <TickSvg width={15} height={23} />
+          </button>
+        )
+      }
 
-      {showMenu && (
-        <ProfileInfoBurgerMenu
-          x={xMousePosition}
-          y={yMousePosition}
-          profileId={currentProfileState.date?.id ?? ""}
-          setShowMenu={SetShowMenu}
-          setUpdateMode={setUpdateMode}
-        />
-      )}
-      <button
-        className={styles.settingsButton}
-        onClick={() => SetShowMenu(true)}
-      >
-        <SettingsSvg className={styles.settingsSvg} width={20} />
-      </button>
+      {
+        showMenu && (
+          <ProfileInfoBurgerMenu
+            x={xMousePosition}
+            y={yMousePosition}
+            profileId={currentProfileState.date?.id ?? ""}
+            setShowMenu={SetShowMenu}
+            setUpdateMode={setUpdateMode}
+          />
+        )
+      }
+      {
+        ((dialogWithThisUser && !isMyProfile) || isMyProfile) &&
+        <button
+          className={styles.settingsButton}
+          onClick={() => SetShowMenu(true)}
+        >
+          <SettingsSvg className={styles.settingsSvg} width={20} />
+        </button>}
       <div className={styles.avatarContainer}>
-        <label htmlFor="avatar" className={styles.avatarBlackCover} />
+        {
+          isMyProfile && <label htmlFor="avatar" className={styles.avatarBlackCover} />
+        }
         <input
           className={styles.avatarInput}
-          onChange={changeAvatarHandler}
+          onChange={onChangeAvatarHandler}
           type="file"
           id="avatar"
           name="avatar"
@@ -142,87 +181,109 @@ const ProfileInfo = observer(() => {
         <img
           className={styles.avatar}
           src={
-            currentProfileState.date?.avatarLink
+            currentProfileState.date
               ? currentProfileState.date.avatarLink || nonAvatar
               : authorizationState.data?.avatarLink || nonAvatar
           }
-          alt=""
-        />
+          onClick={onClickOpenFullSizeAvatar}
+          alt={"avatar"} />
       </div>
-      {updateMode == false && (
-        <p className={styles.displayName}>{inputDisplayName}</p>
-      )}
-      {updateMode && (
-        <input
-          className={styles.inputDisplayName}
-          type="text"
-          value={inputDisplayName}
-          onChange={(e) => setInputDisplayName(e.currentTarget.value)}
-        />
-      )}
-      {updateMode == false && (
-        <p className={styles.nickname}>{inputNickname}</p>
-      )}
-      {updateMode && (
-        <input
-          className={styles.inputNickname}
-          type="text"
-          value={inputNickname}
-          onChange={(e) => setInputNickname(e.currentTarget.value)}
-        />
-      )}
-      {updateMode == false && (
-        <p className={styles.additionalData}>{inputAdditionalData}</p>
-      )}
-      {updateMode && (
-        <input
-          className={styles.inputAdditionalData}
-          type="text"
-          value={inputAdditionalData}
-          onChange={(e) => setInputAdditionalData(e.currentTarget.value)}
-        />
-      )}
-      {currentProfileState.date !== null &&
+      {
+        !updateMode && (
+          <p className={styles.displayName}>{inputDisplayName || "------"}</p>
+        )
+      }
+      {
+        updateMode && (
+          <input
+            className={styles.inputDisplayName}
+            type="text"
+            value={inputDisplayName}
+            onChange={(e) => setInputDisplayName(e.currentTarget.value)}
+          />
+        )
+      }
+      {
+        !updateMode && (
+          <p className={styles.nickname}>{inputNickname || "------"}</p>
+        )
+      }
+      {
+        updateMode && (
+          <input
+            className={styles.inputNickname}
+            type="text"
+            value={inputNickname}
+            onChange={(e) => setInputNickname(e.currentTarget.value)}
+          />
+        )
+      }
+      {
+        !updateMode && (
+          <p className={styles.additionalData}>{inputAdditionalData}</p>
+        )
+      }
+      {
+        updateMode && (
+          <input
+            className={styles.inputAdditionalData}
+            type="text"
+            value={inputAdditionalData}
+            onChange={(e) => setInputAdditionalData(e.currentTarget.value)}
+          />
+        )
+      }
+      {
+        currentProfileState.date &&
         authorizationState.data?.id !== currentProfileState.date?.id &&
-        chatWithThisUser === undefined && (
+        !dialogWithThisUser && (
           <button
             className={styles.startChattingButton}
-            onClick={startChattingHandler}
+            onClick={onClickStartChattingHandler}
           >
             Start Chatting
           </button>
-        )}
-      {(currentProfileState.date?.id === authorizationState.data?.id ||
-        currentProfileState.date === null) && (
-        <button
-          className={styles.showMembersButton}
-          onClick={() => setShowSessionsHandler()}
-        >
-          {showSessions ? "Close" : "Show"} Sessions
-        </button>
-      )}
-      {showSessions && (
-        <div className={styles.sessionList}>
-          {sessionsState.data.map((i) => (
-            <div
-              className={styles.sessionItem}
-              key={i.id}
-              onClick={() => deleteSessionHandler(i.id)}
-            >
-              <button className={styles.sessionItemRemoveButton}>
-                <CrossSvg width={20} />
-              </button>
-              <div className={styles.sessionItemContainer}>
-                <p className={styles.sessionId}>Id: {i.id}</p>
-                <p className={styles.sessionIp}>Ip: {i.ip}</p>
-                <p className={styles.createAt}>
-                  CreateAt: {DateService.getDateAndTime(i.createAt)}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+        )
+      }
+      {
+        (currentProfileState.date?.id === authorizationState.data?.id ||
+          !currentProfileState.date) && (
+          <button
+            className={styles.showSessionsButton}
+            onClick={() => setShowSessionsHandler()}
+          >
+            {showSessions ? "Hide" : "Show"} Sessions
+          </button>
+        )
+      }
+      {
+        showSessions && (
+          <div className={styles.sessionList}>
+            {
+              sessionsState.data.map((i) => (
+                <motion.div
+                  initial={{ opacity: 0.7 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ type: "Inertia", duration: .1 }}
+                  className={i.id === authorizationState.data?.currentSessionId ?
+                    styles.currentSessionItem :
+                    styles.sessionItem}
+                  key={i.id}>
+                  <div className={styles.sessionItemRemoveButton} onClick={() => deleteSessionHandler(i.id)}>
+                    <CrossSvg className={styles.crossSvg} width={20} />
+                  </div>
+                  <div className={styles.sessionItemContainer}>
+                    <p className={styles.sessionId}>Id: {i.id}</p>
+                    <p className={styles.createAt}>
+                      CreateAt: {DateService.getDateAndTime(i.createAt)}
+                    </p>
+                  </div>
+                </motion.div>
+              ))
+            }
+          </div>
+        )
+      }
     </div>
   );
 });

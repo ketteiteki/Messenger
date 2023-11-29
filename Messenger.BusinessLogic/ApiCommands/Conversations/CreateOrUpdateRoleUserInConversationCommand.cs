@@ -1,7 +1,7 @@
 using MediatR;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
-using Messenger.Domain.Enum;
+using Messenger.Domain.Enums;
 
 namespace Messenger.BusinessLogic.ApiCommands.Conversations;
 

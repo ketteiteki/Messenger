@@ -1,9 +1,9 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import ISessionDto from "../models/interfaces/ISessionDto";
+import IUserSessionDto from "../models/interfaces/IUserSessionDto";
 import AuthorizationApi from "../services/api/AuthorizationApi";
 
 class SessionsState {
-  data: ISessionDto[] = [];
+  data: IUserSessionDto[] = [];
 
   constructor() {
     makeAutoObservable(
@@ -14,6 +14,10 @@ class SessionsState {
       }
     );
   }
+
+  public clearData() {
+    this.data = [];
+  };
 
   //api
   public getSessionListAsync = async () => {
@@ -27,7 +31,7 @@ class SessionsState {
   };
 
   public delDeleteSessionAsync = async (sessionId: string) => {
-    const response = await AuthorizationApi.delDeleteSessionAsync(sessionId);
+    const response = await AuthorizationApi.delTerminateSessionAsync(sessionId);
 
     if (response.status === 200) {
       runInAction(() => {

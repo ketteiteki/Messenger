@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Messages;
-using Messenger.Domain.Enum;
+using Messenger.Domain.Enums;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Microsoft.AspNetCore.Http;
@@ -14,7 +14,7 @@ public class CreateMessageWithAttachmentTestSuccess : IntegrationTestBase, IInte
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
             user21Th.Value.Id,
@@ -23,20 +23,20 @@ public class CreateMessageWithAttachmentTestSuccess : IntegrationTestBase, IInte
             ChatType.Conversation,
             AvatarFile: null);
 		
-        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await RequestAsync(createConversationCommand, CancellationToken.None);
 
         var createMessageBy21ThCommand = new CreateMessageCommand(
             user21Th.Value.Id,
             Text: "qwerty1",
             ReplyToId: null,
             createConversationResult.Value.Id,
-            new FormFileCollection
+            new List<IFormFile>
             {
                 FilesHelper.GetFile(),
                 FilesHelper.GetFile()
             });
 
-        var createMessageBy21ThResult = await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
+        var createMessageBy21ThResult = await RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
 
         createMessageBy21ThResult.Value.Attachments.Count.Should().Be(2);
 

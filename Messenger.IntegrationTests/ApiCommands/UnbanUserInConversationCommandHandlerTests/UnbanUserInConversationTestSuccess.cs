@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Conversations;
-using Messenger.Domain.Enum;
+using Messenger.Domain.Enums;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
@@ -13,10 +13,10 @@ public class UnbanUserInConversationTestSuccess : IntegrationTestBase, IIntegrat
 	[Fact]
 	public async Task Test()
 	{
-		var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-		var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
-		var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
-		var alex = await MessengerModule.RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
+		var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+		var alice = await RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+		var bob = await RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
+		var alex = await RequestAsync(CommandHelper.RegistrationAlexCommand(), CancellationToken.None);
 
 		var createConversationCommand = new CreateChatCommand(
 			user21Th.Value.Id,
@@ -25,15 +25,15 @@ public class UnbanUserInConversationTestSuccess : IntegrationTestBase, IIntegrat
 			ChatType.Conversation,
 			AvatarFile: null);
 
-		var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+		var createConversationResult = await RequestAsync(createConversationCommand, CancellationToken.None);
 
 		var aliceJoinConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
 		var bobJoinConversationCommand = new JoinToChatCommand(bob.Value.Id, createConversationResult.Value.Id);
 		var alexJoinConversationCommand = new JoinToChatCommand(alex.Value.Id, createConversationResult.Value.Id);
 		
-		await MessengerModule.RequestAsync(aliceJoinConversationCommand, CancellationToken.None);
-		await MessengerModule.RequestAsync(bobJoinConversationCommand, CancellationToken.None);
-		await MessengerModule.RequestAsync(alexJoinConversationCommand, CancellationToken.None);
+		await RequestAsync(aliceJoinConversationCommand, CancellationToken.None);
+		await RequestAsync(bobJoinConversationCommand, CancellationToken.None);
+		await RequestAsync(alexJoinConversationCommand, CancellationToken.None);
 		
 		var banAliceCommand = new BanUserInConversationCommand(
 			user21Th.Value.Id,
@@ -47,8 +47,8 @@ public class UnbanUserInConversationTestSuccess : IntegrationTestBase, IIntegrat
 			alex.Value.Id,
 			BanMinutes: 15);
 
-		await MessengerModule.RequestAsync(banAliceCommand, CancellationToken.None);
-		await MessengerModule.RequestAsync(banAlexCommand, CancellationToken.None);
+		await RequestAsync(banAliceCommand, CancellationToken.None);
+		await RequestAsync(banAlexCommand, CancellationToken.None);
 		
 		var createRoleBobInConversationCommand = new CreateOrUpdateRoleUserInConversationCommand(
 			user21Th.Value.Id,
@@ -61,7 +61,7 @@ public class UnbanUserInConversationTestSuccess : IntegrationTestBase, IIntegrat
 			CanAddAndRemoveUserToConversation: true,
 			CanGivePermissionToUser:false);
 
-		await MessengerModule.RequestAsync(createRoleBobInConversationCommand, CancellationToken.None);
+		await RequestAsync(createRoleBobInConversationCommand, CancellationToken.None);
 
 		var unbanAliceInConversationBy21ThCommand = new UnbanUserInConversationCommand(
 			user21Th.Value.Id,
@@ -74,10 +74,10 @@ public class UnbanUserInConversationTestSuccess : IntegrationTestBase, IIntegrat
 			alex.Value.Id);
 
 		var unbanAliceInConversationBy21ThResult = 
-			await MessengerModule.RequestAsync(unbanAliceInConversationBy21ThCommand, CancellationToken.None);
+			await RequestAsync(unbanAliceInConversationBy21ThCommand, CancellationToken.None);
 		
 		var unbanAlexInConversationByBobResult = 
-			await MessengerModule.RequestAsync(unbanAlexInConversationByBobCommand, CancellationToken.None);
+			await RequestAsync(unbanAlexInConversationByBobCommand, CancellationToken.None);
 
 		unbanAliceInConversationBy21ThResult.IsSuccess.Should().BeTrue();
 		unbanAlexInConversationByBobResult.IsSuccess.Should().BeTrue();

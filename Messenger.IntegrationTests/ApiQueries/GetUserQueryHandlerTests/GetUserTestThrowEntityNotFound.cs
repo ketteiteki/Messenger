@@ -13,7 +13,7 @@ public class GetUserTestThrowEntityNotFound : IntegrationTestBase, IIntegrationT
     {
         var getUserQuery = new GetUserQuery(Guid.NewGuid());
         
-        var getUserResult = await MessengerModule.RequestAsync(getUserQuery, CancellationToken.None);
+        var getUserResult = await RequestAsync(getUserQuery, CancellationToken.None);
 
         getUserResult.Error.Should().BeOfType<DbEntityNotFoundError>();
     }

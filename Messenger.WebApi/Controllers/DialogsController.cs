@@ -4,6 +4,7 @@ using Messenger.BusinessLogic.ApiQueries.Dialogs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
+using Messenger.WebApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +13,15 @@ namespace Messenger.WebApi.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 [ApiController]
-public class DialogsController : ApiControllerBase
+public class DialogsController : ControllerBase
 {
-    public DialogsController(IMediator mediator) : base(mediator) { }
-    
+    private readonly IMediator _mediator;
+
+    public DialogsController(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
@@ -26,11 +32,11 @@ public class DialogsController : ApiControllerBase
     {
         var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
     
-        var query = new GetDialogQuery(
-            RequesterId: requesterId,
-            UserId: userId);
-		  
-        return await RequestAsync(query, cancellationToken);
+        var query = new GetDialogQuery(requesterId, userId);
+
+        var result = await _mediator.Send(query, cancellationToken);
+        
+        return result.ToActionResult();
     }
     
     [ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
@@ -44,11 +50,11 @@ public class DialogsController : ApiControllerBase
     {
         var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
-        var command = new CreateDialogCommand(
-            RequesterId: requesterId,
-            UserId: userId);
+        var command = new CreateDialogCommand(requesterId, userId);
 		
-        return await RequestAsync(command, cancellationToken);
+        var result = await _mediator.Send(command, cancellationToken);
+        
+        return result.ToActionResult();
     }
     
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
@@ -62,11 +68,10 @@ public class DialogsController : ApiControllerBase
     {
         var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 
-        var command = new DeleteDialogCommand(
-            RequesterId: requesterId,
-            ChatId: dialogId,
-            IsDeleteForAll: isDeleteForAll);
-		
-        return await RequestAsync(command, cancellationToken);
+        var command = new DeleteDialogCommand(requesterId, dialogId, isDeleteForAll);
+        
+        var result = await _mediator.Send(command, cancellationToken);
+        
+        return result.ToActionResult();
     }
 }

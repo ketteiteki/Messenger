@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiQueries.Chats;
-using Messenger.Domain.Enum;
+using Messenger.Domain.Enums;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
@@ -13,8 +13,8 @@ public class GetChatListBySearchTestSuccess : IntegrationTestBase, IIntegrationT
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var alice = await RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
         var firstCreateConversationCommand = new CreateChatCommand(
             user21Th.Value.Id,
@@ -31,9 +31,9 @@ public class GetChatListBySearchTestSuccess : IntegrationTestBase, IIntegrationT
             AvatarFile: null);
 
         var firstCreateConversationResult =
-            await MessengerModule.RequestAsync(firstCreateConversationCommand, CancellationToken.None);
+            await RequestAsync(firstCreateConversationCommand, CancellationToken.None);
         var secondCreateConversationResult = 
-            await MessengerModule.RequestAsync(secondCreateConversationCommand, CancellationToken.None);
+            await RequestAsync(secondCreateConversationCommand, CancellationToken.None);
 
         var firstGetUserListBySearchByAliceQuery =
             new GetChatListBySearchQuery(alice.Value.Id, firstCreateConversationCommand.Name); 
@@ -41,9 +41,9 @@ public class GetChatListBySearchTestSuccess : IntegrationTestBase, IIntegrationT
             new GetChatListBySearchQuery(alice.Value.Id, secondCreateConversationCommand.Name);
         
         var firstGetUserListBySearchByAliceResult = 
-            await MessengerModule.RequestAsync(firstGetUserListBySearchByAliceQuery, CancellationToken.None);
+            await RequestAsync(firstGetUserListBySearchByAliceQuery, CancellationToken.None);
         var secondGetUserListBySearchByAliceResult = 
-            await MessengerModule.RequestAsync(secondGetUserListBySearchByAliceQuery, CancellationToken.None);
+            await RequestAsync(secondGetUserListBySearchByAliceQuery, CancellationToken.None);
 
         firstGetUserListBySearchByAliceResult.Value.Count.Should().Be(2);
         

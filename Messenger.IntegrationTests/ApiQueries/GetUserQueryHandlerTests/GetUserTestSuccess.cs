@@ -11,11 +11,11 @@ public class GetUserTestSuccess : IntegrationTestBase, IIntegrationTest
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
 
         var getUserQuery = new GetUserQuery(user21Th.Value.Id);
         
-        var getUserResult = await MessengerModule.RequestAsync(getUserQuery, CancellationToken.None);
+        var getUserResult = await RequestAsync(getUserQuery, CancellationToken.None);
 
         getUserResult.Value.Id.Should().Be(user21Th.Value.Id);
         getUserResult.Value.Nickname.Should().Be(user21Th.Value.Nickname);

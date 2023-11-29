@@ -1,11 +1,10 @@
 
 
 export default interface IAuthorizationResponse {
-    accessToken: string;
-    refreshToken: string;
     id: string;
     displayName: string;
-    nickName: string;
+    nickname: string;
     bio: string | null;
     avatarLink: string | null;
+    currentSessionId: string;
 }

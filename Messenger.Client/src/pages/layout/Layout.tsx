@@ -7,53 +7,44 @@ import InfoBar from "../../components/infoBar/InfoBar";
 import { useNavigate } from "react-router-dom";
 import { authorizationState } from "../../state/AuthorizationState";
 import { chatListWithMessagesState } from "../../state/ChatListWithMessagesState";
-import * as signalR from "@microsoft/signalr";
-import AppConstants from "../../constants/AppConstants";
 import IMessageDto from "../../models/interfaces/IMessageDto";
-import { currentChatState } from "../../state/CurrentChatState";
 import IMessageUpdateNotificationDto from "../../models/interfaces/IMessageUpdateNotificationDto";
 import IMessageDeleteNotificationDto from "../../models/interfaces/IMessageDeleteNotificationDto";
 import { signalRConfiguration } from "../../services/signalR/SignalRConfiguration";
 import { SignalRMethodsName } from "../../models/enum/SignalRMethodsName";
+import { blackCoverState } from "../../state/BlackCoverState";
+import { motion } from "framer-motion";
+import IChatDto from "../../models/interfaces/IChatDto";
+import { currentChatState } from "../../state/CurrentChatState";
+import ModalWindow from "../../components/modalWindow/ModalWindow";
+import RouteConstants from "../../constants/RouteConstants";
 
 const Layout = observer(() => {
-
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (authorizationState.countFailRefresh >= 2) {
-      authorizationState.resetCountFailRefresh();
-      return navigate("/login", {replace: true});
-    }
-
-  }, [authorizationState.countFailRefresh]);
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem("AuthorizationToken");
-
     const fun = async () => {
-      if (accessToken == null) {
-        return navigate("/registration", { replace: true });
-      }
 
-      const authorizationResponse = await authorizationState.getAuthorizationAsync(accessToken);
+      const authorizationResponse = await authorizationState.getAuthorizationAsync().catch((e) => {});
 
-      if (authorizationResponse.status !== 200) {
-        return navigate("/registration", { replace: true });
+      if (!authorizationResponse || authorizationResponse.status !== 200) {
+        return navigate(RouteConstants.Login, { replace: true });
       }
 
       const response = await chatListWithMessagesState.getChatListAsync();
 
-      signalRConfiguration.buildConnection(accessToken);
+      signalRConfiguration.buildConnection();
 
-      if (signalRConfiguration.connection === null) return;
+      if (!signalRConfiguration.connection) return;
+      if (authorizationResponse === null) return;
 
       signalRConfiguration.connection.on(SignalRMethodsName.BroadcastMessageAsync, (message: IMessageDto) => {
         if (message.ownerId === authorizationResponse.data.id) return;
 
-        console.log("send message");
+        message.isMessageRealtime = true;
         chatListWithMessagesState.addMessageInData(message);
         chatListWithMessagesState.setLastMessage(message);
+        chatListWithMessagesState.pushChatOnTop(message.chatId);
       });
 
       signalRConfiguration.connection.on(SignalRMethodsName.UpdateMessageAsync, (message: IMessageUpdateNotificationDto) => {
@@ -65,16 +56,23 @@ const Layout = observer(() => {
       signalRConfiguration.connection.on(SignalRMethodsName.DeleteMessageAsync, (message: IMessageDeleteNotificationDto) => {
         if (message.ownerId === authorizationResponse.data.id) return;
 
-        chatListWithMessagesState.deleteMessageInData(message);
+        chatListWithMessagesState.deleteMessageInDataByMessageDeleteNotification(message);
       });
 
-      signalRConfiguration.connection.on("CreateDialogForInterlocutor", (message: string) => {
-        console.log(message);
+      signalRConfiguration.connection.on(SignalRMethodsName.CreateDialogForInterlocutor, async (chat: IChatDto) => {
+        await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, chat.id);
+        chatListWithMessagesState.addChatInData(chat, []);
+        chatListWithMessagesState.pushChatOnTop(chat.id);
+      });
+
+      signalRConfiguration.connection.on(SignalRMethodsName.DeleteDialogForInterlocutor, (chatId: string) => {
+        chatListWithMessagesState.deleteChatInDataById(chatId);
+        currentChatState.setChatAndMessagesNull();
       });
 
       signalRConfiguration.connection
         .start()
-        .then(function () {  
+        .then(function () {
           response.data.forEach(async (c) => {
             await signalRConfiguration.connection?.invoke(SignalRMethodsName.JoinChat, c.id);
           });
@@ -89,6 +87,32 @@ const Layout = observer(() => {
 
   return (
     <div className={styles.layout}>
+      {
+        blackCoverState.isBlackCoverShown &&
+        blackCoverState.imageLink &&
+        <motion.div
+          initial={{ opacity: .7 }}
+          animate={{ opacity: 1 }}
+          className={styles.blackCover}
+          onClick={() => blackCoverState.closeBlackCover()}>
+          <motion.img
+            initial={{ y: -5 }}
+            animate={{ y: 0 }}
+            className={styles.blackCoverImage}
+            src={blackCoverState.imageLink} onClick={(e) => e.stopPropagation()} />
+        </motion.div>
+      }
+      {
+        blackCoverState.isBlackCoverShown &&
+        blackCoverState.modalWindow &&
+        <motion.div
+          initial={{ opacity: .7 }}
+          animate={{ opacity: 1 }}
+          className={styles.blackCover}
+          onClick={() => blackCoverState.closeBlackCover()}>
+          <ModalWindow />
+        </motion.div>
+      }
       <div className={styles.background} />
       <div className={styles.layoutContainer}>
         <ChatList />

@@ -10,5 +10,5 @@ public record CreateMessageCommand(
 	string Text,
 	Guid? ReplyToId,
 	Guid ChatId,
-	IFormFileCollection Files
+	List<IFormFile> Files
 	) : IRequest<Result<MessageDto>>;

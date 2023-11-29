@@ -4,15 +4,12 @@ namespace Messenger.IntegrationTests.Helpers;
 
 public static class CommandHelper
 {
-	//registration
 	public static RegistrationCommand Registration21ThCommand()
 	{
 		return new RegistrationCommand(
 			DisplayName: "21th",
 			Nickname: "ketteiteki",
-			Password: "1234567890",
-			UserAgent: "Mozilla",
-			Ip: "314.423.215.764");
+			Password: "1234567890");
 	}
 	
 	public static RegistrationCommand RegistrationAliceCommand()
@@ -20,9 +17,7 @@ public static class CommandHelper
 		return new RegistrationCommand(
 			DisplayName: "alice", 
 			Nickname: "alice123", 
-			Password: "3254321f",
-			UserAgent: "Mozilla",
-			Ip: "332.223.242.732");
+			Password: "3254321f");
 	}
 	
 	public static RegistrationCommand RegistrationBobCommand()
@@ -30,9 +25,7 @@ public static class CommandHelper
 		return new RegistrationCommand(
 			DisplayName: "bob",
 			Nickname: "bob123",
-			Password: "gbv43rf",
-			UserAgent: "Mozilla",
-			Ip: "534.123.32.53");
+			Password: "gbv43rf");
 	}
 	
 	public static RegistrationCommand RegistrationAlexCommand()
@@ -40,8 +33,6 @@ public static class CommandHelper
 		return new RegistrationCommand(
 			DisplayName: "alex", 
 			Nickname: "alex123",
-			Password: "765cs3131",
-			UserAgent: "Mozilla",
-			Ip: "324.768.543.211");
+			Password: "765cs3131");
 	}
 }

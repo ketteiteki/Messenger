@@ -22,3 +22,18 @@
   z-index: 2;
   background-color: white;
 }
+
+.blackCover {
+  display: flex;
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 3;
+  cursor: pointer;
+}
+
+.blackCoverImage {
+  margin: auto;
+  max-height: 90%;
+}

@@ -6,7 +6,6 @@
   width: 100%;
   height: 100%;
   background-color: $light-grey;
-  border-radius: 0 20px 0 0;
 }
 
 .header {
@@ -14,7 +13,6 @@
   width: 100%;
   height: 71px;
   background-color: white;
-  border-radius: 0 20px 0 0;
 }
 
 .chatAvatar {
@@ -24,10 +22,12 @@
   right: 15px;
   top: 7px;
   border-radius: 100%;
+  object-fit: cover;
 }
 
 .chatName {
   padding-top: 14px;
+  margin-bottom: 5px;
   text-align: center;
 }
 
@@ -38,10 +38,24 @@
 }
 
 .messageList {
-  display: block;
+  display: flex;
+  flex-direction: column-reverse;
   width: 100%;
   height: 100%;
   overflow-y: scroll;
+  scroll-behavior: smooth;
+
+  &::-webkit-scrollbar {
+    width: 2px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $light-grey;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $light-grey-border;
+  }
 }
 
 .banned {
@@ -73,6 +87,22 @@
   background-color: white;
 }
 
+.attachmentInput {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.attachmentLabel {
+  width: 30px;
+  height: 35px;
+  margin-top: 12px;
+  margin-left: 12px;
+}
+
 .textarea {
   width: 100%;
   padding: 17px;
@@ -90,8 +120,7 @@
   cursor: pointer;
 }
 
-.attachment {
-  margin-left: 10px;
+.attachmentSvg {
   cursor: pointer;
 }
 
@@ -135,16 +164,18 @@
   margin-left: 20px;
 }
 
-.replyConstainer {
+.replyContainer {
   margin-top: 7px;
   margin-left: 20px;
 }
 
-.replyDisplayName {
-
-}
+.replyDisplayName {}
 
 .replyMessageText {
+  width: 350px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   color: $grey-font-page;
 }
 
@@ -171,16 +202,18 @@
   margin-left: 20px;
 }
 
-.editMessageConstainer {
+.editMessageContainer {
   margin-top: 7px;
   margin-left: 20px;
 }
 
-.editMessagePage {
-
-}
+.editMessagePage {}
 
 .editMessageText {
+  width: 350px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   color: $grey-font-page;
 }
 
@@ -191,4 +224,37 @@
   background-color: inherit;
   border: none;
   cursor: pointer;
+}
+
+.attachmentPanel {
+  display: flex;
+  position: absolute;
+  top: -100%;
+  width: 100%;
+  height: 52px;
+  background-color: white;
+}
+
+.attachmentPanelItem {
+  height: 100%;
+  margin-right: 2px;
+}
+
+.attachmentPanelContainer {
+  margin-top: 7px;
+  margin-left: 20px;
+}
+
+.closeAttachmentButton {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: inherit;
+  border: none;
+  cursor: pointer;
+}
+
+.messageListLastElement {
+  height: 15px;
+  flex-shrink: 0;
 }

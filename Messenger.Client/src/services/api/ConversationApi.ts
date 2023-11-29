@@ -1,5 +1,5 @@
 import IUserDto from "../../models/interfaces/IUserDto";
-import api from "./baseApi";
+import api from "./baseAPI";
 
 
 

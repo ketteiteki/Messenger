@@ -12,6 +12,7 @@ import { IChatListWithMessagesDataItem } from "./types/ChatListWithMessagesState
 class ChatListWithMessagesState {
   public data: IChatListWithMessagesDataItem[] = [];
   public dataForSearchChats: IChatListWithMessagesDataItem[] = [];
+  public searchInput: string = "";
 
   constructor() {
     makeAutoObservable(
@@ -23,10 +24,14 @@ class ChatListWithMessagesState {
     );
   }
 
+  public setSearchInput = (text: string) => {
+    this.searchInput = text;
+  }
+
   public setLastMessage = (message: IMessageDto) => {
     const item = this.data.find((c) => c.chat.id === message.chatId);
 
-    if (item === undefined) return;
+    if (!item) return;
 
     item.chat.lastMessageId = message.id;
     item.chat.lastMessageText = message.text;
@@ -38,8 +43,8 @@ class ChatListWithMessagesState {
     const item = this.data.find((c) => c.chat.id === message.chatId);
     const itemInSearchData = this.dataForSearchChats.find((c) => c.chat.id === message.chatId);
 
-    item?.messages.push(message);
-    itemInSearchData?.messages.push(message);
+    item?.messages.unshift(message);
+    itemInSearchData?.messages.unshift(message);
   };
 
   public updateMessageInData = (
@@ -49,58 +54,75 @@ class ChatListWithMessagesState {
       (c) => c.chat.id === messageUpdateNotification.chatId
     );
 
-    if (item === undefined) return;
+    if (!item) return;
 
     const message = item.messages.find(
       (x) => x.id === messageUpdateNotification.messageId
     );
 
-    if (message === undefined) return;
+    if (!message) return;
 
     message.text = messageUpdateNotification.updatedText;
+    message.isEdit = true;
 
     if (messageUpdateNotification.isLastMessage) {
       item.chat.lastMessageText = messageUpdateNotification.updatedText;
     }
   };
 
-  public deleteMessageInData = (
+  public deleteMessageInDataByMessageDeleteNotification = (
     messageDeleteNotification: IMessageDeleteNotificationDto
   ) => {
-    const item = this.data.find(
-      (c) => c.chat.id === messageDeleteNotification.chatId
-    );
-
-    if (item === undefined) return;
-
-    item.messages = item.messages.filter(
-      (x) => x.id !== messageDeleteNotification.messageId
-    );
-  };
-
-  public updateMessageAfterCreating = (
-    lastMessageId: string,
-    message: IMessageDto
-  ) => {
-    const dataItem = this.data.find((d) => d.chat.id === message.chatId);
+    const dataItem = this.data.find((c) => c.chat.id === messageDeleteNotification.chatId);
 
     if (!dataItem) return;
 
-    const indexMessageById = dataItem.messages.findIndex(
-      (m) => m.id === lastMessageId
-    );
+    const messageIndex = dataItem.messages.findIndex((x) => x.id === messageDeleteNotification.messageId);
 
-    if (indexMessageById) {
-      dataItem.messages[indexMessageById] = message;
-    }
+    if (messageIndex === -1) return;
+
+    dataItem.messages.splice(messageIndex, 1);
+
+    const lastMessageNow = dataItem?.messages[dataItem?.messages.length - 1];
+
+    dataItem.chat.lastMessageId = lastMessageNow?.id ?? null;
+    dataItem.chat.lastMessageAuthorDisplayName = lastMessageNow?.ownerDisplayName ?? null;
+    dataItem.chat.lastMessageText = lastMessageNow?.text ?? null;
+    dataItem.chat.lastMessageDateOfCreate = lastMessageNow?.dateOfCreate ?? null;
   };
 
   public addChatInData = (chat: IChatDto, messages: IMessageDto[]) => {
-    this.data.push({chat, messages});
+    this.data.unshift({ chat, messages });
   };
 
   public resetDataForSearchChats = () => {
     this.dataForSearchChats = [];
+  };
+
+  public deleteChatInDataById = (chatId: string) => {
+    const item = this.data.findIndex((c) => c.chat.id === chatId);
+
+    if (!item) return;
+
+    this.data.splice(item, 1);
+  };
+
+  public pushChatOnTop = (chatId: string) => {
+    const itemIndex = this.data.findIndex((x) => x.chat.id === chatId);
+
+    if (itemIndex === -1) return;
+
+    const chat = this.data[itemIndex];
+
+    this.data.splice(itemIndex, 1);
+
+    this.data.splice(0, 0, chat);
+  };
+
+  public clearChatListWithMessagesData = () => {
+    this.data = [];
+    this.dataForSearchChats = [];
+    this.searchInput = "";
   };
 
   //api
@@ -111,7 +133,7 @@ class ChatListWithMessagesState {
     const response = await MessagesApi.getMessageListAsync(
       chatId,
       fromMessageDateTime,
-      40
+      30
     );
 
     if (response.status === 200) {
@@ -121,10 +143,10 @@ class ChatListWithMessagesState {
           (i) => i.chat.id === chatId
         );
 
-        const messages = response.data.reverse();
+        const messages = response.data;
 
-        dataItem?.messages.unshift(...messages);
-        dataForSearchItem?.messages.unshift(...messages);
+        dataItem?.messages.push(...messages);
+        dataForSearchItem?.messages.push(...messages);
       });
     }
 
@@ -159,39 +181,52 @@ class ChatListWithMessagesState {
     messageId: string,
     text: string
   ) => {
-    const item = this.data.find((c) => c.chat.id === chatId);
+    const chatItem = this.data.find((c) => c.chat.id === chatId);
 
-    if (item === undefined) return;
+    if (!chatItem) return;
 
-    const message = item.messages.find((x) => x.id === messageId);
+    const message = chatItem.messages.find((x) => x.id === messageId);
 
-    if (message === undefined) return;
+    if (!message) return;
     message.text = text;
+    message.loading = true;
+    message.isEdit = true;
 
     const response = await MessagesApi.putUpdateMessageAsync(messageId, text);
 
-    if (
-      item.messages.length - 1 ===
-      item.messages.findIndex((x) => x.id === messageId)
-    ) {
-      item.chat.lastMessageText = text;
+    if (response.status === 200) {
+      runInAction(() => {
+        message.loading = false;
+
+        if (
+          chatItem.messages.length - 1 ===
+          chatItem.messages.findIndex((x) => x.id === messageId)
+        ) {
+          chatItem.chat.lastMessageText = text;
+        }
+      });
     }
 
     return response;
   };
 
   public delDeleteMessageAsync = async (chatId: string, messageId: string) => {
-    const item = this.data.find((c) => c.chat.id === chatId);
+    const dataItem = this.data.find((c) => c.chat.id === chatId);
 
-    if (item === undefined) return;
+    if (!dataItem) return;
 
-    console.log(item.messages.findIndex((x) => x.id === "43"));
-
-    const messageIndex = item.messages.findIndex((x) => x.id === messageId);
+    const messageIndex = dataItem.messages.findIndex((x) => x.id === messageId);
 
     if (messageIndex === -1) return;
 
-    item.messages.splice(messageIndex, 1);
+    dataItem.messages.splice(messageIndex, 1);
+
+    const lastMessageNow = dataItem?.messages[dataItem?.messages.length - 1];
+
+    dataItem.chat.lastMessageId = lastMessageNow?.id ?? null;
+    dataItem.chat.lastMessageAuthorDisplayName = lastMessageNow?.ownerDisplayName ?? null;
+    dataItem.chat.lastMessageText = lastMessageNow?.text ?? null;
+    dataItem.chat.lastMessageDateOfCreate = lastMessageNow?.dateOfCreate ?? null;
 
     const response = await MessagesApi.delDeleteMessageAsync(messageId, true);
 
@@ -203,7 +238,7 @@ class ChatListWithMessagesState {
 
     if (response.status === 200) {
       runInAction(() => {
-        this.data.push({chat: response.data, messages: []});
+        this.data.push({ chat: response.data, messages: [] });
       });
     }
 
@@ -214,12 +249,6 @@ class ChatListWithMessagesState {
     messageEntity: IMessageDto,
     files: File[]
   ) => {
-    const item = this.data.find((c) => c.chat.id === messageEntity.chatId);
-
-    if (item === undefined) return;
-
-    item.messages.push(messageEntity);
-
     const response = await MessagesApi.postCreateMessageAsync(
       messageEntity.text,
       messageEntity.chatId,
@@ -229,6 +258,14 @@ class ChatListWithMessagesState {
 
     if (response.status === 200) {
       runInAction(() => {
+        const dataItem = this.data.find(x => x.chat.id === messageEntity.chatId);
+        const messageItem = dataItem?.messages.find(x => x.id === messageEntity.id);
+
+        if (!messageItem) return;
+
+        messageItem.id = response.data.id;
+        messageItem.loading = false;
+        messageEntity.attachments = response.data.attachments;
         chatListWithMessagesState.setLastMessage(response.data);
       });
     }
@@ -250,8 +287,7 @@ class ChatListWithMessagesState {
     );
 
     runInAction(() => {
-      console.log(response.data);
-      this.data.push({ chat: response.data, messages: [] });
+      this.data.unshift({ chat: response.data, messages: [] });
     });
 
     return response;
@@ -299,7 +335,7 @@ class ChatListWithMessagesState {
       runInAction(() => {
         const item = this.data.find((c) => c.chat.id === chatId);
 
-        if (item === undefined) return;
+        if (!item) return;
 
         item.chat.avatarLink = response.data.avatarLink;
       });

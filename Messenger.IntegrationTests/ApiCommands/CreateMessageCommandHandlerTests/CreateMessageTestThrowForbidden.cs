@@ -2,7 +2,7 @@ using FluentAssertions;
 using Messenger.BusinessLogic.ApiCommands.Chats;
 using Messenger.BusinessLogic.ApiCommands.Messages;
 using Messenger.BusinessLogic.Responses;
-using Messenger.Domain.Enum;
+using Messenger.Domain.Enums;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
@@ -14,8 +14,8 @@ public class CreateMessageTestThrowForbidden : IntegrationTestBase, IIntegration
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        var bob = await MessengerModule.RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var bob = await RequestAsync(CommandHelper.RegistrationBobCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
             user21Th.Value.Id,
@@ -24,7 +24,7 @@ public class CreateMessageTestThrowForbidden : IntegrationTestBase, IIntegration
             ChatType.Conversation,
             AvatarFile: null);
 		
-        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await RequestAsync(createConversationCommand, CancellationToken.None);
         
         var createdMessageByBobCommand = new CreateMessageCommand(
             bob.Value.Id,
@@ -33,7 +33,7 @@ public class CreateMessageTestThrowForbidden : IntegrationTestBase, IIntegration
             createConversationResult.Value.Id,
             Files: null);
         
-        var createMessageByBobResult = await MessengerModule.RequestAsync(createdMessageByBobCommand, CancellationToken.None);
+        var createMessageByBobResult = await RequestAsync(createdMessageByBobCommand, CancellationToken.None);
         
         createMessageByBobResult.Error.Should().BeOfType<ForbiddenError>();
     }

@@ -14,4 +14,7 @@ export default interface IMessageDto {
     attachments: IAttachmentDto[];
     chatId: string;
     dateOfCreate: string;
+
+    loading: boolean;
+    isMessageRealtime: boolean;
 }

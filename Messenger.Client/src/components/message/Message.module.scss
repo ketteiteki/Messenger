@@ -8,7 +8,7 @@
   margin-top: 10px;
   margin-left: 10px;
 
-  &:last-child {
+  &:first-child {
     margin-bottom: 10px;
   }
 }
@@ -19,11 +19,12 @@
   border-radius: 100%;
   cursor: pointer;
   flex-shrink: 0;
+  object-fit: cover;
 }
 
 .messageData {
   font-size: 17px;
-  max-width: 320px;
+  max-width: 400px;
   min-width: 120px;
   min-height: 30px;
   margin-left: 10px;
@@ -43,6 +44,11 @@
 }
 
 .messageReplyText {
+  max-width: 200px;
+  height: 15px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   margin-left: 5px;
   font-size: 14px;
 }
@@ -54,6 +60,7 @@
 
 .text {
   font-size: 16px;
+  word-wrap: break-word;
 }
 
 .metaData {
@@ -70,7 +77,7 @@
   margin-top: 10px;
   margin-left: 10px;
 
-  &:last-child {
+  &:first-child {
     margin-bottom: 10px;
   }
 }
@@ -80,17 +87,93 @@
   height: 45px;
   border-radius: 100%;
   flex-shrink: 0;
+  object-fit: cover;
+  cursor: pointer;
 }
 
 .myMessageData {
   color: white;
-  max-width: 320px;
+  max-width: 400px;
   min-width: 120px;
   min-height: 30px;
   margin-left: 10px;
   background-color: $blue;
   border-radius: 5px;
   padding: 7px;
+}
+
+.messageAttachmentListOneAttachment {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 5px;
+  gap: 2px;
+  grid-template-columns: auto;
+  grid-template-rows: 420px;
+  grid-template-areas:
+    "block-1";
+}
+
+.messageAttachmentListTwoAttachment {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 5px;
+  gap: 2px;
+  grid-template-columns: auto;
+  grid-template-rows: 300px;
+  grid-template-areas:
+    "block-1 block-2";
+}
+
+.messageAttachmentListThreeAttachment {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 5px;
+  gap: 2px;
+  grid-template-columns: repeat(2, 150px);
+  grid-template-rows: 300px 130px;
+  grid-template-areas:
+    "block-1 block-1"
+    "block-2 block-3";
+}
+
+.messageAttachmentListFourAttachment {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 5px;
+  gap: 2px;
+  grid-template-columns: 1fr 110px;
+  grid-template-rows: repeat(3, 130px);
+  grid-template-areas:
+    "block-1 block-2"
+    "block-1 block-3"
+    "block-1 block-4";
+}
+
+.messageAttachment {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.messageAttachment:nth-child(1) {
+  grid-area: block-1;
+}
+
+.messageAttachment:nth-child(2) {
+  grid-area: block-2;
+}
+
+.messageAttachment:nth-child(3) {
+  grid-area: block-3;
+}
+
+.messageAttachment:nth-child(4) {
+  grid-area: block-4;
 }
 
 .myMessageReply {
@@ -104,6 +187,11 @@
 }
 
 .myMessageReplyText {
+  max-width: 200px;
+  height: 15px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   margin-left: 5px;
   font-size: 14px;
 }
@@ -114,6 +202,7 @@
 
 .myText {
   font-size: 16px;
+  word-wrap: break-word;
 }
 
 .myMetaData {
@@ -121,3 +210,4 @@
   text-align: right;
 }
 
+.clockSvg {}

@@ -1,12 +1,10 @@
-import { action, makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import IAuthorizationResponse from "../models/interfaces/IAuthorizationResponse";
 import AuthorizationApi from "../services/api/AuthorizationApi";
-import ProfileApi from "../services/api/ProfileApi";
-import TokenService from "../services/messenger/TokenService";
+import ProfileApi from "../services/api/ProfileAPI";
 
 class AuthorizationState {
   public data: IAuthorizationResponse | null = null;
-  public countFailRefresh: number = 0;
 
   constructor() {
     makeAutoObservable(
@@ -22,23 +20,13 @@ class AuthorizationState {
     this.data = null;
   };
 
-  public incrementCountFailRefresh = () => {
-    this.countFailRefresh++;
-  }
-
-  public resetCountFailRefresh = () => {
-    this.countFailRefresh = 0;
-  }
-
   //api
-  public getAuthorizationAsync = async (accessToken: string) => {
-    const response = await AuthorizationApi.getAuthorizationAsync(accessToken);
+  public getAuthorizationAsync = async () => {
+    const response = await AuthorizationApi.getAuthorizationAsync();
 
     if (response.status === 200) {
       runInAction(() => {
         this.data = response.data;
-        TokenService.setLocalAccessToken(response.data.accessToken!);
-        TokenService.setLocalRefreshToken(response.data.refreshToken);
       });
     }
 
@@ -59,8 +47,6 @@ class AuthorizationState {
     if (response.status === 200) {
       runInAction(() => {
         this.data = response.data;
-        TokenService.setLocalAccessToken(response.data.accessToken!);
-        TokenService.setLocalRefreshToken(response.data.refreshToken);
       });
     }
 
@@ -73,8 +59,6 @@ class AuthorizationState {
     if (response.status === 200) {
       runInAction(() => {
         this.data = response.data;
-        TokenService.setLocalAccessToken(response.data.accessToken!);
-        TokenService.setLocalRefreshToken(response.data.refreshToken);
       });
     }
 
@@ -94,9 +78,9 @@ class AuthorizationState {
 
     if (response.status === 200) {
       runInAction(() => {
-        if (this.data !== null) {
+        if (this.data) {
           this.data.displayName = response.data.displayName;
-          this.data.nickName = response.data.nickname;
+          this.data.nickname = response.data.nickname;
           this.data.bio = response.data.bio;
         }
       });
@@ -110,7 +94,7 @@ class AuthorizationState {
 
     if (response.status === 200) {
       runInAction(() => {
-        if (this.data !== null) {
+        if (this.data) {
           this.data.avatarLink = response.data.avatarLink;
         }
       });

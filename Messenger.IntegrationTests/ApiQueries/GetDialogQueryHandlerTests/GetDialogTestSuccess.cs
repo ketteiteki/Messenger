@@ -12,21 +12,21 @@ public class GetDialogTestSuccess : IntegrationTestBase, IIntegrationTest
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var alice = await RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
         var createDialogBetween21ThAndAliceCommand = new CreateDialogCommand(user21Th.Value.Id, alice.Value.Id); 
         
-        await MessengerModule.RequestAsync(createDialogBetween21ThAndAliceCommand, CancellationToken.None);
+        await RequestAsync(createDialogBetween21ThAndAliceCommand, CancellationToken.None);
 
         var getDialogBetween21ThAndAliceBy21ThQuery = new GetDialogQuery(user21Th.Value.Id, alice.Value.Id);
         var getDialogBetween21ThAndAliceByAliceQuery = new GetDialogQuery(alice.Value.Id, user21Th.Value.Id);
 
         var getDialogBetween21ThAndAliceBy21ThResult =
-            await MessengerModule.RequestAsync(getDialogBetween21ThAndAliceBy21ThQuery, CancellationToken.None);
+            await RequestAsync(getDialogBetween21ThAndAliceBy21ThQuery, CancellationToken.None);
         
         var getDialogBetween21ThAndAliceByAliceResult = 
-            await MessengerModule.RequestAsync(getDialogBetween21ThAndAliceByAliceQuery, CancellationToken.None);
+            await RequestAsync(getDialogBetween21ThAndAliceByAliceQuery, CancellationToken.None);
 
         getDialogBetween21ThAndAliceBy21ThResult.Value.Members.Count.Should().Be(2);
         getDialogBetween21ThAndAliceBy21ThResult.Value.Members

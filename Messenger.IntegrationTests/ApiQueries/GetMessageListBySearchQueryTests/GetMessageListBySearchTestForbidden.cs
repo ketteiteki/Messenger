@@ -4,7 +4,7 @@ using Messenger.BusinessLogic.ApiCommands.Conversations;
 using Messenger.BusinessLogic.ApiCommands.Messages;
 using Messenger.BusinessLogic.ApiQueries.Messages;
 using Messenger.BusinessLogic.Responses;
-using Messenger.Domain.Enum;
+using Messenger.Domain.Enums;
 using Messenger.IntegrationTests.Abstraction;
 using Messenger.IntegrationTests.Helpers;
 using Xunit;
@@ -16,8 +16,8 @@ public class GetMessageListBySearchTestForbidden : IntegrationTestBase, IIntegra
     [Fact]
     public async Task Test()
     {
-        var user21Th = await MessengerModule.RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
-        var alice = await MessengerModule.RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
+        var user21Th = await RequestAsync(CommandHelper.Registration21ThCommand(), CancellationToken.None);
+        var alice = await RequestAsync(CommandHelper.RegistrationAliceCommand(), CancellationToken.None);
 
         var createConversationCommand = new CreateChatCommand(
             user21Th.Value.Id,
@@ -26,11 +26,11 @@ public class GetMessageListBySearchTestForbidden : IntegrationTestBase, IIntegra
             ChatType.Conversation,
             AvatarFile: null);
         
-        var createConversationResult = await MessengerModule.RequestAsync(createConversationCommand, CancellationToken.None);
+        var createConversationResult = await RequestAsync(createConversationCommand, CancellationToken.None);
 
         var aliceJoinConversationCommand = new JoinToChatCommand(alice.Value.Id, createConversationResult.Value.Id);
         
-        await MessengerModule.RequestAsync(aliceJoinConversationCommand, CancellationToken.None);
+        await RequestAsync(aliceJoinConversationCommand, CancellationToken.None);
 
         var banAliceInConversationBy21ThCommand = new BanUserInConversationCommand(
             user21Th.Value.Id,
@@ -38,7 +38,7 @@ public class GetMessageListBySearchTestForbidden : IntegrationTestBase, IIntegra
             alice.Value.Id,
             BanMinutes: 15); 
         
-        await MessengerModule.RequestAsync(banAliceInConversationBy21ThCommand, CancellationToken.None);
+        await RequestAsync(banAliceInConversationBy21ThCommand, CancellationToken.None);
 
         var createMessageBy21ThCommand = new CreateMessageCommand(
             user21Th.Value.Id,
@@ -47,7 +47,7 @@ public class GetMessageListBySearchTestForbidden : IntegrationTestBase, IIntegra
             createConversationResult.Value.Id,
             Files: null);
         
-        await MessengerModule.RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
+        await RequestAsync(createMessageBy21ThCommand, CancellationToken.None);
 
         var getMessageListBySearchByAliceQuery = new GetMessageListBySearchQuery(
             alice.Value.Id,
@@ -57,7 +57,7 @@ public class GetMessageListBySearchTestForbidden : IntegrationTestBase, IIntegra
             createMessageBy21ThCommand.Text);
         
         var getMessageListByAliceResult = 
-            await MessengerModule.RequestAsync(getMessageListBySearchByAliceQuery, CancellationToken.None);
+            await RequestAsync(getMessageListBySearchByAliceQuery, CancellationToken.None);
 
         getMessageListByAliceResult.Error.Should().BeOfType<ForbiddenError>();
     }

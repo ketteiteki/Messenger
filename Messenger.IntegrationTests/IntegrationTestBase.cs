@@ -1,9 +1,8 @@
+using MediatR;
 using Messenger.Application.Interfaces;
-using Messenger.Application.Services;
 using Messenger.Domain.Constants;
-using Messenger.Infrastructure;
-using Messenger.Infrastructure.Configuration;
-using Messenger.Services;
+using Messenger.IntegrationTests.Configuration;
+using Messenger.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,50 +13,53 @@ namespace Messenger.IntegrationTests;
 [Collection("Sequential")]
 public class IntegrationTestBase : IAsyncLifetime
 {
-	private DatabaseContext DatabaseContextFixture { get; }
-	
-	protected MessengerModule MessengerModule { get; }
+	protected DatabaseContext DatabaseContextFixture { get; }
 	
 	private IServiceProvider ServiceProvider { get; }
-
-	protected readonly IBaseDirService BaseDirService = new BaseDirService();
 
 	protected readonly IBlobService BlobService;
 	
 	protected IntegrationTestBase()
 	{
-		var pathAppSettingsDevelopment = BaseDirService.GetPathAppSettingsJson(isDevelopment: true);
-
 		var configuration = new ConfigurationBuilder()
-			.AddJsonFile(pathAppSettingsDevelopment)
+			.SetBasePath(Directory.GetCurrentDirectory())
+			.AddJsonFile("appsettings.json")
 			.Build();
 
 		var databaseConnectionString = configuration[AppSettingConstants.DatabaseConnectionStringForIntegrationTests];
-		var signKey = configuration[AppSettingConstants.MessengerJwtSettingsSecretAccessTokenKey];
 		
 		var messengerBlobContainerName = configuration[AppSettingConstants.BlobContainer];
 		var messengerBlobAccess = configuration[AppSettingConstants.BlobAccess];
 		var messengerBlobUrl = configuration[AppSettingConstants.BlobUrl];
 
-		MessengerStartup.Initialize(
+		var serviceProvider = MessengerStartup.Initialize(
 			configuration,
 			databaseConnectionString,
-			signKey,
 			messengerBlobContainerName,
 			messengerBlobAccess,
 			messengerBlobUrl);
 
-		ServiceProvider = MessengerCompositionRoot.Provider;
-
-		MessengerModule = new MessengerModule();
+		ServiceProvider = serviceProvider;
 		
 		DatabaseContextFixture = ServiceProvider.GetRequiredService<DatabaseContext>() ??
 		                         throw new InvalidOperationException("DatabaseContext service is not registered in the DI.");
 
 		BlobService = ServiceProvider.GetRequiredService<IBlobService>() ??
-		              throw new InvalidOperationException("BlobService is not registered in the DI.");;
+		              throw new InvalidOperationException("BlobService is not registered in the DI.");
 	}
 
+	protected async Task<TResult> RequestAsync<TResult>(IRequest<TResult> request, CancellationToken cancellationToken)
+	{
+		if (ServiceProvider == null)
+		{
+			throw new Exception("ServiceProvider is null");
+		}
+		
+		var mediator = ServiceProvider.GetRequiredService<IMediator>();
+
+		return await mediator.Send(request, cancellationToken);
+	}
+	
 	public async Task InitializeAsync()
 	{
 		await DatabaseContextFixture.Database.MigrateAsync();

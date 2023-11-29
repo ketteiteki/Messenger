@@ -4,8 +4,8 @@ using Messenger.BusinessLogic.Hubs;
 using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Responses;
 using Messenger.Domain.Entities;
-using Messenger.Domain.Enum;
-using Messenger.Services;
+using Messenger.Domain.Enums;
+using Messenger.Persistence;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,7 +43,7 @@ public class CreateMessageCommandHandler : IRequestHandler<CreateMessageCommand,
 
 		var isRequesterOwner = chatUser.Chat.OwnerId == request.RequesterId;
 
-		if (chatUser.Chat.Type == ChatType.Channel && isRequesterOwner)
+		if (chatUser.Chat.Type == ChatType.Channel && !isRequesterOwner)
 		{
 			return new Result<MessageDto>(new ForbiddenError("Only the owner can send messages to the channel"));
 		}

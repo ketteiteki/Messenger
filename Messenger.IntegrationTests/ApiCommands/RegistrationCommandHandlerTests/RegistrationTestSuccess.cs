@@ -13,12 +13,10 @@ public class RegistrationTestSuccess : IntegrationTestBase
 		var registrationCommand = new RegistrationCommand(
 			CommandHelper.Registration21ThCommand().DisplayName,
 			CommandHelper.Registration21ThCommand().Nickname,
-			CommandHelper.Registration21ThCommand().Password,
-			UserAgent: "Mozilla",
-			Ip: "323.432.21.542");
-
-		var registrationResult = await MessengerModule.RequestAsync(registrationCommand, CancellationToken.None);
-
+			CommandHelper.Registration21ThCommand().Password);
+		
+		var registrationResult = await RequestAsync(registrationCommand, CancellationToken.None);
+		
 		registrationResult.IsSuccess.Should().BeTrue();
 	}
 }

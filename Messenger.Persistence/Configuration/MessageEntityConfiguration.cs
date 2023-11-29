@@ -3,7 +3,7 @@ using Messenger.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Messenger.Services.Configuration;
+namespace Messenger.Persistence.Configuration;
 
 public class MessageEntityConfiguration : IEntityTypeConfiguration<MessageEntity>
 {
@@ -11,7 +11,7 @@ public class MessageEntityConfiguration : IEntityTypeConfiguration<MessageEntity
 	{
 		builder
 			.HasOne(m => m.ReplyToMessage)
-			.WithOne()
+			.WithMany()
 			.OnDelete(DeleteBehavior.SetNull);
 		
 		builder

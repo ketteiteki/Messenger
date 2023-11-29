@@ -1,10 +1,10 @@
 using Messenger.Domain.Constants;
 using Messenger.Domain.Entities;
-using Messenger.Domain.Enum;
+using Messenger.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Messenger.Services.Configuration;
+namespace Messenger.Persistence.Configuration;
 
 public class ChatEntityConfiguration : IEntityTypeConfiguration<ChatEntity>
 {
@@ -33,7 +33,7 @@ public class ChatEntityConfiguration : IEntityTypeConfiguration<ChatEntity>
 			name: "DotNetRuChat",
 			type: ChatType.Conversation,
 			ownerId: SeedDataConstants.KaminomeUserId,
-			avatarFileName: null,
+			avatarFileName: "dotnetchat.jpg",
 			lastMessageId: null)
 		{
 			Id = SeedDataConstants.DotnetChatId
@@ -44,7 +44,7 @@ public class ChatEntityConfiguration : IEntityTypeConfiguration<ChatEntity>
 			name: "dotnettalks",
 			type: ChatType.Conversation,
 			ownerId: SeedDataConstants.AliceUserId,
-			avatarFileName: null,
+			avatarFileName: "dotnettalkschat.jpg",
 			lastMessageId: null)
 		{
 			Id = SeedDataConstants.DotnetFloodChatId

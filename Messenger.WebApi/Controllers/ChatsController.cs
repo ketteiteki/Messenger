@@ -5,7 +5,8 @@ using Messenger.BusinessLogic.Models;
 using Messenger.BusinessLogic.Models.Requests;
 using Messenger.BusinessLogic.Responses.Abstractions;
 using Messenger.Domain.Constants;
-using Messenger.Domain.Enum;
+using Messenger.Domain.Enums;
+using Messenger.WebApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,9 +15,14 @@ namespace Messenger.WebApi.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 [ApiController]
-public class ChatsController : ApiControllerBase
+public class ChatsController : ControllerBase
 {
-	public ChatsController(IMediator mediator) : base(mediator) {}
+	private readonly IMediator _mediator;
+	
+	public ChatsController(IMediator mediator)
+	{
+		_mediator = mediator;
+	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
 	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
@@ -26,11 +32,11 @@ public class ChatsController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
-		var query = new GetChatQuery(
-			RequesterId: requesterId,
-			ChatId: chatId);
+		var query = new GetChatQuery(requesterId, chatId);
 
-		return await RequestAsync(query, cancellationToken);
+		var result = await _mediator.Send(query, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(List<ChatDto>), StatusCodes.Status200OK)]
@@ -39,10 +45,11 @@ public class ChatsController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
-		var query = new GetChatListQuery(
-			RequesterId: requesterId);
+		var query = new GetChatListQuery(requesterId);
 
-		return await RequestAsync(query, cancellationToken);
+		var result = await _mediator.Send(query, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(List<ChatDto>), StatusCodes.Status200OK)]
@@ -53,11 +60,11 @@ public class ChatsController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
-		var query = new GetChatListBySearchQuery(
-			RequesterId: requesterId,
-			SearchText: searchText);
+		var query = new GetChatListBySearchQuery(requesterId, searchText);
 
-		return await RequestAsync(query, cancellationToken);
+		var result = await _mediator.Send(query, cancellationToken);
+		
+		return result.ToActionResult();		
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
@@ -70,11 +77,11 @@ public class ChatsController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
-		var command = new JoinToChatCommand(
-			RequesterId: requesterId,
-			ChatId: chatId);
+		var command = new JoinToChatCommand(requesterId, chatId);
 
-		return await RequestAsync(command, cancellationToken);
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
@@ -87,29 +94,33 @@ public class ChatsController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
-		var command = new LeaveFromChatCommand(
-			RequesterId: requesterId,
-			ChatId: chatId);
+		var command = new LeaveFromChatCommand(requesterId, chatId);
 
-		return await RequestAsync(command, cancellationToken);
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
 	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
 	[HttpPost("createChat")]
-	public async Task<IActionResult> CreateChat([FromForm] CreateChatRequest request, CancellationToken cancellationToken)
+	public async Task<IActionResult> CreateChat(
+		[FromForm] CreateChatRequest request, 
+		CancellationToken cancellationToken)
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
 		var command = new CreateChatCommand(
-			RequesterId: requesterId,
-			Name: request.Name,
-			Title: request.Title,
-			Type: (ChatType)request.Type,
-			AvatarFile: request.AvatarFile);
+			requesterId, 
+			request.Name, 
+			request.Title,
+			(ChatType)request.Type,
+			request.AvatarFile);
 
-		return await RequestAsync(command, cancellationToken);
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status409Conflict)]
@@ -118,17 +129,17 @@ public class ChatsController : ApiControllerBase
 	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
 	[HttpPut("updateChatData")]
-	public async Task<IActionResult> UpdateChatData([FromBody] UpdateChatDataRequest request, CancellationToken cancellationToken)
+	public async Task<IActionResult> UpdateChatData(
+		[FromBody] UpdateChatDataRequest request, 
+		CancellationToken cancellationToken)
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
-		var command = new UpdateChatDataCommand(
-			RequesterId: requesterId,
-			ChatId: request.ChatId,
-			Name: request.Name,
-			Title: request.Title);
+		var command = new UpdateChatDataCommand(requesterId, request.ChatId, request.Name, request.Title);
 
-		return await RequestAsync(command, cancellationToken);
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
@@ -136,16 +147,17 @@ public class ChatsController : ApiControllerBase
 	[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ChatDto), StatusCodes.Status200OK)]
 	[HttpPut("updateChatAvatar")]
-	public async Task<IActionResult> UpdateChatAvatar([FromForm] UpdateChatAvatarRequest request, CancellationToken cancellationToken)
+	public async Task<IActionResult> UpdateChatAvatar(
+		[FromForm] UpdateChatAvatarRequest request, 
+		CancellationToken cancellationToken)
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
-		var command = new UpdateChatAvatarCommand(
-			RequesterId: requesterId,
-			ChatId: request.ChatId,
-			AvatarFile: request.AvatarFile);
+		var command = new UpdateChatAvatarCommand(requesterId, request.ChatId, request.AvatarFile);
 
-		return await RequestAsync(command, cancellationToken);
+		var result = await _mediator.Send(command, cancellationToken);
+		
+		return result.ToActionResult();
 	}
 	
 	[ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
@@ -157,10 +169,10 @@ public class ChatsController : ApiControllerBase
 	{
 		var requesterId = new Guid(HttpContext.User.Claims.First(c => c.Type == ClaimConstants.Id).Value);
 		
-		var command = new DeleteChatCommand(
-			RequesterId: requesterId,
-			ChatId: chatId);
+		var command = new DeleteChatCommand(requesterId, chatId);
 
-		return await RequestAsync(command, cancellationToken);
+		var result = await _mediator.Send(command, cancellationToken);
+
+		return result.ToActionResult();
 	}
 }
