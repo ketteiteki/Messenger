@@ -1,11 +1,21 @@
-# Messenger
+<p align="center">
+  <img src="./img/logo.png" width="150" height="150"  alt="Messenger Logo"/>
+</p>
+
+<div align="center">
+  <h1>Messenger</h1>
+</div>
+
+The project is a messenger application allowing users to exchange messages in real-time. 
+Within the app, users can create private dialogs, group chats, and channels for mass broadcasting. 
+Additionally, the application supports sending photos in chats, enabling users to share images.
 
 [![Run Build and Test](https://github.com/Ketteiteki/Messenger/actions/workflows/run-build-and-test.yml/badge.svg)](https://github.com/Ketteiteki/Messenger/actions/workflows/run-build-and-test.yml)
 
 ### To run docker container
     - `docker run --name "messenger-pgsql-db" -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:latest`
 
-### [Demo Video](https://youtu.be/3SgCwOaLhUg)
+- **Video**: https://youtu.be/3SgCwOaLhUg
 
 ## How to build project
 
